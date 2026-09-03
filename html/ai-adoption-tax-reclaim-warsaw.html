@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Adoption — Tax Reclaim Warsaw</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800;900&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy-950:#070b16;
+    --navy-900:#0a0e1c;
+    --navy-800:#111a30;
+    --navy-700:#1a2544;
+    --line:rgba(154,168,214,0.14);
+    --line-strong:rgba(154,168,214,0.26);
+    --citi-blue:#3b6bd6;
+    --citi-blue-deep:#0c3fa8;
+    --citi-red:#e21836;
+    --amber:#d9a441;
+    --amber-soft:#f0c477;
+    --mint:#34b378;
+    --ink:#eef0fa;
+    --ink-dim:#aab2cf;
+    --ink-faint:#6b7396;
+    --mono:'IBM Plex Mono', ui-monospace, monospace;
+    --sans:'IBM Plex Sans', -apple-system, sans-serif;
+    --disp:'Big Shoulders Display', 'Arial Narrow', sans-serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{background:var(--navy-950); scroll-behavior:smooth;}
+  body{
+    background:var(--navy-950); color:var(--ink); font-family:var(--sans);
+    line-height:1.55; overflow-x:hidden; position:relative;
+  }
+  @media (prefers-reduced-motion: reduce){ *{animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; scroll-behavior:auto !important;} }
+
+  /* ambient board texture */
+  body::before{
+    content:''; position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size:64px 64px;
+    -webkit-mask-image:radial-gradient(ellipse 80% 60% at 50% 0%, #000 0%, transparent 72%);
+            mask-image:radial-gradient(ellipse 80% 60% at 50% 0%, #000 0%, transparent 72%);
+    opacity:0.5;
+  }
+  body::after{
+    content:''; position:fixed; inset:0; z-index:0; pointer-events:none;
+    background:radial-gradient(700px 420px at 18% -6%, rgba(59,107,214,0.22), transparent 60%),
+               radial-gradient(560px 380px at 88% 8%, rgba(226,24,54,0.10), transparent 62%);
+  }
+  section, header, footer{position:relative; z-index:1;}
+  .wrap{max-width:1080px; margin:0 auto; padding:0 28px;}
+  svg.icon{width:16px; height:16px; stroke-width:2;}
+
+  .reveal{opacity:0; transform:translateY(18px); transition:opacity .7s cubic-bezier(.2,.7,.2,1), transform .7s cubic-bezier(.2,.7,.2,1);}
+  .reveal.in{opacity:1; transform:translateY(0);}
+
+  /* ===== TICKER STRIP ===== */
+  .ticker{
+    background:var(--navy-900); border-bottom:1px solid var(--line);
+    overflow:hidden; white-space:nowrap; padding:9px 0;
+  }
+  .ticker-track{display:inline-flex; gap:0; animation:ticker 34s linear infinite;}
+  .ticker-item{
+    font-family:var(--mono); font-size:11.5px; letter-spacing:0.4px; color:var(--ink-dim);
+    padding:0 26px; display:inline-flex; align-items:center; gap:10px; flex-shrink:0;
+  }
+  .ticker-item b{color:var(--amber-soft); font-weight:600;}
+  .ticker-item .sep{color:var(--ink-faint);}
+  @keyframes ticker{ from{transform:translateX(0);} to{transform:translateX(-50%);} }
+
+  /* ===== HEADER / HERO ===== */
+  .board-head{padding:78px 0 46px; border-bottom:1px solid var(--line);}
+  .brand-row{display:flex; align-items:center; justify-content:space-between; margin-bottom:56px; flex-wrap:wrap; gap:16px;}
+  .citi-mark{display:flex; align-items:center; gap:10px;}
+  .citi-mark svg{width:74px; height:22px;}
+  .brand-meta{font-family:var(--mono); font-size:11px; color:var(--ink-faint); letter-spacing:0.5px; text-align:right;}
+  .brand-meta .live{display:inline-flex; align-items:center; gap:6px; color:var(--mint); font-weight:600;}
+  .led{width:6px; height:6px; border-radius:50%; background:var(--mint); box-shadow:0 0 0 0 rgba(52,179,120,0.6); animation:pulse 1.8s ease-out infinite;}
+  @keyframes pulse{ 0%{box-shadow:0 0 0 0 rgba(52,179,120,0.55);} 70%{box-shadow:0 0 0 7px rgba(52,179,120,0);} 100%{box-shadow:0 0 0 0 rgba(52,179,120,0);} }
+
+  .flap-line{overflow:hidden;}
+  .flap-line span{display:block; transform:translateY(115%); animation:flap .7s cubic-bezier(.2,.9,.25,1) forwards;}
+  .flap-line:nth-child(1) span{animation-delay:.05s;}
+  .flap-line:nth-child(2) span{animation-delay:.18s;}
+  @keyframes flap{ to{transform:translateY(0);} }
+
+  h1.title{
+    font-family:var(--disp); font-weight:800; letter-spacing:-0.5px; line-height:0.94;
+    font-size:clamp(42px,7vw,84px); text-transform:uppercase; text-wrap:balance;
+  }
+  h1.title .accent{color:var(--amber-soft);}
+  .subhead{margin-top:26px; max-width:600px; color:var(--ink-dim); font-size:16.5px;}
+  .subhead b{color:var(--ink); font-weight:600;}
+
+  .meta-row{display:flex; gap:28px; margin-top:40px; flex-wrap:wrap;}
+  .meta-cell{border-left:2px solid var(--citi-blue); padding-left:14px;}
+  .meta-cell .k{font-family:var(--mono); font-size:10.5px; letter-spacing:0.6px; color:var(--ink-faint); text-transform:uppercase;}
+  .meta-cell .v{font-family:var(--mono); font-size:15px; color:var(--ink); font-weight:600; margin-top:3px;}
+
+  .cta-row{margin-top:44px; display:flex; gap:14px; flex-wrap:wrap;}
+  .cta{
+    display:inline-flex; align-items:center; gap:9px;
+    background:var(--citi-blue-deep); border:1px solid var(--citi-blue);
+    padding:14px 24px; font-family:var(--mono); font-size:13px; font-weight:600; letter-spacing:0.3px;
+    color:#fff; text-decoration:none; cursor:pointer; text-transform:uppercase;
+  }
+  .cta.ghost{background:transparent; border-color:var(--line-strong); color:var(--ink-dim);}
+  .cta svg{width:14px; height:14px;}
+
+  /* ===== SECTION LABEL ===== */
+  .sec-label{
+    display:flex; align-items:center; gap:12px; margin-bottom:8px;
+    font-family:var(--mono); font-size:11.5px; letter-spacing:1.2px; color:var(--amber-soft); font-weight:600; text-transform:uppercase;
+  }
+  .sec-label .n{color:var(--ink-faint);}
+  h2.sec-title{
+    font-family:var(--disp); font-weight:800; text-transform:uppercase; letter-spacing:-0.3px;
+    font-size:clamp(28px,4vw,42px); margin-bottom:12px; text-wrap:balance;
+  }
+  .sec-desc{color:var(--ink-dim); max-width:560px; font-size:15.5px; margin-bottom:44px;}
+
+  /* ===== BOARD (schedule rows) ===== */
+  .board{border-top:1px solid var(--line-strong); margin-bottom:96px;}
+  .board-row{
+    display:grid; grid-template-columns:64px 128px 1fr 150px; align-items:center; gap:20px;
+    padding:20px 4px; border-bottom:1px solid var(--line); cursor:default;
+  }
+  .board-row .wk{font-family:var(--disp); font-size:30px; font-weight:800; color:var(--ink-faint);}
+  .board-row.current .wk{color:var(--amber-soft);}
+  .board-row .date{font-family:var(--mono); font-size:13px; color:var(--ink-dim);}
+  .board-row .topic{font-size:16.5px; font-weight:600; color:var(--ink);}
+  .board-row .stat{
+    justify-self:end; font-family:var(--mono); font-size:11px; letter-spacing:0.4px; font-weight:600;
+    display:flex; align-items:center; gap:7px; text-transform:uppercase; color:var(--ink-faint);
+  }
+  .board-row.current .stat{color:var(--mint);}
+  .board-head-row{
+    display:grid; grid-template-columns:64px 128px 1fr 150px; gap:20px; padding:0 4px 10px;
+    font-family:var(--mono); font-size:10.5px; letter-spacing:0.6px; color:var(--ink-faint); text-transform:uppercase;
+  }
+  .board-head-row .r{justify-self:end;}
+
+  /* ===== FEATURE ROW (skills) ===== */
+  .skill-strip{display:grid; grid-template-columns:repeat(4,1fr); border:1px solid var(--line); margin-bottom:96px;}
+  .skill-cell{padding:26px 22px; border-right:1px solid var(--line);}
+  .skill-cell:last-child{border-right:none;}
+  .skill-num{font-family:var(--mono); font-size:11px; color:var(--amber-soft); margin-bottom:12px;}
+  .skill-title{font-weight:600; font-size:14.5px; margin-bottom:6px;}
+  .skill-desc{color:var(--ink-faint); font-size:12.5px;}
+
+  /* ===== WEEK STUB CARDS ===== */
+  .weeks{padding-bottom:20px;}
+  .stub{
+    display:grid; grid-template-columns:120px 1fr; border:1px solid var(--line-strong); margin-bottom:40px;
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+  }
+  .stub-spine{
+    background:var(--navy-800); border-right:1px dashed var(--line-strong); padding:26px 18px;
+    display:flex; flex-direction:column; justify-content:space-between;
+  }
+  .stub-spine .wk{font-family:var(--disp); font-size:44px; font-weight:800; line-height:0.9;}
+  .stub-spine .code{font-family:var(--mono); font-size:10.5px; color:var(--ink-faint); writing-mode:vertical-rl; text-orientation:mixed; letter-spacing:1px;}
+  .stub-body{padding:30px 34px;}
+  .stub-tag{font-family:var(--mono); font-size:11.5px; color:var(--ink-faint); letter-spacing:0.4px; margin-bottom:8px;}
+  .stub-title{font-family:var(--disp); font-size:30px; font-weight:700; text-transform:uppercase; margin-bottom:14px; letter-spacing:-0.2px;}
+  .stub-body p.body{color:var(--ink-dim); font-size:14.5px; max-width:600px; margin-bottom:18px;}
+  .stub-list{list-style:none; max-width:600px; margin-bottom:20px;}
+  .stub-list li{display:flex; align-items:flex-start; gap:9px; margin-bottom:9px; color:var(--ink); font-size:14px;}
+  .stub-list li svg{width:14px; height:14px; margin-top:3px; flex-shrink:0; color:var(--amber-soft);}
+  .stub-note{
+    display:inline-flex; align-items:center; gap:8px; padding:9px 14px; font-family:var(--mono); font-size:11.5px;
+    color:var(--amber-soft); border:1px solid rgba(217,164,65,0.35); background:rgba(217,164,65,0.06);
+  }
+  .stub-note.alert{color:var(--citi-red); border-color:rgba(226,24,54,0.35); background:rgba(226,24,54,0.06);}
+
+  .readout{border:1px solid var(--line); background:var(--navy-900); margin-top:22px;}
+  .readout-bar{display:flex; align-items:center; gap:8px; padding:8px 14px; border-bottom:1px solid var(--line); font-family:var(--mono); font-size:10.5px; color:var(--ink-faint); letter-spacing:0.4px;}
+  .readout-bar .led{background:var(--mint);}
+  .readout-body{padding:18px;}
+  .rd-chat{display:flex; flex-direction:column; gap:10px;}
+  .rd-bubble{max-width:80%; padding:10px 14px; font-size:12.5px; font-family:var(--mono);}
+  .rd-bubble.u{align-self:flex-end; background:rgba(59,107,214,0.18); border:1px solid rgba(59,107,214,0.3); color:var(--ink);}
+  .rd-bubble.a{align-self:flex-start; background:var(--navy-800); border:1px solid var(--line); color:var(--ink-dim);}
+  .rd-stats{display:grid; grid-template-columns:repeat(3,1fr); gap:12px;}
+  .rd-stat{border:1px solid var(--line); padding:14px; text-align:left;}
+  .rd-stat .n{font-family:var(--mono); font-size:22px; font-weight:600; color:var(--amber-soft); font-variant-numeric:tabular-nums;}
+  .rd-stat .l{font-size:10px; color:var(--ink-faint); margin-top:4px; letter-spacing:0.3px;}
+  .rd-spa{display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;}
+  .rd-spa .c{border:1px solid var(--line); padding:12px; font-family:var(--mono); font-size:11px; color:var(--ink-faint);}
+  .rd-spa .bar{height:5px; background:linear-gradient(90deg,var(--citi-blue),var(--amber)); margin-top:9px;}
+  .rd-spa .bar.b2{width:66%;} .rd-spa .bar.b3{width:38%;}
+
+  /* ===== JOIN ===== */
+  .join{padding:110px 0 90px; border-top:1px solid var(--line);}
+  .join-grid{display:grid; grid-template-columns:1.1fr 0.9fr; gap:0; border:1px solid var(--line-strong); margin-top:44px;}
+  .join-info{padding:38px; border-right:1px dashed var(--line-strong);}
+  .join-field{padding:16px 0; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:14px;}
+  .join-field:last-child{border-bottom:none;}
+  .join-field svg{color:var(--amber-soft); width:18px; height:18px; flex-shrink:0;}
+  .join-field .k{font-family:var(--mono); font-size:10px; color:var(--ink-faint); letter-spacing:0.5px; text-transform:uppercase;}
+  .join-field .v{font-size:14.5px; font-weight:600; color:var(--ink); margin-top:2px;}
+  .join-cta-panel{padding:38px; display:flex; flex-direction:column; justify-content:center; gap:16px; background:var(--navy-900);}
+  .join-cta-panel .stub-title{font-size:26px; margin-bottom:0;}
+  .join-cta-panel p{color:var(--ink-dim); font-size:13.5px;}
+  .join-cta-panel .cta{justify-content:center; width:100%;}
+  .join-host{font-family:var(--mono); font-size:11.5px; color:var(--ink-faint); text-align:center;}
+
+  footer{padding:60px 28px; text-align:center; border-top:1px solid var(--line);}
+  .foot-mark{display:flex; justify-content:center; margin-bottom:16px;}
+  .foot-mark svg{width:64px; height:19px;}
+  .footer-tag{font-family:var(--disp); font-size:20px; font-weight:700; text-transform:uppercase; color:var(--ink); margin-bottom:6px;}
+  .footer-sub{font-family:var(--mono); font-size:11px; color:var(--ink-faint);}
+
+  @media (max-width:760px){
+    .board-row, .board-head-row{grid-template-columns:40px 1fr; }
+    .board-row .date, .board-head-row .d{display:none;}
+    .board-row .stat{justify-self:start; grid-column:2;}
+    .skill-strip{grid-template-columns:1fr 1fr;}
+    .skill-cell:nth-child(2n){border-right:none;}
+    .skill-cell:nth-child(n+3){border-top:1px solid var(--line);}
+    .stub{grid-template-columns:1fr;}
+    .stub-spine{flex-direction:row; align-items:center; border-right:none; border-bottom:1px dashed var(--line-strong);}
+    .stub-spine .code{writing-mode:horizontal-tb;}
+    .join-grid{grid-template-columns:1fr;}
+    .join-info{border-right:none; border-bottom:1px dashed var(--line-strong);}
+    .rd-spa,.rd-stats{grid-template-columns:1fr 1fr;}
+  }
+</style>
+</head>
+<body>
+
+<div class="ticker">
+  <div class="ticker-track" id="ticker-track"></div>
+</div>
+
+<header class="board-head">
+  <div class="wrap">
+    <div class="brand-row">
+      <div class="citi-mark">
+        <svg viewBox="0 0 200 56" xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 44 C 26 6, 174 6, 194 44" stroke="#e21836" stroke-width="9" fill="none" stroke-linecap="round"/>
+          <text x="100" y="46" text-anchor="middle" font-family="IBM Plex Sans" font-weight="700" font-size="38" fill="#eef0fa">citi</text>
+        </svg>
+      </div>
+      <div class="brand-meta">
+        <div class="live"><span class="led"></span>SESSION BOARD — LIVE</div>
+        TAX RECLAIM WARSAW · HOSTED BY TOMASZ PERKOWSKI
+      </div>
+    </div>
+
+    <h1 class="title">
+      <div class="flap-line"><span>Connect, learn</span></div>
+      <div class="flap-line"><span><span class="accent">and grow</span> with Citi AI</span></div>
+    </h1>
+    <p class="subhead">A weekly, <b>45-minute</b> hands-on training series in the <b>Sudety Meeting Room</b>, showing how to use Citi's AI tools like Stylus to build dashboards, everyday work tools, and presentations — and where AI truly adds value.</p>
+
+    <div class="meta-row">
+      <div class="meta-cell"><div class="k">Runs</div><div class="v">09 SEP – 07 OCT</div></div>
+      <div class="meta-cell"><div class="k">Cadence</div><div class="v">EVERY WED · 5 SLOTS</div></div>
+      <div class="meta-cell"><div class="k">Location</div><div class="v">SUDETY RM, FL 4</div></div>
+      <div class="meta-cell"><div class="k">Credit</div><div class="v">3H / QUARTER</div></div>
+    </div>
+
+    <div class="cta-row">
+      <a href="#board" class="cta">View the 5-Week Board <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg></a>
+      <a href="ai-adoption-portal.html" class="cta ghost">Book a Slot <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>
+    </div>
+  </div>
+</header>
+
+<section id="board" style="padding-top:90px;">
+  <div class="wrap">
+    <div class="sec-label"><span class="n">01</span> PROGRAM OVERVIEW</div>
+    <h2 class="sec-title">The 5-Week Board</h2>
+    <p class="sec-desc">One topic per week. Every session is practical, live, and built around real Tax Reclaim Warsaw use cases.</p>
+
+    <div class="board reveal">
+      <div class="board-head-row"><span>WK</span><span class="d">DATE</span><span>TOPIC</span><span class="r">STATUS</span></div>
+      <div class="board-row current"><span class="wk">01</span><span class="date">09 SEP</span><span class="topic">AI Tools 101 &amp; Using AI Safely</span><span class="stat"><span class="led"></span>NEXT UP</span></div>
+      <div class="board-row"><span class="wk">02</span><span class="date">16 SEP</span><span class="topic">Building Tools with AI</span><span class="stat">SCHEDULED</span></div>
+      <div class="board-row"><span class="wk">03</span><span class="date">23 SEP</span><span class="topic">Copilot in Office</span><span class="stat">SCHEDULED</span></div>
+      <div class="board-row"><span class="wk">04</span><span class="date">30 SEP</span><span class="topic">Exploring Data Visualization</span><span class="stat">SCHEDULED</span></div>
+      <div class="board-row"><span class="wk">05</span><span class="date">07 OCT</span><span class="topic">AI in Practice — Labs</span><span class="stat">SCHEDULED</span></div>
+    </div>
+
+    <div class="skill-strip reveal">
+      <div class="skill-cell"><div class="skill-num">A</div><div class="skill-title">How the models work</div><div class="skill-desc">Capabilities &amp; limits, explained simply.</div></div>
+      <div class="skill-cell"><div class="skill-num">B</div><div class="skill-title">Prompting fundamentals</div><div class="skill-desc">Getting reliable, useful results.</div></div>
+      <div class="skill-cell"><div class="skill-num">C</div><div class="skill-title">Integrations</div><div class="skill-desc">Connecting AI to daily tasks.</div></div>
+      <div class="skill-cell"><div class="skill-num">D</div><div class="skill-title">Safety &amp; guardrails</div><div class="skill-desc">Attestation and data classification.</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="weeks">
+  <div class="wrap">
+    <div class="sec-label"><span class="n">02</span> SESSION DETAIL</div>
+    <h2 class="sec-title">Five Sessions, One Skill Set</h2>
+    <p class="sec-desc">Each week builds on the last — from safe everyday use to shipping a working prototype.</p>
+
+    <div class="stub reveal">
+      <div class="stub-spine"><span class="wk">01</span><span class="code">TRW·W1·09SEP</span></div>
+      <div class="stub-body">
+        <div class="stub-tag">WEEK 1 · 9 SEP 2026</div>
+        <div class="stub-title">AI Tools 101 &amp; Using AI Safely</div>
+        <p class="body">A foundational walkthrough of Citi's AI toolset — and because there is no responsible use of AI without safety, this session covers both from day one.</p>
+        <ul class="stub-list">
+          <li><svg data-lucide="check"></svg>How Citi AI tools (incl. Stylus) actually work</li>
+          <li><svg data-lucide="check"></svg>Prompting fundamentals for reliable results</li>
+          <li><svg data-lucide="check"></svg>Integrations: connecting AI to your everyday tasks</li>
+          <li><svg data-lucide="check"></svg>AI attestation, data classification, and guardrails</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="stub reveal">
+      <div class="stub-spine"><span class="wk">02</span><span class="code">TRW·W2·16SEP</span></div>
+      <div class="stub-body">
+        <div class="stub-tag">WEEK 2 · 16 SEP 2026</div>
+        <div class="stub-title">Building Tools with AI</div>
+        <p class="body">A live, hands-on case study: generating a working single-page application (SPA) that automates a repetitive task — from idea to functioning tool in minutes, the same way the team's own Tax Reclaim MIS Dashboard was built.</p>
+        <ul class="stub-list">
+          <li><svg data-lucide="check"></svg>How to design a useful, everyday work tool</li>
+          <li><svg data-lucide="check"></svg>Live build: generating an SPA for a repetitive task</li>
+          <li><svg data-lucide="check"></svg>From prompt to working prototype — no IT ticket needed</li>
+        </ul>
+        <div class="readout">
+          <div class="readout-bar"><span class="led"></span>GENERATED-SPA.HTML</div>
+          <div class="readout-body rd-spa">
+            <div class="c">Task input<div class="bar"></div></div>
+            <div class="c">Generating…<div class="bar b2"></div></div>
+            <div class="c">Live preview<div class="bar b3"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stub reveal">
+      <div class="stub-spine"><span class="wk">03</span><span class="code">TRW·W3·23SEP</span></div>
+      <div class="stub-body">
+        <div class="stub-tag">WEEK 3 · 23 SEP 2026</div>
+        <div class="stub-title">Copilot in Office</div>
+        <p class="body">Microsoft 365 Copilot Chat is embedded directly in Outlook, Teams, and mobile apps — complementing Citi Stylus Workspaces and Citi Assist. Learn to use it as your everyday assistant.</p>
+        <ul class="stub-list">
+          <li><svg data-lucide="check"></svg>Knowledge &amp; research: summarize, explain, search the web</li>
+          <li><svg data-lucide="check"></svg>Data &amp; analysis: analyze spreadsheets, generate charts</li>
+          <li><svg data-lucide="check"></svg>Writing: draft emails, reports, translate, refine tone</li>
+          <li><svg data-lucide="check"></svg>Productivity: meeting agendas, task planning, templates</li>
+        </ul>
+        <div class="readout">
+          <div class="readout-bar"><span class="led"></span>MICROSOFT365.COM/COPILOT-CHAT</div>
+          <div class="readout-body rd-chat">
+            <div class="rd-bubble u">Summarize this quarter's open queries by status</div>
+            <div class="rd-bubble a">6,766 reclaims across 8 statuses — 53.6% closed for 2023…</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stub reveal">
+      <div class="stub-spine"><span class="wk">04</span><span class="code">TRW·W4·30SEP</span></div>
+      <div class="stub-body">
+        <div class="stub-tag">WEEK 4 · 30 SEP 2026</div>
+        <div class="stub-title">Exploring Data Visualization</div>
+        <p class="body">Discover how to turn raw data into a live, interactive HTML dashboard — using a real example from the Tax Query Hub, built and iterated on with AI assistance.</p>
+        <ul class="stub-list">
+          <li><svg data-lucide="check"></svg>From spreadsheet data to a live HTML dashboard</li>
+          <li><svg data-lucide="check"></svg>Live walkthrough of the Tax Query Hub dashboard</li>
+          <li><svg data-lucide="check"></svg>Choosing the right visualization for your data</li>
+        </ul>
+        <div class="readout">
+          <div class="readout-bar"><span class="led"></span>TAX QUERY HUB · DASHBOARD</div>
+          <div class="readout-body rd-stats">
+            <div class="rd-stat"><div class="n">1,074</div><div class="l">SUBMISSION RECLAIMS</div></div>
+            <div class="rd-stat"><div class="n">764</div><div class="l">CERTIFICATION RECLAIMS</div></div>
+            <div class="rd-stat"><div class="n">47</div><div class="l">BATCHES PROCESSED</div></div>
+          </div>
+        </div>
+        <div class="stub-note alert" style="margin-top:20px;"><svg class="icon" data-lucide="triangle-alert"></svg>Quarter deadline reminder — last session before the 30 Sep cut-off for Q3 credit.</div>
+      </div>
+    </div>
+
+    <div class="skill-strip reveal">
+      <div class="skill-cell"><div class="skill-num">E</div><div class="skill-title">Bring your own task</div><div class="skill-desc">A real, repetitive task from your work.</div></div>
+      <div class="skill-cell"><div class="skill-num">F</div><div class="skill-title">Build it live</div><div class="skill-desc">Apply Weeks 1–4 skills hands-on.</div></div>
+      <div class="skill-cell"><div class="skill-num">G</div><div class="skill-title">Present it</div><div class="skill-desc">Show your working prototype.</div></div>
+      <div class="skill-cell"><div class="skill-num">H</div><div class="skill-title">Take it further</div><div class="skill-desc">Keep iterating after the session.</div></div>
+    </div>
+
+    <div class="stub reveal">
+      <div class="stub-spine"><span class="wk">05</span><span class="code">TRW·W5·07OCT</span></div>
+      <div class="stub-body">
+        <div class="stub-tag">WEEK 5 · 7 OCT 2026</div>
+        <div class="stub-title">AI in Practice — Labs</div>
+        <p class="body">A hands-on lab session: participants apply everything learned in Weeks 1–4 to build their own AI-powered tool, using their real, everyday work as the case study.</p>
+        <ul class="stub-list">
+          <li><svg data-lucide="check"></svg>Live labs: bring a repetitive task from your own work</li>
+          <li><svg data-lucide="check"></svg>Apply prompting, safety, and tool-building skills together</li>
+          <li><svg data-lucide="check"></svg>Build and present a working prototype by the end of the session</li>
+        </ul>
+        <div class="stub-note"><svg class="icon" data-lucide="info"></svg>Falls after the 30 Sep quarterly deadline — still counts as AI Experiential Learning, tracked toward Q4.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="join">
+  <div class="wrap">
+    <div class="sec-label"><span class="n">03</span> JOIN THE SESSION</div>
+    <h2 class="sec-title">Reserve Your Seat</h2>
+    <p class="sec-desc">Every Wednesday · Sudety Meeting Room, Floor 4 · open to all Tax Reclaim Warsaw colleagues.</p>
+
+    <div class="join-grid reveal">
+      <div class="join-info">
+        <div class="join-field"><svg data-lucide="calendar"></svg><div><div class="k">Recurring</div><div class="v">Every Wednesday · 10:00–14:45</div></div></div>
+        <div class="join-field"><svg data-lucide="map-pin"></svg><div><div class="k">Location</div><div class="v">Sudety Meeting Room, Floor 4</div></div></div>
+        <div class="join-field"><svg data-lucide="video"></svg><div><div class="k">Zoom — 10:00 slot only</div><div class="v">ID 681 272 6342 · Passcode 290488</div></div></div>
+        <div class="join-field"><svg data-lucide="badge-check"></svg><div><div class="k">Credit rule</div><div class="v">3 booked slots = full LMS credit</div></div></div>
+      </div>
+      <div class="join-cta-panel">
+        <div class="stub-title">Book Now</div>
+        <p>Attendance confirmed via Slido. Book a minimum of 3 sessions to receive full LMS credit.</p>
+        <a href="ai-adoption-portal.html" class="cta">Open Booking Portal <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>
+        <div class="join-host">Hosted by Tomasz Perkowski</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-mark">
+    <svg viewBox="0 0 200 56" xmlns="http://www.w3.org/2000/svg">
+      <path d="M6 44 C 26 6, 174 6, 194 44" stroke="#e21836" stroke-width="9" fill="none" stroke-linecap="round"/>
+      <text x="100" y="46" text-anchor="middle" font-family="IBM Plex Sans" font-weight="700" font-size="38" fill="#eef0fa">citi</text>
+    </svg>
+  </div>
+  <div class="footer-tag">Connect, Learn, and Grow with Citi AI</div>
+  <div class="footer-sub">NEW SESSION EVERY WEEK · 45 MIN · TAX RECLAIM WARSAW</div>
+</footer>
+
+<script>
+  const ICONS = {
+    check:'<path d="M20 6 9 17l-5-5"/>',
+    'triangle-alert':'<path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
+    info:'<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
+    calendar:'<path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>',
+    'map-pin':'<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>',
+    video:'<path d="m16 13 5.22 3.48a.5.5 0 0 0 .78-.42V7.87a.5.5 0 0 0-.75-.43L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/>',
+    'badge-check':'<path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"/><path d="m9 12 2 2 4-4"/>'
+  };
+  document.querySelectorAll('[data-lucide]').forEach(el=>{
+    const name = el.getAttribute('data-lucide');
+    el.setAttribute('viewBox','0 0 24 24');
+    el.setAttribute('fill','none');
+    el.setAttribute('stroke','currentColor');
+    el.setAttribute('stroke-width','2');
+    el.setAttribute('stroke-linecap','round');
+    el.setAttribute('stroke-linejoin','round');
+    el.innerHTML = ICONS[name] || '';
+  });
+
+  const tickerData = [
+    'WEEK 1 · 09 SEP · AI TOOLS 101 &amp; SAFETY',
+    'WEEK 2 · 16 SEP · BUILDING TOOLS WITH AI',
+    'WEEK 3 · 23 SEP · COPILOT IN OFFICE',
+    'WEEK 4 · 30 SEP · DATA VISUALIZATION — Q3 DEADLINE',
+    'WEEK 5 · 07 OCT · AI IN PRACTICE — LABS',
+    'SUDETY MEETING ROOM · FLOOR 4 · 5 SLOTS DAILY',
+    'ZOOM LIVE AT 10:00 · ID 681 272 6342',
+  ];
+  const track = document.getElementById('ticker-track');
+  const build = () => tickerData.map(t => `<span class="ticker-item"><b>●</b> ${t}<span class="sep">&nbsp;&nbsp;/&nbsp;&nbsp;</span></span>`).join('');
+  track.innerHTML = build() + build();
+
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, {threshold:0.12});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>

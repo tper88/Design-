@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Adoption Training Series — Bulletin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800;900&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f3f1ea;
+    --paper-raised:#ffffff;
+    --line:#ddd8c9;
+    --line-strong:#171b2b;
+    --navy:#0d1730;
+    --citi-red:#e21836;
+    --citi-blue:#1547c4;
+    --amber:#b5791a;
+    --amber-bg:#fbf0d9;
+    --mint:#1f8a56;
+    --mint-bg:#e5f4ea;
+    --ink:#171b2b;
+    --ink-dim:#5c6178;
+    --ink-faint:#8b8f9f;
+    --mono:'IBM Plex Mono', ui-monospace, monospace;
+    --sans:'IBM Plex Sans', -apple-system, sans-serif;
+    --disp:'Big Shoulders Display', 'Arial Narrow', sans-serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{background:var(--paper); color:var(--ink); font-family:var(--sans); line-height:1.6; font-variant-numeric:tabular-nums;}
+  .sheet{max-width:760px; margin:0 auto; background:var(--paper-raised); border-left:1px solid var(--line); border-right:1px solid var(--line);}
+
+  /* ===== letterhead ===== */
+  .letterhead{background:var(--navy); color:#fff; padding:30px 44px; border-bottom:4px solid var(--citi-red);}
+  .lh-top{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:22px;}
+  .citi-mark svg{width:70px; height:20px;}
+  .lh-meta{font-family:var(--mono); font-size:10.5px; color:#9aa6cf; letter-spacing:0.5px; text-align:right;}
+  .lh-title{font-family:var(--disp); font-size:36px; font-weight:800; text-transform:uppercase; letter-spacing:-0.3px; line-height:1.03; text-wrap:balance;}
+  .lh-sub{font-family:var(--mono); font-size:12px; color:#c3cae6; margin-top:10px; letter-spacing:0.3px;}
+
+  .ticker{background:#0a1226; overflow:hidden; white-space:nowrap; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.08);}
+  .ticker-track{display:inline-flex; animation:ticker 32s linear infinite;}
+  .ticker-item{font-family:var(--mono); font-size:10.5px; color:#8fa0d6; padding:0 20px; display:inline-flex; align-items:center; gap:8px; flex-shrink:0;}
+  .ticker-item b{color:#f0c477;}
+  @keyframes ticker{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+  @media (prefers-reduced-motion: reduce){ .ticker-track{animation:none;} }
+
+  .body-pad{padding:44px;}
+
+  .mandatory{
+    border:1px solid #e8b3bb; background:#fdeef0; padding:18px 22px; margin-bottom:30px;
+    display:flex; gap:14px; align-items:flex-start;
+  }
+  .mandatory svg{width:20px; height:20px; color:var(--citi-red); flex-shrink:0; margin-top:2px;}
+  .mandatory .k{font-family:var(--mono); font-size:11px; font-weight:700; color:var(--citi-red); letter-spacing:0.5px; margin-bottom:4px;}
+  .mandatory p{font-size:14px; color:#5c1420; line-height:1.6;}
+
+  p.lead{font-size:15px; color:var(--ink-dim); margin-bottom:20px;}
+  p.lead b{color:var(--ink); font-weight:600;}
+
+  .note{
+    border-left:3px solid var(--amber); background:var(--amber-bg); padding:14px 18px; margin:22px 0;
+    font-size:13.5px; color:#6b4c0e;
+  }
+  .note b{font-weight:700;}
+
+  .sec-head{
+    display:flex; align-items:baseline; gap:12px; margin:38px 0 18px; padding-bottom:10px; border-bottom:2px solid var(--line-strong);
+  }
+  .sec-head .n{font-family:var(--disp); font-size:14px; color:var(--ink-faint); font-weight:700;}
+  .sec-head h2{font-family:var(--disp); font-size:22px; font-weight:800; text-transform:uppercase; letter-spacing:0.2px;}
+
+  /* schedule board */
+  .board{border:1px solid var(--line-strong);}
+  .board-head-row{
+    display:grid; grid-template-columns:52px 110px 1fr; gap:14px; padding:10px 16px;
+    background:var(--navy); color:#9aa6cf; font-family:var(--mono); font-size:10px; letter-spacing:0.5px; text-transform:uppercase;
+  }
+  .b-row{display:grid; grid-template-columns:52px 110px 1fr; align-items:center; gap:14px; padding:13px 16px; border-bottom:1px solid var(--line);}
+  .b-row:last-child{border-bottom:none;}
+  .b-row .wk{font-family:var(--disp); font-weight:800; font-size:19px; color:var(--ink-faint);}
+  .b-row .date{font-family:var(--mono); font-size:12.5px; color:var(--ink-dim);}
+  .b-row .topic{font-weight:600; font-size:14px;}
+
+  /* detail table */
+  .kv{border:1px solid var(--line-strong); margin-top:4px;}
+  .kv-row{display:grid; grid-template-columns:170px 1fr; border-bottom:1px solid var(--line);}
+  .kv-row:last-child{border-bottom:none;}
+  .kv-row .k{font-family:var(--mono); font-size:11px; letter-spacing:0.4px; color:var(--ink-faint); text-transform:uppercase; padding:12px 16px; background:var(--paper);}
+  .kv-row .v{font-size:14px; font-weight:600; padding:12px 16px;}
+
+  .zoom-stub{
+    display:grid; grid-template-columns:110px 1fr; border:1px solid var(--line-strong); margin-top:4px;
+  }
+  .zoom-spine{background:var(--navy); color:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; padding:20px 10px; border-right:1px dashed rgba(255,255,255,0.3);}
+  .zoom-spine svg{width:26px; height:26px; color:var(--amber);}
+  .zoom-spine .lbl{font-family:var(--mono); font-size:9.5px; letter-spacing:0.5px;}
+  .zoom-body{padding:18px 20px;}
+
+  .attend-note{font-size:13.5px; color:var(--ink-dim); margin-top:22px; padding-top:18px; border-top:1px solid var(--line);}
+
+  .sign{margin-top:44px; padding-top:22px; border-top:2px solid var(--line-strong);}
+  .sign .close{font-size:14.5px; color:var(--ink-dim); margin-bottom:18px;}
+  .sign .name{font-family:var(--disp); font-size:22px; font-weight:800; text-transform:uppercase;}
+  .sign .role{font-family:var(--mono); font-size:12px; color:var(--ink-faint); margin-top:2px;}
+
+  .doc-foot{
+    background:var(--navy); color:#8fa0d6; text-align:center; padding:22px; font-family:var(--mono); font-size:10.5px; letter-spacing:0.3px;
+  }
+  .doc-foot .line2{margin-top:4px; color:#5c688f;}
+
+  @media (max-width:640px){
+    .letterhead, .body-pad{padding:26px 22px;}
+    .board-head-row, .b-row{grid-template-columns:36px 1fr;}
+    .board-head-row .d, .b-row .date{display:none;}
+    .kv-row{grid-template-columns:1fr;}
+    .zoom-stub{grid-template-columns:1fr;}
+    .zoom-spine{flex-direction:row; border-right:none; border-bottom:1px dashed rgba(255,255,255,0.3);}
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <div class="letterhead">
+    <div class="lh-top">
+      <div class="citi-mark">
+        <svg viewBox="0 0 200 56" xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 44 C 26 6, 174 6, 194 44" stroke="#e21836" stroke-width="9" fill="none" stroke-linecap="round"/>
+          <text x="100" y="46" text-anchor="middle" font-family="IBM Plex Sans" font-weight="700" font-size="38" fill="#ffffff">citi</text>
+        </svg>
+      </div>
+      <div class="lh-meta">OFFICIAL BULLETIN<br>TAX RECLAIM WARSAW</div>
+    </div>
+    <div class="lh-title">AI Adoption Training Series</div>
+    <div class="lh-sub">MANDATORY · STARTING 09 SEP 2026 · SUDETY MEETING ROOM, FLOOR 4</div>
+  </div>
+
+  <div class="ticker"><div class="ticker-track" id="ticker-track"></div></div>
+
+  <div class="body-pad">
+    <p class="lead">Dear Colleagues,</p>
+    <p class="lead" style="margin-top:14px;">I am pleased to announce that starting <b>Wednesday, 9 September 2026</b>, our Tax Reclaim Warsaw team will be running a dedicated weekly <b>AI Live training series</b> — designed specifically around our real work and use cases.</p>
+
+    <div class="mandatory">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+      <div>
+        <div class="k">These sessions are mandatory</div>
+        <p>As communicated by Shahmir, all Services colleagues must complete a minimum of <b>3 hours of AI-related learning per quarter</b>. The current quarter deadline is <b>30 September 2026</b>. Attending at least <b>3 sessions</b> from the series below counts directly toward this requirement — provided attendance is confirmed via <b>Slido</b>.</p>
+      </div>
+    </div>
+
+    <div class="note"><b>Note on the deadline:</b> Week 5 (7 October) falls after the 30 September quarterly cut-off. To guarantee Q3 credit, please book and attend your 3 required sessions within <b>Weeks 1–4</b>. Week 5 will still run and count toward Q4 tracking for anyone who prefers to attend it.</div>
+
+    <div class="sec-head"><span class="n">01</span><h2>5-Week Programme Schedule</h2></div>
+    <div class="board">
+      <div class="board-head-row"><span>WK</span><span class="d">DATE</span><span>TOPIC</span></div>
+      <div class="b-row"><span class="wk">01</span><span class="date">9 Sep</span><span class="topic">AI Tools 101 &amp; Using AI Safely</span></div>
+      <div class="b-row"><span class="wk">02</span><span class="date">16 Sep</span><span class="topic">Building Tools with AI</span></div>
+      <div class="b-row"><span class="wk">03</span><span class="date">23 Sep</span><span class="topic">Copilot in Office</span></div>
+      <div class="b-row"><span class="wk">04</span><span class="date">30 Sep</span><span class="topic">Exploring Data Visualization</span></div>
+      <div class="b-row"><span class="wk">05</span><span class="date">7 Oct</span><span class="topic">AI in Practice — Labs</span></div>
+    </div>
+
+    <div class="sec-head"><span class="n">02</span><h2>Session Details</h2></div>
+    <div class="kv">
+      <div class="kv-row"><div class="k">Location</div><div class="v">Sudety Meeting Room, Floor 4</div></div>
+      <div class="kv-row"><div class="k">Day</div><div class="v">Every Wednesday</div></div>
+      <div class="kv-row"><div class="k">Time slots</div><div class="v">10:00, 11:00, 12:00, 13:00, 14:00 (Warsaw time)</div></div>
+      <div class="kv-row"><div class="k">Duration</div><div class="v">45 minutes per slot</div></div>
+      <div class="kv-row"><div class="k">Capacity</div><div class="v">Max 10 people per slot (room size)</div></div>
+      <div class="kv-row"><div class="k">Booking</div><div class="v">Via the AI Adoption Portal — pick any slot(s) that suit your schedule</div></div>
+      <div class="kv-row"><div class="k">Attendance</div><div class="v">Logged via Slido — log in with your Citi email and SOE ID during the first 10 minutes</div></div>
+    </div>
+    <div class="note"><b>Important — booking:</b> Seats are limited to 10 per slot. Please book through the AI Adoption Portal in advance. You need to attend a minimum of 3 sessions across the series to receive the full 3-hour AI training credit in LMS.</div>
+
+    <div class="sec-head"><span class="n">03</span><h2>Zoom — 10:00 Slot Only</h2></div>
+    <p class="lead">The <b>10:00</b> slot each Wednesday is also streamed live on Zoom for anyone who cannot join in person in Sudety.</p>
+    <div class="zoom-stub">
+      <div class="zoom-spine">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 13 5.22 3.48a.5.5 0 0 0 .78-.42V7.87a.5.5 0 0 0-.75-.43L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg>
+        <span class="lbl">JOIN LIVE</span>
+      </div>
+      <div class="zoom-body">
+        <div class="kv" style="border:none;">
+          <div class="kv-row" style="grid-template-columns:120px 1fr; border-color:var(--line);"><div class="k" style="background:transparent; padding:6px 0;">Day &amp; time</div><div class="v" style="padding:6px 0;">Every Wednesday · 10:00 Warsaw time</div></div>
+          <div class="kv-row" style="grid-template-columns:120px 1fr; border-color:var(--line);"><div class="k" style="background:transparent; padding:6px 0;">Meeting ID</div><div class="v" style="padding:6px 0;">681 272 6342</div></div>
+          <div class="kv-row" style="grid-template-columns:120px 1fr; border-color:var(--line);"><div class="k" style="background:transparent; padding:6px 0;">Passcode</div><div class="v" style="padding:6px 0;">290488</div></div>
+          <div class="kv-row" style="grid-template-columns:120px 1fr;"><div class="k" style="background:transparent; padding:6px 0;">Host</div><div class="v" style="padding:6px 0;">Tomasz Perkowski</div></div>
+        </div>
+      </div>
+    </div>
+
+    <p class="attend-note"><b>Important — LMS recording:</b> Our sessions qualify as AI Experiential Learning. Attendance is captured via Slido/Zoom reports and submitted to LMS. You must attend at least <b>50% of each session</b> to receive credit.</p>
+    <p class="attend-note">Please book your slots through the AI Adoption Portal and add the sessions to your calendar. If you have any questions about the programme, booking, or LMS recording, feel free to reach out directly.</p>
+    <p class="attend-note">Looking forward to learning together.</p>
+
+    <div class="sign">
+      <div class="name">Tomasz Perkowski</div>
+      <div class="role">Tax Reclaim Warsaw · AI Training Organiser</div>
+    </div>
+  </div>
+
+  <div class="doc-foot">
+    CITI · TAX RECLAIM WARSAW · WEEKLY AI TRAINING SERIES · STARTING 9 SEPTEMBER 2026
+    <div class="line2">This communication is intended for Tax Reclaim Warsaw colleagues only.</div>
+  </div>
+</div>
+
+<script>
+  const tickerData = ['WEEK 1 · 09 SEP · AI TOOLS 101 &amp; SAFETY','WEEK 2 · 16 SEP · BUILDING TOOLS WITH AI','WEEK 3 · 23 SEP · COPILOT IN OFFICE','WEEK 4 · 30 SEP · DATA VISUALIZATION — Q3 DEADLINE','WEEK 5 · 07 OCT · AI IN PRACTICE — LABS','ZOOM LIVE AT 10:00 · ID 681 272 6342'];
+  const track = document.getElementById('ticker-track');
+  const build = () => tickerData.map(t => `<span class="ticker-item"><b>●</b> ${t}</span>`).join('');
+  track.innerHTML = build() + build();
+</script>
+</body>
+</html>
