@@ -4,13 +4,28 @@ Styl wyekstrahowany z referencyjnego dashboardu „Savance”: ciepły glassmorp
 
 ## Pliki
 
+**Do narzędzia generującego (wymagane):**
+
 | Plik | Do czego |
 |---|---|
-| `savance.css` | Wszystkie tokeny (`--sv-*`) i klasy komponentów (`.sv-*`). Jedyny wymagany plik. |
-| `savance-charts.js` | Lekkie wykresy SVG bez zależności: `SavanceCharts.bar()` i `SavanceCharts.line()` z tooltipami. |
-| `tokens.json` | Te same wartości w JSON: dla generatora, Figmy (Tokens Studio) albo Tailwinda. |
-| `example-dashboard.html` | Pełny przykładowy dashboard, gotowy szablon startowy. |
-| `styleguide.html` | Wizualny style guide: paleta, gradienty, typografia, komponenty, wykresy. |
+| `savance.css` | Wszystkie tokeny (`--sv-*`) i klasy komponentów (`.sv-*`). |
+| `savance-charts.js` | Wykresy SVG bez zależności: `bar`, `line` (wiele serii), `hbar` (ranking), `donut`, `spark`, formatery liczb (pl-PL). |
+| `savance-ui.js` | Zachowanie: zakładki (sidebar i w kartach), modal (statyczny i dynamiczny), toast, sortowanie tabel, upload pliku. |
+| `PROMPT.md` | Pełny prompt systemowy dla AI generującego dashboard z danych Excela plus instrukcja integracji. |
+
+**Referencyjne (opcjonalne):**
+
+| Plik | Do czego |
+|---|---|
+| `components.html` | Wzorcowy dashboard z 4 stronami i wszystkimi komponentami. Można go dołączyć do promptu jako przykład. |
+| `example-dashboard.html` | Odtworzenie oryginalnego dashboardu Savance. |
+| `styleguide.html` | Wizualny style guide: paleta, gradienty, typografia, komponenty v1.0. |
+| `tokens.json` | Wartości tokenów w JSON (Figma / Tailwind / własny generator). |
+
+## Komponenty
+
+v1.0: shell, sidebar, nawigacja, topbar, karty KPI, karta szklana, przyciski, chipy, input, awatary, legenda, miernik, wykresy słupkowe i liniowe.
+v1.1: baner (8 wariantów), zakładki w treści, karta statystyki, sparkline, pasek postępu, tabela (sortowanie, stopka, przewijanie), lista top N, select, pole formularza, strefa uploadu i karta pliku, **modal** (4 rozmiary, statyczny i dynamiczny), toast, stan pusty, skeleton, tagi, siatki 2/3/4 kolumny, donut, ranking poziomy, wykres wieloseryjny.
 
 ## Szybki start
 
