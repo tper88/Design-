@@ -4,6 +4,8 @@ Styl wyekstrahowany z referencyjnego dashboardu „Savance”: ciepły glassmorp
 
 ## Pliki
 
+**Wszystko w jednym pliku:** `savance-kit.html`. Przykładowy dashboard, paleta, prompt AI (przycisk „Kopiuj”), kod trzech plików biblioteki (przyciski „Kopiuj” i „Pobierz”) oraz instrukcja integracji. Otwórz go w przeglądarce. Po zmianie źródeł wygeneruj go ponownie: `python3 build-kit.py`.
+
 **Do narzędzia generującego (wymagane):**
 
 | Plik | Do czego |

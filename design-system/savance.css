@@ -186,6 +186,7 @@
 }
 .sv-body *, .sv-body *::before, .sv-body *::after { box-sizing: border-box; }
 .sv-num { font-variant-numeric: tabular-nums; }
+.sv-body [hidden] { display: none !important; } /* el.hidden = true działa także na .sv-btn, .sv-chip itp. */
 :where(.sv-body) :focus-visible { outline: 2px solid var(--sv-sky-400); outline-offset: 2px; }
 
 /* ==========================================================================
