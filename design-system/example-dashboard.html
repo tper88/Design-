@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Savance Dashboard</title>
+<link rel="stylesheet" href="savance.css">
+<style>
+  .page { padding: 40px 16px; }
+  .keysave { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+  .keysave__big { display: flex; align-items: baseline; gap: 10px; }
+  .split { display: grid; grid-template-columns: minmax(0, 1fr) 170px; gap: 16px; align-items: start; }
+  @media (max-width: 640px) { .split { grid-template-columns: 1fr; } }
+  .stack { display: flex; flex-direction: column; gap: 16px; }
+</style>
+</head>
+<body class="sv-body">
+<!-- Ikony (sprite) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-wallet" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="14" rx="3"/><path d="M16 13h2M3 10h18M7 6V4h10v2"/></symbol>
+  <symbol id="i-income" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 9h18M8 15h3"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10l8-6 8 6v10z"/><path d="M9 20v-6h6v6"/></symbol>
+  <symbol id="i-swap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3-3M20 16H7l3 3"/></symbol>
+  <symbol id="i-gift" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="9" width="16" height="11" rx="2"/><path d="M3 9h18M12 9v11"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c1-4 4-6 7-6s6 2 7 6"/></symbol>
+  <symbol id="i-target" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24" fill="currentColor"><path d="M9 7l8 5-8 5z"/></symbol>
+</svg>
+
+<div class="page">
+  <div class="sv-shell">
+    <aside class="sv-sidebar">
+      <div class="sv-brand"><span class="sv-avatar">SV</span> Savance</div>
+      <nav>
+        <ul class="sv-nav">
+          <li><a class="sv-nav__item is-active" href="#"><svg><use href="#i-wallet"/></svg>Savings</a></li>
+          <li><a class="sv-nav__item" href="#"><svg><use href="#i-income"/></svg>Income</a></li>
+          <li><a class="sv-nav__item" href="#"><svg><use href="#i-grid"/></svg>Dashboard</a></li>
+          <li><a class="sv-nav__item" href="#"><svg><use href="#i-swap"/></svg>Exchange</a></li>
+          <li><a class="sv-nav__item" href="#"><svg><use href="#i-gift"/></svg>Pensions</a></li>
+          <li><a class="sv-nav__item" href="#"><svg><use href="#i-users"/></svg>Balances</a></li>
+          <li><a class="sv-nav__item" href="#"><svg><use href="#i-target"/></svg>Goals</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <main class="sv-main">
+      <header class="sv-topbar">
+        <h1 class="sv-title">Dashboard</h1>
+        <button class="sv-btn sv-btn--cream" type="button">Income Tracking</button>
+        <input class="sv-input" id="search" type="search" placeholder="Automated team savings" aria-label="Szukaj">
+        <button class="sv-btn sv-btn--amber" type="button">Savings ▾</button>
+        <span class="sv-avatar">TP</span>
+      </header>
+
+      <section class="sv-grid sv-grid--kpi" aria-label="Wskaźniki">
+        <article class="sv-kpi sv-kpi--khaki"><div class="sv-kpi__head"><span class="sv-avatar sv-avatar--sm">FN</span>Financial</div><div class="sv-kpi-value">$2,000,000</div><div class="sv-kpi__foot"><span>$7.8k monthly</span><span>+2.72%</span></div></article>
+        <article class="sv-kpi sv-kpi--indigo"><div class="sv-kpi__head"><span class="sv-avatar sv-avatar--sm">PL</span>Planned</div><div class="sv-kpi-value">$150,000</div><div class="sv-kpi__foot"><span>Deposits</span><span>+1.4%</span></div></article>
+        <article class="sv-kpi sv-kpi--magenta"><div class="sv-kpi__head"><span class="sv-avatar sv-avatar--sm">RT</span>Retirement</div><div class="sv-kpi-value">$1,000,000</div><div class="sv-kpi__foot"><span>$22k daily</span><span>+6%</span></div></article>
+        <article class="sv-kpi sv-kpi--rose"><div class="sv-kpi__head"><span class="sv-avatar sv-avatar--sm">VC</span>Vacation</div><div class="sv-kpi-value">$100,000</div><div class="sv-kpi__foot"><span>Savings fill</span><span>68%</span></div></article>
+        <article class="sv-kpi sv-kpi--sunset"><div class="sv-kpi__head"><span class="sv-avatar sv-avatar--sm">SV</span>Savings</div><div class="sv-kpi-value">$3,595</div><div class="sv-kpi__foot"><span>$11.5k total</span><span>/ month</span></div></article>
+      </section>
+
+      <div class="sv-grid sv-grid--main">
+        <div class="stack">
+          <section class="sv-card keysave">
+            <div class="keysave__big"><span class="sv-hero">$7,800</span><div><div class="sv-h3">Key savings</div><div class="sv-caption">Current period</div></div></div>
+            <div style="display:flex;align-items:center;gap:12px"><span class="sv-play"><svg width="14" height="14"><use href="#i-play"/></svg></span><div><div class="sv-label">Available</div><div class="sv-h3 sv-num">$155,000</div></div></div>
+          </section>
+
+          <section class="sv-card">
+            <div class="sv-card__head"><div><div class="sv-h3">Monthly savings</div><div class="sv-caption">$1,000 base per month</div></div><span class="sv-chip sv-chip--accent">Avg 40.4%</span></div>
+            <div class="split">
+              <div id="c-monthly"></div>
+              <ul class="sv-legend">
+                <li class="sv-legend__row"><span class="sv-dot" style="--sv-dot:var(--sv-chart-1)"></span>Income<b>$0.05k</b></li>
+                <li class="sv-legend__row"><span class="sv-dot" style="--sv-dot:var(--sv-chart-2)"></span>Homes<b>$13.5k</b></li>
+                <li class="sv-legend__row"><span class="sv-dot" style="--sv-dot:var(--sv-chart-muted)"></span>Prior year<b>$15.0k</b></li>
+              </ul>
+            </div>
+            <div class="split" style="margin-top:16px">
+              <div id="c-auto"></div>
+              <ul class="sv-legend">
+                <li class="sv-eyebrow">Automated savings</li>
+                <li class="sv-legend__row"><span class="sv-dot" style="--sv-dot:var(--sv-success)"></span>Active<span class="sv-meter" style="margin-left:auto"><span style="width:45%;--sv-meter:var(--sv-text-3)"></span></span><b style="margin-left:0">45%</b></li>
+                <li class="sv-legend__row"><span class="sv-dot" style="--sv-dot:var(--sv-neutral)"></span>Paused<span class="sv-meter" style="margin-left:auto"><span style="width:60%;--sv-meter:var(--sv-danger)"></span></span><b style="margin-left:0">1.0%</b></li>
+                <li class="sv-legend__row"><span class="sv-dot" style="--sv-dot:var(--sv-info)"></span>Planned<b>4.0%</b></li>
+                <li class="sv-legend__row"><span class="sv-chip sv-chip--success">▲ 1.50%</span></li>
+              </ul>
+            </div>
+          </section>
+        </div>
+
+        <div class="stack">
+          <section class="sv-card">
+            <div class="sv-card__head"><div><div class="sv-h3">Calculations</div><div class="sv-caption">Company saving, % of plan</div></div><span class="sv-chip sv-chip--accent">$ 450.0%</span></div>
+            <div id="c-calc"></div>
+          </section>
+          <section class="sv-card">
+            <div class="sv-card__head"><div class="sv-h3">Main feature saving</div><button class="sv-btn sv-btn--sm" type="button">See all</button></div>
+            <div id="c-line"></div>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script src="savance-charts.js"></script>
+<script>
+  var M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  SavanceCharts.bar(document.getElementById('c-monthly'), {
+    title: 'Monthly savings', labels: M, yMax: 30, yTicks: 3, height: 170, format: function (v) { return v + 'k'; },
+    series: [
+      { name: 'Income', values: [6,21,12,18,24,17,20,23,26,13,19,9], fill: 'amber' },
+      { name: 'Homes',  values: [9,14,19,11,16,22,15,25,18,21,12,14], fill: 'lavender' },
+      { name: 'Prior year', values: [5,8,7,9,10,6,11,8,9,7,6,5], fill: 'ghost' }
+    ]
+  });
+  SavanceCharts.bar(document.getElementById('c-auto'), {
+    title: 'Automated savings', labels: ['Q1','Q2','Q3','Q4','Q5','Q6'], yMax: 40, yTicks: 4, height: 160, barWidth: 22,
+    format: function (v) { return v + '%'; },
+    series: [{ name: 'Saved', values: [21,11,24,33,28,31], fill: 'sky' }]
+  });
+  SavanceCharts.bar(document.getElementById('c-calc'), {
+    title: 'Calculations', labels: ['Jan','Mar','May','Jul','Sep','Nov','Dec'], yMax: 25, yTicks: 5, height: 190,
+    format: function (v) { return v + '%'; },
+    series: [
+      { name: 'Plan',   values: [9,6,13,11,9,7,21], fill: 'amber' },
+      { name: 'Actual', values: [7,15,17,19,12,15,23], fill: 'lavender' }
+    ]
+  });
+  SavanceCharts.line(document.getElementById('c-line'), {
+    title: 'Main feature saving', labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug'],
+    values: [18,22,20,41,28,35,48,52], yMax: 60, yTicks: 3, height: 160, color: 'gold',
+    format: function (v) { return v + '%'; }
+  });
+</script>
+</body>
+</html>

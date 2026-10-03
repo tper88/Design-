@@ -1,0 +1,489 @@
+<title>Savance Design System</title>
+<link rel="stylesheet" href="savance.css">
+<style>
+  /* Layout: jedna kolumna sekcji w szklanych panelach na tle backdropu; dashboard na górze jako dowód stylu. */
+  :root { color-scheme: dark; }
+  html, body { background: var(--sv-backdrop-umber); }
+  .sg { max-width: 1280px; margin-inline: auto; padding-inline: 16px; padding-block: 32px 64px; display: flex; flex-direction: column; gap: 24px; }
+  .sg-intro { display: flex; flex-wrap: wrap; gap: 16px 32px; align-items: end; justify-content: space-between; }
+  .sg-intro h1 { font-size: clamp(1.75rem, 4vw, 2.75rem); font-weight: 800; letter-spacing: -0.03em; margin: 0; line-height: 1.05; text-wrap: balance; }
+  .sg-intro p { margin: 8px 0 0; max-width: 60ch; color: var(--sv-cream-100); opacity: .85; }
+  .sg-toc { display: flex; flex-wrap: wrap; gap: 8px; }
+  .sg-section { background: rgba(14, 10, 9, .78); border: 1px solid var(--sv-border); border-radius: var(--sv-radius-xl); padding: 28px clamp(16px, 3vw, 32px); display: flex; flex-direction: column; gap: 20px; -webkit-backdrop-filter: var(--sv-blur); backdrop-filter: var(--sv-blur); min-width: 0; }
+  .sg-section > header { display: flex; flex-direction: column; gap: 4px; }
+  .sg-section h2 { font-size: 1.25rem; font-weight: 700; margin: 0; letter-spacing: -0.02em; }
+  .sg-section h3 { font-size: .8125rem; font-weight: 600; margin: 0; color: var(--sv-text-2); }
+  .sg-section p { margin: 0; color: var(--sv-text-2); max-width: 70ch; }
+  .sg-group { display: flex; flex-direction: column; gap: 10px; }
+  .sg-swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); gap: 10px; }
+  .sg-swatch { all: unset; box-sizing: border-box; cursor: pointer; border-radius: var(--sv-radius-md); overflow: hidden; border: 1px solid var(--sv-border); background: var(--sv-glass-solid-1); display: flex; flex-direction: column; transition: transform var(--sv-dur) var(--sv-ease), border-color var(--sv-dur); }
+  .sg-swatch:hover { transform: translateY(-2px); border-color: var(--sv-border-strong); }
+  .sg-swatch:focus-visible { outline: 2px solid var(--sv-sky-400); outline-offset: 2px; }
+  .sg-swatch__chip { height: 64px; background-color: #221A17; background-image: linear-gradient(45deg, #2B211D 25%, transparent 25%, transparent 75%, #2B211D 75%), linear-gradient(45deg, #2B211D 25%, transparent 25%, transparent 75%, #2B211D 75%); background-size: 12px 12px; background-position: 0 0, 6px 6px; position: relative; }
+  .sg-swatch__chip > i { position: absolute; inset: 0; }
+  .sg-swatch__meta { padding: 8px 10px; display: flex; flex-direction: column; gap: 2px; }
+  .sg-swatch__name { font-size: 11px; font-weight: 600; color: var(--sv-text); }
+  .sg-swatch__val { font: 500 10.5px/1.3 var(--sv-font-mono); color: var(--sv-text-3); word-break: break-all; }
+  .sg-grads { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+  .sg-grads .sg-swatch__chip { height: 84px; }
+  .sg-type { display: flex; flex-direction: column; }
+  .sg-type__row { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 16px; align-items: baseline; padding-block: 12px; border-bottom: 1px solid var(--sv-divider); }
+  .sg-type__row:last-child { border-bottom: 0; }
+  .sg-type__spec { font: 500 11px/1.4 var(--sv-font-mono); color: var(--sv-text-3); }
+  .sg-scale { display: flex; flex-wrap: wrap; gap: 16px; align-items: end; }
+  .sg-scale__item { display: flex; flex-direction: column; gap: 6px; align-items: center; font: 500 10.5px var(--sv-font-mono); color: var(--sv-text-3); }
+  .sg-scale__bar { background: var(--sv-amber-400); border-radius: 3px; }
+  .sg-radius { width: 72px; height: 72px; background: var(--sv-glass-3); border: 1px solid var(--sv-border-strong); }
+  .sg-shadow { width: 120px; height: 80px; border-radius: var(--sv-radius-md); background: var(--sv-glass-solid-2); }
+  .sg-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  .sg-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+  .sg-demo { background: var(--sv-canvas-grad); background-color: var(--sv-canvas); border-radius: var(--sv-radius-lg); padding: 18px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+  .sg-code { position: relative; background: #0B0807; border: 1px solid var(--sv-border); border-radius: var(--sv-radius-md); overflow-x: auto; }
+  .sg-code pre { margin: 0; padding: 16px; font: 400 12px/1.6 var(--sv-font-mono); color: var(--sv-cream-200); white-space: pre; }
+  .sg-code .sv-btn { position: absolute; top: 8px; right: 8px; }
+  .sg-toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 20; }
+  .sg-rules { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; color: var(--sv-text-2); max-width: 80ch; }
+  .sg-rules b { color: var(--sv-text); font-weight: 600; }
+  /* dashboard preview */
+  .keysave { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+  .keysave__big { display: flex; align-items: baseline; gap: 10px; }
+  .split { display: grid; grid-template-columns: minmax(0, 1fr) 170px; gap: 16px; align-items: start; }
+  .stack { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+  @media (max-width: 640px) {
+    .split { grid-template-columns: 1fr; }
+    .sg-type__row { grid-template-columns: 1fr; gap: 4px; }
+  }
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-wallet" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="14" rx="3"/><path d="M16 13h2M3 10h18M7 6V4h10v2"/></symbol>
+  <symbol id="i-income" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 9h18M8 15h3"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10l8-6 8 6v10z"/><path d="M9 20v-6h6v6"/></symbol>
+  <symbol id="i-swap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3-3M20 16H7l3 3"/></symbol>
+  <symbol id="i-gift" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="9" width="16" height="11" rx="2"/><path d="M3 9h18M12 9v11"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c1-4 4-6 7-6s6 2 7 6"/></symbol>
+  <symbol id="i-target" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24" fill="currentColor"><path d="M9 7l8 5-8 5z"/></symbol>
+</svg>
+
+<div class="sv-body" style="background: var(--sv-backdrop); background-attachment: fixed; min-height: 100vh;">
+<div class="sg">
+
+  <div class="sg-intro">
+    <div>
+      <div class="sv-eyebrow" style="color: var(--sv-cocoa-700)">Design system · v1.0 · dark-first</div>
+      <h1>Savance Design System</h1>
+      <p>Ciepłe szkło na bursztynowym tle: prawie czarny sidebar, brązowy canvas z poświatą, kolorowe karty KPI i pastelowe wykresy. Kliknij dowolną próbkę, żeby skopiować jej wartość.</p>
+    </div>
+    <nav class="sg-toc" aria-label="Spis treści">
+      <a class="sv-btn sv-btn--sm" href="#kolory">Kolory</a>
+      <a class="sv-btn sv-btn--sm" href="#gradienty">Gradienty</a>
+      <a class="sv-btn sv-btn--sm" href="#typografia">Typografia</a>
+      <a class="sv-btn sv-btn--sm" href="#przestrzen">Odstępy i cienie</a>
+      <a class="sv-btn sv-btn--sm" href="#komponenty">Komponenty</a>
+      <a class="sv-btn sv-btn--sm" href="#wykresy">Wykresy</a>
+      <a class="sv-btn sv-btn--sm" href="#uzycie">Użycie</a>
+    </nav>
+  </div>
+
+  <!-- ===================== DASHBOARD PREVIEW ===================== -->
+  <div class="sv-shell" id="podglad">
+    <aside class="sv-sidebar">
+      <div class="sv-brand"><span class="sv-avatar">SV</span> Savance</div>
+      <nav>
+        <ul class="sv-nav">
+          <li><a class="sv-nav__item is-active" href="#podglad"><svg><use href="#i-wallet"/></svg>Savings</a></li>
+          <li><a class="sv-nav__item" href="#podglad"><svg><use href="#i-income"/></svg>Income</a></li>
+          <li><a class="sv-nav__item" href="#podglad"><svg><use href="#i-grid"/></svg>Dashboard</a></li>
+          <li><a class="sv-nav__item" href="#podglad"><svg><use href="#i-swap"/></svg>Exchange</a></li>
+          <li><a class="sv-nav__item" href="#podglad"><svg><use href="#i-gift"/></svg>Pensions</a></li>
+          <li><a class="sv-nav__item" href="#podglad"><svg><use href="#i-users"/></svg>Balances</a></li>
+          <li><a class="sv-nav__item" href="#podglad"><svg><use href="#i-target"/></svg>Goals</a></li>
+        </ul>
+      </nav>
+    </aside>
+    <main class="sv-main">
+      <header class="sv-topbar">
+        <h2 class="sv-title">Dashboard</h2>
+        <button class="sv-btn sv-btn--cream" type="button">Income Tracking</button>
+        <input class="sv-input" id="pv-search" type="search" placeholder="Automated team savings" aria-label="Szukaj">
+        <button class="sv-btn sv-btn--amber" type="button">Savings ▾</button>
+        <span class="sv-avatar">TP</span>
+      </header>
+      <section class="sv-grid sv-grid--kpi" aria-label="Wskaźniki">
+        <article class="sv-kpi sv-kpi--khaki"><div class="sv-kpi__head"><span class="sv-avatar sv-avatar--sm">FN</span>Financial</div><div class="sv-kpi-value">$2,000,000</div><div class="sv-kpi__foot"><span>$7.8k monthly</span><span>+2.72%</span></div></article>
+        <article class="sv-kpi sv-kpi--indigo"><div class="sv-kpi__head"><span class="sv-avatar sv-avatar--sm">PL</span>Planned</div><div class="sv-kpi-value">$150,000</div><div class="sv-kpi__foot"><span>Deposits</span><span>+1.4%</span></div></article>
+        <article class="sv-kpi sv-kpi--magenta"><div class="sv-kpi__head"><span class="sv-avatar sv-avatar--sm">RT</span>Retirement</div><div class="sv-kpi-value">$1,000,000</div><div class="sv-kpi__foot"><span>$22k daily</span><span>+6%</span></div></article>
+        <article class="sv-kpi sv-kpi--rose"><div class="sv-kpi__head"><span class="sv-avatar sv-avatar--sm">VC</span>Vacation</div><div class="sv-kpi-value">$100,000</div><div class="sv-kpi__foot"><span>Savings fill</span><span>68%</span></div></article>
+        <article class="sv-kpi sv-kpi--sunset"><div class="sv-kpi__head"><span class="sv-avatar sv-avatar--sm">SV</span>Savings</div><div class="sv-kpi-value">$3,595</div><div class="sv-kpi__foot"><span>$11.5k total</span><span>/ month</span></div></article>
+      </section>
+      <div class="sv-grid sv-grid--main">
+        <div class="stack">
+          <section class="sv-card keysave">
+            <div class="keysave__big"><span class="sv-hero">$7,800</span><div><div class="sv-h3">Key savings</div><div class="sv-caption">Current period</div></div></div>
+            <div style="display:flex;align-items:center;gap:12px"><span class="sv-play"><svg width="14" height="14"><use href="#i-play"/></svg></span><div><div class="sv-label">Available</div><div class="sv-h3 sv-num">$155,000</div></div></div>
+          </section>
+          <section class="sv-card">
+            <div class="sv-card__head"><div><div class="sv-h3">Monthly savings</div><div class="sv-caption">$1,000 base per month</div></div><span class="sv-chip sv-chip--accent">Avg 40.4%</span></div>
+            <div class="split">
+              <div id="c-monthly"></div>
+              <ul class="sv-legend">
+                <li class="sv-legend__row"><span class="sv-dot" style="--sv-dot:var(--sv-chart-1)"></span>Income<b>$0.05k</b></li>
+                <li class="sv-legend__row"><span class="sv-dot" style="--sv-dot:var(--sv-chart-2)"></span>Homes<b>$13.5k</b></li>
+                <li class="sv-legend__row"><span class="sv-dot" style="--sv-dot:var(--sv-chart-muted)"></span>Prior year<b>$15.0k</b></li>
+              </ul>
+            </div>
+            <div class="split" style="margin-top:16px">
+              <div id="c-auto"></div>
+              <ul class="sv-legend">
+                <li class="sv-eyebrow">Automated savings</li>
+                <li class="sv-legend__row"><span class="sv-dot" style="--sv-dot:var(--sv-success)"></span>Active<span class="sv-meter" style="margin-left:auto"><span style="width:45%;--sv-meter:var(--sv-text-3)"></span></span><b style="margin-left:0">45%</b></li>
+                <li class="sv-legend__row"><span class="sv-dot" style="--sv-dot:var(--sv-neutral)"></span>Paused<span class="sv-meter" style="margin-left:auto"><span style="width:60%;--sv-meter:var(--sv-danger)"></span></span><b style="margin-left:0">1.0%</b></li>
+                <li class="sv-legend__row"><span class="sv-dot" style="--sv-dot:var(--sv-info)"></span>Planned<b>4.0%</b></li>
+                <li class="sv-legend__row"><span class="sv-chip sv-chip--success">▲ 1.50%</span></li>
+              </ul>
+            </div>
+          </section>
+        </div>
+        <div class="stack">
+          <section class="sv-card">
+            <div class="sv-card__head"><div><div class="sv-h3">Calculations</div><div class="sv-caption">Company saving, % of plan</div></div><span class="sv-chip sv-chip--accent">$ 450.0%</span></div>
+            <div id="c-calc"></div>
+            <ul class="sv-legend" style="flex-direction:row;gap:16px;margin-top:10px">
+              <li class="sv-legend__row"><span class="sv-dot" style="--sv-dot:var(--sv-chart-1)"></span>Plan</li>
+              <li class="sv-legend__row"><span class="sv-dot" style="--sv-dot:var(--sv-chart-2)"></span>Actual</li>
+            </ul>
+          </section>
+          <section class="sv-card">
+            <div class="sv-card__head"><div class="sv-h3">Main feature saving</div><button class="sv-btn sv-btn--sm" type="button">See all</button></div>
+            <div id="c-line"></div>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ===================== KOLORY ===================== -->
+  <section class="sg-section" id="kolory">
+    <header><h2>Kolory</h2><p>Pełna paleta. Tło i powierzchnie tworzą ciepłą, ciemną bazę. Kolory akcentów służą kartom KPI, nawigacji i wykresom. Kolory statusu są zarezerwowane dla stanów (wzrost, spadek, ostrzeżenie) i nie są używane jako serie danych.</p></header>
+    <div id="swatch-groups" class="sg-group" style="gap:24px"></div>
+  </section>
+
+  <!-- ===================== GRADIENTY ===================== -->
+  <section class="sg-section" id="gradienty">
+    <header><h2>Gradienty</h2><p>Karty KPI zawsze w tej kolejności od lewej: khaki, indigo, magenta, rose, sunset. Każda ma dodatkowo połysk szkła (biały gradient 22% → 0% od lewego górnego rogu).</p></header>
+    <div id="grad-groups" class="sg-group" style="gap:24px"></div>
+  </section>
+
+  <!-- ===================== TYPOGRAFIA ===================== -->
+  <section class="sg-section" id="typografia">
+    <header><h2>Typografia</h2><p>Plus Jakarta Sans: geometryczny, miękki grotesk, jak na referencji. Liczby zawsze z <code>tabular-nums</code>. JetBrains Mono tylko do kodu i wartości technicznych.</p></header>
+    <div class="sg-type">
+      <div class="sg-type__row"><div class="sg-type__spec">.sv-hero<br>36 / 600 / -0.02em</div><div class="sv-hero">$7,800.00</div></div>
+      <div class="sg-type__row"><div class="sg-type__spec">.sv-title (H1)<br>22 / 600</div><div class="sv-title">Dashboard</div></div>
+      <div class="sg-type__row"><div class="sg-type__spec">.sv-kpi-value<br>20 / 700</div><div class="sv-kpi-value">$1,000,000</div></div>
+      <div class="sg-type__row"><div class="sg-type__spec">.sv-h2<br>17 / 600</div><div class="sv-h2">Automated savings overview</div></div>
+      <div class="sg-type__row"><div class="sg-type__spec">.sv-h3<br>14 / 600</div><div class="sv-h3">Main feature saving</div></div>
+      <div class="sg-type__row"><div class="sg-type__spec">body<br>13 / 400 / 1.5</div><div>Savings grew 6% this month, led by automated transfers from income accounts.</div></div>
+      <div class="sg-type__row"><div class="sg-type__spec">.sv-label<br>12 / 400 · text-2</div><div class="sv-label">Available balance</div></div>
+      <div class="sg-type__row"><div class="sg-type__spec">.sv-caption<br>11 / 400 · text-3</div><div class="sv-caption">Updated 5 min ago</div></div>
+      <div class="sg-type__row"><div class="sg-type__spec">.sv-eyebrow<br>10 / 600 / +0.06em</div><div class="sv-eyebrow">Automated savings</div></div>
+    </div>
+  </section>
+
+  <!-- ===================== PRZESTRZEŃ ===================== -->
+  <section class="sg-section" id="przestrzen">
+    <header><h2>Odstępy, promienie, cienie</h2><p>Siatka 4 px. Karty KPI 14 px promienia, panele 18 px, okno aplikacji 26 px. Odstęp między kartami 16 px, padding kart 18 px.</p></header>
+    <div class="sg-cols">
+      <div class="sg-group"><h3>Odstępy (--sv-space-*)</h3>
+        <div class="sg-scale" id="space-scale"></div></div>
+      <div class="sg-group"><h3>Promienie (--sv-radius-*)</h3>
+        <div class="sg-scale" id="radius-scale"></div></div>
+    </div>
+    <div class="sg-group"><h3>Cienie i poświaty</h3>
+      <div class="sg-row" id="shadow-row" style="gap:24px"></div></div>
+  </section>
+
+  <!-- ===================== KOMPONENTY ===================== -->
+  <section class="sg-section" id="komponenty">
+    <header><h2>Komponenty</h2><p>Gotowe klasy z <code>savance.css</code>. Każdy komponent działa na canvasie (<code>.sv-main</code>) albo w karcie (<code>.sv-card</code>).</p></header>
+    <div class="sg-cols">
+      <div class="sg-group"><h3>Nawigacja · .sv-nav__item</h3>
+        <div class="sg-demo" style="background: var(--sv-sidebar-grad)">
+          <ul class="sv-nav">
+            <li><a class="sv-nav__item is-active" href="#komponenty"><svg><use href="#i-wallet"/></svg>Savings (is-active)</a></li>
+            <li><a class="sv-nav__item" href="#komponenty"><svg><use href="#i-income"/></svg>Income</a></li>
+            <li><a class="sv-nav__item" href="#komponenty"><svg><use href="#i-grid"/></svg>Dashboard</a></li>
+          </ul>
+        </div></div>
+      <div class="sg-group"><h3>Przyciski · .sv-btn</h3>
+        <div class="sg-demo">
+          <div class="sg-row">
+            <button class="sv-btn sv-btn--cream" type="button">Cream</button>
+            <button class="sv-btn sv-btn--primary" type="button">Primary</button>
+            <button class="sv-btn sv-btn--amber" type="button">Savings ▾</button>
+          </div>
+          <div class="sg-row">
+            <button class="sv-btn" type="button">Default</button>
+            <button class="sv-btn sv-btn--ghost" type="button">Ghost</button>
+            <button class="sv-btn sv-btn--sm" type="button">See all</button>
+            <button class="sv-btn sv-icon-btn" type="button" aria-label="Odtwórz"><svg width="14" height="14"><use href="#i-play"/></svg></button>
+          </div>
+          <input class="sv-input" id="demo-input" type="search" placeholder="Automated team savings" aria-label="Pole wyszukiwania">
+        </div></div>
+      <div class="sg-group"><h3>Chipy i status · .sv-chip</h3>
+        <div class="sg-demo">
+          <div class="sg-row">
+            <span class="sv-chip">Neutral</span>
+            <span class="sv-chip sv-chip--accent">$ 450.0%</span>
+            <span class="sv-chip sv-chip--success">▲ 1.50%</span>
+            <span class="sv-chip sv-chip--danger">▼ 0.8%</span>
+            <span class="sv-chip sv-chip--warning">! Limit</span>
+            <span class="sv-chip sv-chip--info">i Planned</span>
+          </div>
+          <div class="sg-row">
+            <span class="sv-avatar sv-avatar--sm">AB</span><span class="sv-avatar">TP</span><span class="sv-avatar sv-avatar--lg">SV</span>
+            <span class="sv-play"><svg width="14" height="14"><use href="#i-play"/></svg></span>
+          </div>
+        </div></div>
+      <div class="sg-group"><h3>Legenda i mierniki · .sv-legend, .sv-meter</h3>
+        <div class="sg-demo">
+          <ul class="sv-legend">
+            <li class="sv-legend__row"><span class="sv-dot" style="--sv-dot:var(--sv-chart-1)"></span>Income<b>$0.05k</b></li>
+            <li class="sv-legend__row"><span class="sv-dot" style="--sv-dot:var(--sv-chart-2)"></span>Homes<b>$13.5k</b></li>
+            <li class="sv-legend__row"><span class="sv-dot" style="--sv-dot:var(--sv-success)"></span>Active<span class="sv-meter" style="margin-left:auto"><span style="width:45%;--sv-meter:var(--sv-text-3)"></span></span><b style="margin-left:0">45%</b></li>
+            <li class="sv-legend__row"><span class="sv-dot" style="--sv-dot:var(--sv-danger)"></span>Overdue<span class="sv-meter" style="margin-left:auto"><span style="width:70%;--sv-meter:var(--sv-danger)"></span></span><b style="margin-left:0">1.0%</b></li>
+          </ul>
+        </div></div>
+    </div>
+    <div class="sg-group"><h3>Karty KPI · .sv-kpi--khaki / --indigo / --magenta / --rose / --sunset</h3>
+      <div class="sg-demo">
+        <div class="sv-grid sv-grid--kpi">
+          <article class="sv-kpi sv-kpi--khaki"><div class="sv-kpi__head"><span class="sv-avatar sv-avatar--sm">KH</span>Khaki</div><div class="sv-kpi-value">$2,000,000</div><div class="sv-kpi__foot"><span>Neutralna</span><span>+2.72%</span></div></article>
+          <article class="sv-kpi sv-kpi--indigo"><div class="sv-kpi__head"><span class="sv-avatar sv-avatar--sm">IN</span>Indigo</div><div class="sv-kpi-value">$150,000</div><div class="sv-kpi__foot"><span>Chłodna</span><span>+1.4%</span></div></article>
+          <article class="sv-kpi sv-kpi--magenta"><div class="sv-kpi__head"><span class="sv-avatar sv-avatar--sm">MG</span>Magenta</div><div class="sv-kpi-value">$1,000,000</div><div class="sv-kpi__foot"><span>Wyróżniona</span><span>+6%</span></div></article>
+          <article class="sv-kpi sv-kpi--rose"><div class="sv-kpi__head"><span class="sv-avatar sv-avatar--sm">RS</span>Rose</div><div class="sv-kpi-value">$100,000</div><div class="sv-kpi__foot"><span>Ciepła</span><span>68%</span></div></article>
+          <article class="sv-kpi sv-kpi--sunset"><div class="sv-kpi__head"><span class="sv-avatar sv-avatar--sm">SN</span>Sunset</div><div class="sv-kpi-value">$3,595</div><div class="sv-kpi__foot"><span>Główna</span><span>/ mo</span></div></article>
+        </div>
+      </div></div>
+    <div class="sg-group"><h3>Panel · .sv-card</h3>
+      <div class="sg-demo">
+        <div class="sv-card">
+          <div class="sv-card__head"><div><div class="sv-h3">Tytuł karty</div><div class="sv-caption">Podtytuł / okres</div></div><span class="sv-chip sv-chip--accent">+12.4%</span></div>
+          <p style="margin:0;color:var(--sv-text-2)">Szklana karta: tło rgba(255,244,235,.045), obramowanie 9% bieli, promień 18 px, rozmycie tła 22 px, wewnętrzny highlight 1 px u góry.</p>
+        </div>
+      </div></div>
+  </section>
+
+  <!-- ===================== WYKRESY ===================== -->
+  <section class="sg-section" id="wykresy">
+    <header><h2>Wykresy</h2><p>Słupki są cienkie, z zaokrągloną górą (4 px), zanikają ku osi. Między słupkami w grupie 2 px przerwy. Siatka ledwie widoczna (7% bieli), osie w kolorze text-3. Linia 2 px w kolorze gold, ostatni punkt wypełniony. Najedź na wykres, żeby zobaczyć tooltip.</p></header>
+    <div class="sg-group"><h3>Kolejność kolorów serii (stała, nie przestawiać)</h3>
+      <div class="sg-swatches" id="chart-order"></div></div>
+    <div class="sg-cols">
+      <div class="sg-demo"><div class="sv-h3">Słupki grupowane · amber + lavender</div><div id="c-demo-bar"></div></div>
+      <div class="sg-demo"><div class="sv-h3">Słupki gradientowe · sky</div><div id="c-demo-sky"></div></div>
+      <div class="sg-demo"><div class="sv-h3">Linia z obszarem · gold</div><div id="c-demo-line"></div></div>
+    </div>
+  </section>
+
+  <!-- ===================== UŻYCIE ===================== -->
+  <section class="sg-section" id="uzycie">
+    <header><h2>Użycie w generatorze dashboardów</h2><p>Dołącz dwa pliki i buduj z klas. Wszystkie wartości są też w <code>tokens.json</code> (dla generatora opartego na danych) i w <code>README.md</code> (reguły dla promptu AI).</p></header>
+    <div class="sg-code"><button class="sv-btn sv-btn--sm" type="button" data-copy="snippet">Kopiuj</button><pre id="snippet">&lt;link rel="stylesheet" href="savance.css"&gt;
+&lt;body class="sv-body"&gt;
+  &lt;div class="sv-shell"&gt;
+    &lt;aside class="sv-sidebar"&gt; … .sv-nav / .sv-nav__item.is-active … &lt;/aside&gt;
+    &lt;main class="sv-main"&gt;
+      &lt;header class="sv-topbar"&gt;&lt;h1 class="sv-title"&gt;Dashboard&lt;/h1&gt; … &lt;/header&gt;
+      &lt;section class="sv-grid sv-grid--kpi"&gt;
+        &lt;article class="sv-kpi sv-kpi--indigo"&gt;
+          &lt;div class="sv-kpi__head"&gt;Planned&lt;/div&gt;
+          &lt;div class="sv-kpi-value"&gt;$150,000&lt;/div&gt;
+          &lt;div class="sv-kpi__foot"&gt;&lt;span&gt;Deposits&lt;/span&gt;&lt;span&gt;+1.4%&lt;/span&gt;&lt;/div&gt;
+        &lt;/article&gt;
+      &lt;/section&gt;
+      &lt;div class="sv-grid sv-grid--main"&gt;
+        &lt;section class="sv-card"&gt;&lt;div id="chart"&gt;&lt;/div&gt;&lt;/section&gt;
+      &lt;/div&gt;
+    &lt;/main&gt;
+  &lt;/div&gt;
+  &lt;script src="savance-charts.js"&gt;&lt;/script&gt;
+  &lt;script&gt;
+    SavanceCharts.bar(document.getElementById('chart'), {
+      labels: ['Jan','Feb','Mar'], yMax: 30, yTicks: 3,
+      series: [{ name: 'Income', values: [12, 24, 18], fill: 'amber' },
+               { name: 'Homes',  values: [9, 16, 21],  fill: 'lavender' }]
+    });
+  &lt;/script&gt;
+&lt;/body&gt;</pre></div>
+    <div class="sg-group"><h3>Zasady stylu</h3>
+      <ul class="sg-rules">
+        <li><b>Tło zawsze ciepłe.</b> Za oknem bursztynowy gradient, w oknie prawie czarny sidebar i brązowy canvas z poświatą w prawym górnym rogu. Nigdy czysta szarość ani czysta czerń.</li>
+        <li><b>Kolor tylko w dwóch miejscach:</b> w rzędzie kart KPI i w danych na wykresach. Panele, tekst i kontrolki pozostają neutralne.</li>
+        <li><b>Jeden aktywny element nawigacji</b> w błękitnym gradiencie z poświatą. Cream pill to główna akcja w topbarze, amber dropdown to przełącznik kontekstu.</li>
+        <li><b>Maksymalnie 5 kart KPI w rzędzie</b>, w kolejności khaki → indigo → magenta → rose → sunset. Przy mniejszej liczbie zacznij od indigo.</li>
+        <li><b>Serie wykresów:</b> amber, lavender, sky, rose, gold, khaki, w tej kolejności. Poprzedni okres jako „ghost”. Zielony i czerwony tylko dla statusu.</li>
+        <li><b>Tekst nigdy w kolorze serii.</b> Wartości w text, etykiety w text-2, osie i podpisy w text-3. Kolor niesie kropka lub słupek obok.</li>
+        <li><b>Liczby tabelaryczne</b> (<code>.sv-num</code> lub <code>tabular-nums</code>) wszędzie tam, gdzie cyfry stoją w kolumnie.</li>
+      </ul>
+    </div>
+  </section>
+</div>
+</div>
+<div class="sg-toast" id="toast" hidden><span class="sv-chip sv-chip--accent" id="toast-text">Skopiowano</span></div>
+
+<script src="savance-charts.js"></script>
+<script>
+(function () {
+  var groups = [
+    ['Backdrop (za oknem aplikacji)', [
+      ['backdrop-amber', '#E0A35E'], ['backdrop-honey', '#A37D50'], ['backdrop-umber', '#836146'], ['backdrop-slate', '#545260']]],
+    ['Powierzchnie', [
+      ['shell', '#0C0908'], ['sidebar', '#0A0706'], ['canvas', '#1A1311'],
+      ['glass-1', 'rgba(255,244,235,.045)'], ['glass-2', 'rgba(255,244,235,.075)'], ['glass-3', 'rgba(255,244,235,.11)'],
+      ['glass-solid-1', '#221A17'], ['glass-solid-2', '#2B211D'], ['glass-solid-3', '#362B26'],
+      ['border', 'rgba(255,240,225,.09)'], ['border-strong', 'rgba(255,240,225,.16)'], ['border-glow', 'rgba(242,169,79,.45)']]],
+    ['Tekst', [
+      ['text', '#F6F0EA'], ['text-2', '#BDB3AB'], ['text-3', '#857B74'], ['text-on-light', '#1C1410'], ['text-on-accent', '#0F1A2A']]],
+    ['Amber (akcent marki)', [
+      ['amber-200', '#FAD9A6'], ['amber-300', '#F6C27E'], ['amber-400', '#EFA75E'], ['amber-500', '#E39F5F'], ['amber-600', '#D0822F'], ['amber-700', '#A8621C']]],
+    ['Sky (nawigacja, zaznaczenie)', [
+      ['sky-200', '#CBE6FB'], ['sky-300', '#A6D3F7'], ['sky-400', '#89BFEF'], ['sky-500', '#72B0EA'], ['sky-600', '#4F92D6'], ['sky-700', '#356FB0']]],
+    ['Lavender i indigo', [
+      ['lavender-200', '#DCD7F6'], ['lavender-300', '#BFB6E1'], ['lavender-400', '#A59CE6'], ['lavender-500', '#8A84E0'], ['lavender-600', '#6F6AD0'],
+      ['indigo-400', '#6F87C8'], ['indigo-500', '#6560D8'], ['indigo-600', '#6E429E'], ['indigo-700', '#4A2E80']]],
+    ['Magenta, rose, coral', [
+      ['magenta-400', '#CA768E'], ['magenta-500', '#BB4189'], ['magenta-600', '#962E6D'],
+      ['rose-400', '#E7768A'], ['rose-500', '#E05A7C'], ['coral-400', '#F0906E'], ['coral-500', '#E8745A']]],
+    ['Gold, khaki, cream, cocoa', [
+      ['gold-300', '#F8DC7E'], ['gold-400', '#F2C94C'], ['gold-500', '#E0B02E'],
+      ['khaki-300', '#B89C7C'], ['khaki-400', '#986F50'], ['khaki-500', '#76716E'],
+      ['cream-100', '#FBEFD9'], ['cream-200', '#F4DFBC'], ['cream-300', '#D0B690'],
+      ['cocoa-500', '#5A3E2C'], ['cocoa-600', '#3E2A1E'], ['cocoa-700', '#2A1C14']]],
+    ['Status (zarezerwowane)', [
+      ['success', '#3CCB7F'], ['warning', '#F5B544'], ['danger', '#EF5A5F'], ['info', '#89BFEF'], ['neutral', '#8A807A']]]
+  ];
+  var grads = [
+    ['Karty KPI', [
+      ['grad-kpi-khaki', 'linear-gradient(135deg, #9C7A58 0%, #807064 55%, #6E6A69 100%)'],
+      ['grad-kpi-indigo', 'linear-gradient(145deg, #6F87C8 0%, #6560D8 45%, #6E429E 100%)'],
+      ['grad-kpi-magenta', 'linear-gradient(120deg, #BB4189 0%, #CA5A93 50%, #D9738E 100%)'],
+      ['grad-kpi-rose', 'linear-gradient(120deg, #D2588A 0%, #E0727E 50%, #EE9270 100%)'],
+      ['grad-kpi-sunset', 'linear-gradient(135deg, #F4CB85 0%, #EBAA66 45%, #C9803F 100%)']]],
+    ['Interfejs', [
+      ['grad-nav-active', 'linear-gradient(90deg, #8FCBF6 0%, #72BDF2 55%, #5EA6E6 100%)'],
+      ['grad-pill-cream', 'linear-gradient(180deg, #FBEFD9 0%, #EFD7B0 100%)'],
+      ['grad-dropdown', 'linear-gradient(180deg, #4A3325 0%, #2E1F16 100%)'],
+      ['grad-accent-chip', 'linear-gradient(90deg, rgba(239,167,94,.30) 0%, rgba(239,167,94,.12) 100%)']]],
+    ['Słupki wykresów (góra → dół)', [
+      ['grad-bar-amber', 'linear-gradient(180deg, #F8C98A 0%, #E39F5F 60%, rgba(227,159,95,.35) 100%)'],
+      ['grad-bar-lavender', 'linear-gradient(180deg, #D6CFF6 0%, #A59CE6 60%, rgba(138,132,224,.35) 100%)'],
+      ['grad-bar-sky', 'linear-gradient(180deg, #F2D6A6 0%, #BCD7F2 35%, #89BFEF 70%, #5EA6E6 100%)'],
+      ['grad-bar-ghost', 'linear-gradient(180deg, rgba(255,240,225,.22) 0%, rgba(255,240,225,.04) 100%)'],
+      ['grad-area-gold', 'linear-gradient(180deg, rgba(242,201,76,.28) 0%, rgba(242,201,76,0) 100%)']]],
+    ['Tła powierzchni', [
+      ['backdrop', 'var(--sv-backdrop)'], ['sidebar-grad', 'var(--sv-sidebar-grad)'], ['canvas-grad', 'var(--sv-canvas-grad)']]]
+  ];
+  var chartOrder = [['chart-1 · amber', '#EFA75E'], ['chart-2 · lavender', '#A59CE6'], ['chart-3 · sky', '#89BFEF'],
+    ['chart-4 · rose', '#E05A7C'], ['chart-5 · gold', '#F2C94C'], ['chart-6 · khaki', '#B89C7C'], ['chart-muted', 'rgba(255,240,225,.18)']];
+
+  function swatch(name, val, isGrad) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'sg-swatch';
+    b.dataset.copyValue = 'var(--sv-' + name.split(' ')[0] + ')';
+    b.setAttribute('aria-label', 'Kopiuj ' + name);
+    var chip = document.createElement('div'); chip.className = 'sg-swatch__chip';
+    var i = document.createElement('i'); i.style.background = val; chip.appendChild(i);
+    var meta = document.createElement('div'); meta.className = 'sg-swatch__meta';
+    meta.innerHTML = '<span class="sg-swatch__name"></span><span class="sg-swatch__val"></span>';
+    meta.children[0].textContent = '--sv-' + name;
+    meta.children[1].textContent = isGrad && val.indexOf('var(') === 0 ? 'wielowarstwowy, patrz CSS' : val;
+    if (!(isGrad && val.indexOf('var(') === 0)) b.dataset.copyValue = val;
+    b.append(chip, meta);
+    return b;
+  }
+  function render(host, list, isGrad) {
+    list.forEach(function (g) {
+      var wrap = document.createElement('div'); wrap.className = 'sg-group';
+      var h = document.createElement('h3'); h.textContent = g[0];
+      var grid = document.createElement('div'); grid.className = isGrad ? 'sg-grads' : 'sg-swatches';
+      g[1].forEach(function (s) { grid.appendChild(swatch(s[0], s[1], isGrad)); });
+      wrap.append(h, grid); host.appendChild(wrap);
+    });
+  }
+  render(document.getElementById('swatch-groups'), groups, false);
+  render(document.getElementById('grad-groups'), grads, true);
+  var co = document.getElementById('chart-order');
+  chartOrder.forEach(function (s) { co.appendChild(swatch(s[0], s[1], false)); });
+
+  // skale
+  [4, 8, 12, 16, 20, 24, 32, 40, 48].forEach(function (v, i) {
+    var d = document.createElement('div'); d.className = 'sg-scale__item';
+    d.innerHTML = '<div class="sg-scale__bar" style="width:' + v + 'px;height:' + v + 'px"></div>' + v;
+    document.getElementById('space-scale').appendChild(d);
+  });
+  [['xs', 6], ['sm', 10], ['md', 14], ['lg', 18], ['xl', 26], ['pill', 999]].forEach(function (r) {
+    var d = document.createElement('div'); d.className = 'sg-scale__item';
+    d.innerHTML = '<div class="sg-radius" style="border-radius:' + r[1] + 'px"></div>' + r[0] + ' · ' + (r[1] === 999 ? '999' : r[1]) + 'px';
+    document.getElementById('radius-scale').appendChild(d);
+  });
+  [['shadow-card', 'var(--sv-shadow-card)'], ['shadow-pop', 'var(--sv-shadow-pop)'], ['glow-amber', 'var(--sv-glow-amber)'],
+   ['glow-sky', 'var(--sv-glow-sky)'], ['glow-indigo', 'var(--sv-glow-indigo)'], ['glow-magenta', 'var(--sv-glow-magenta)']].forEach(function (s) {
+    var d = document.createElement('div'); d.className = 'sg-scale__item';
+    d.innerHTML = '<div class="sg-shadow" style="box-shadow:' + s[1] + '"></div>--sv-' + s[0];
+    document.getElementById('shadow-row').appendChild(d);
+  });
+
+  // kopiowanie
+  var toast = document.getElementById('toast'), tt = document.getElementById('toast-text'), timer;
+  function flash(msg) { tt.textContent = msg; toast.hidden = false; clearTimeout(timer); timer = setTimeout(function () { toast.hidden = true; }, 1600); }
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-copy-value],[data-copy]');
+    if (!b) return;
+    var text = b.dataset.copyValue || document.getElementById(b.dataset.copy).textContent;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(function () { flash('Skopiowano: ' + (text.length > 40 ? text.slice(0, 40) + '…' : text)); },
+        function () { flash(text.length > 60 ? 'Zaznacz i skopiuj ręcznie' : text); });
+    } else { flash(text); }
+  });
+
+  // wykresy
+  var M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var pct = function (v) { return v + '%'; };
+  SavanceCharts.bar(document.getElementById('c-monthly'), {
+    title: 'Monthly savings', labels: M, yMax: 30, yTicks: 3, height: 170, format: function (v) { return v + 'k'; },
+    series: [
+      { name: 'Income', values: [6,21,12,18,24,17,20,23,26,13,19,9], fill: 'amber' },
+      { name: 'Homes',  values: [9,14,19,11,16,22,15,25,18,21,12,14], fill: 'lavender' },
+      { name: 'Prior year', values: [5,8,7,9,10,6,11,8,9,7,6,5], fill: 'ghost' }
+    ]
+  });
+  SavanceCharts.bar(document.getElementById('c-auto'), {
+    title: 'Automated savings', labels: ['Q1','Q2','Q3','Q4','Q5','Q6'], yMax: 40, yTicks: 4, height: 160, barWidth: 22, format: pct,
+    series: [{ name: 'Saved', values: [21,11,24,33,28,31], fill: 'sky' }]
+  });
+  SavanceCharts.bar(document.getElementById('c-calc'), {
+    title: 'Calculations', labels: ['Jan','Mar','May','Jul','Sep','Nov','Dec'], yMax: 25, yTicks: 5, height: 190, format: pct,
+    series: [
+      { name: 'Plan',   values: [9,6,13,11,9,7,21], fill: 'amber' },
+      { name: 'Actual', values: [7,15,17,19,12,15,23], fill: 'lavender' }
+    ]
+  });
+  SavanceCharts.line(document.getElementById('c-line'), {
+    title: 'Main feature saving', labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug'],
+    values: [18,22,20,41,28,35,48,52], yMax: 60, yTicks: 3, height: 160, color: 'gold', format: pct
+  });
+  SavanceCharts.bar(document.getElementById('c-demo-bar'), {
+    labels: ['Q1','Q2','Q3','Q4'], yMax: 40, yTicks: 4, height: 180, format: pct,
+    series: [{ name: 'Plan', values: [18,26,22,34], fill: 'amber' }, { name: 'Actual', values: [21,24,29,37], fill: 'lavender' }]
+  });
+  SavanceCharts.bar(document.getElementById('c-demo-sky'), {
+    labels: ['Mon','Tue','Wed','Thu','Fri'], yMax: 40, yTicks: 4, height: 180, barWidth: 24, format: pct,
+    series: [{ name: 'Saved', values: [19,9,27,35,30], fill: 'sky' }]
+  });
+  SavanceCharts.line(document.getElementById('c-demo-line'), {
+    labels: ['W1','W2','W3','W4','W5','W6'], values: [12,19,15,28,24,36], yMax: 40, yTicks: 4, height: 180, color: 'gold', format: pct
+  });
+})();
+</script>
