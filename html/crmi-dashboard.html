@@ -1,0 +1,1683 @@
+<!DOCTYPE html>
+<!--
+  CRMi - Dashboard (self-contained rebuild)
+
+  A from-scratch reproduction of the CRMi sales-dashboard layout as ONE file.
+  No external requests: no CDN, no webfonts, no icon fonts, no image files.
+  Everything (CSS, icons, charts) is inline, so the file works offline and
+  when opened straight from disk.
+
+  To repoint it at your own tooling, edit the DATA object near the top of the
+  <script> block - markup and charts are generated from it.
+-->
+<html lang="pl" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CRMi - Dashboard</title>
+<style>
+/* ============================================================
+   1. Design tokens
+   Dark is the default skin (as in the original). Light is opt-in
+   via data-theme="light" on <html>; the toggle persists it.
+   ============================================================ */
+:root{
+  color-scheme: dark;
+
+  --bg:#14161f;
+  --surface:#1e2130;
+  --surface-2:#262a3c;
+  --surface-3:#2f3447;
+  --line:#2f3447;
+
+  --ink:#ffffff;
+  --ink-2:#a9adc1;
+  --ink-3:#7b8098;
+
+  --brand:#7047ee;
+  --brand-2:#9a7cf4;
+  --brand-soft:rgba(112,71,238,.18);
+
+  /* categorical series - dark steps, validated against --surface */
+  --s1:#3987e5;
+  --s2:#d95926;
+  --s3:#199e70;
+  --s4:#c98500;
+
+  /* status - fixed, never themed */
+  --good:#0ca30c;
+  --warn:#fab219;
+  --serious:#ec835a;
+  --crit:#d03b3b;
+
+  --grid:#2f3447;
+  --track:#2a2f42;
+
+  --radius:14px;
+  --radius-sm:9px;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.22);
+
+  --hdr:64px;
+  --sb:72px;
+  --sb-wide:248px;
+  --gap:20px;
+}
+:root[data-theme="light"]{
+  color-scheme: light;
+
+  --bg:#f3f4f8;
+  --surface:#ffffff;
+  --surface-2:#f6f7fb;
+  --surface-3:#eceef5;
+  --line:#e4e6ef;
+
+  --ink:#15171f;
+  --ink-2:#545a6e;
+  --ink-3:#848aa0;
+
+  --brand:#7047ee;
+  --brand-2:#5a32d6;
+  --brand-soft:rgba(112,71,238,.10);
+
+  /* categorical series - light steps, validated against #ffffff */
+  --s1:#2a78d6;
+  --s2:#eb6834;
+  --s3:#1baf7a;
+  --s4:#eda100;
+
+  --grid:#e8e9ef;
+  --track:#eef0f6;
+
+  --shadow:0 1px 2px rgba(16,24,40,.06),0 8px 24px rgba(16,24,40,.06);
+}
+
+/* ============================================================
+   2. Base
+   ============================================================ */
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  font-size:14px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  min-height:100%;
+}
+h1,h2,h3,h4,h5,h6{margin:0;font-weight:600;line-height:1.25}
+p{margin:0}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+ul{margin:0;padding:0;list-style:none}
+svg{display:block}
+:focus-visible{outline:2px solid var(--brand-2);outline-offset:2px;border-radius:6px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.icon{width:20px;height:20px;flex:0 0 auto;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+.icon-sm{width:16px;height:16px}
+
+/* ============================================================
+   3. Header
+   ============================================================ */
+.header{
+  position:fixed;inset:0 0 auto 0;height:var(--hdr);z-index:40;
+  display:flex;align-items:center;gap:12px;
+  padding:0 16px;
+  background:var(--surface);
+  border-bottom:1px solid var(--line);
+}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:-.01em;font-size:17px}
+.brand-mark{
+  width:32px;height:32px;border-radius:9px;flex:0 0 auto;
+  display:grid;place-items:center;
+  background:linear-gradient(135deg,var(--brand),#4f8ef7);
+  color:#fff;font-weight:700;font-size:15px;
+}
+.icon-btn{
+  width:38px;height:38px;border-radius:10px;
+  display:grid;place-items:center;
+  color:var(--ink-2);background:var(--surface-2);
+  position:relative;transition:color .15s,background .15s;
+}
+.icon-btn:hover{color:var(--brand-2);background:var(--brand-soft)}
+.icon-btn[aria-pressed="true"]{color:var(--brand-2);background:var(--brand-soft)}
+.icon-btn .dot{
+  position:absolute;top:7px;right:8px;width:7px;height:7px;border-radius:50%;
+  background:var(--crit);box-shadow:0 0 0 2px var(--surface);
+}
+.search{position:relative;flex:1 1 auto;max-width:340px}
+.search .icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--ink-3)}
+.search input{
+  width:100%;height:38px;padding:0 12px 0 38px;
+  border-radius:10px;border:1px solid transparent;
+  background:var(--surface-2);color:var(--ink);font:inherit;
+}
+.search input::placeholder{color:var(--ink-3)}
+.search input:focus{border-color:var(--brand);outline:none;background:var(--surface)}
+.header-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.avatar{
+  width:38px;height:38px;border-radius:50%;flex:0 0 auto;
+  display:grid;place-items:center;font-weight:600;font-size:13px;color:#fff;
+  background:linear-gradient(135deg,#4f8ef7,var(--brand));
+}
+.who{display:none;line-height:1.2}
+.who b{display:block;font-size:13px}
+.who span{font-size:12px;color:var(--ink-3)}
+@media(min-width:1100px){.who{display:block}}
+
+/* ============================================================
+   4. Sidebar (mini, widens on hover or when pinned)
+   ============================================================ */
+.sidebar{
+  position:fixed;top:var(--hdr);bottom:0;left:0;z-index:45;
+  width:var(--sb);
+  background:var(--surface);
+  border-right:1px solid var(--line);
+  padding:14px 0 24px;
+  overflow:hidden auto;
+  scrollbar-width:thin;
+  transition:width .18s ease, transform .22s ease;
+}
+.sidebar:hover,body.sb-pinned .sidebar{width:var(--sb-wide)}
+.nav-group{padding:16px 18px 6px;font-size:10.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);white-space:nowrap;opacity:0;transition:opacity .15s}
+.sidebar:hover .nav-group,body.sb-pinned .nav-group{opacity:1}
+.nav-group:first-child{padding-top:2px}
+.nav-link{
+  display:flex;align-items:center;gap:14px;
+  height:46px;margin:2px 10px;padding:0 14px;
+  border-radius:11px;color:var(--ink-2);white-space:nowrap;
+  transition:color .15s,background .15s;
+}
+.nav-link:hover{color:var(--ink);background:var(--surface-2)}
+.nav-link[aria-current="page"]{color:#fff;background:linear-gradient(135deg,var(--brand),#5a74f0)}
+.nav-link .label{opacity:0;transition:opacity .15s}
+.sidebar:hover .nav-link .label,body.sb-pinned .nav-link .label{opacity:1}
+.nav-link .badge{
+  margin-left:auto;font-size:11px;font-weight:700;padding:1px 7px;border-radius:999px;
+  background:var(--brand-soft);color:var(--brand-2);opacity:0;transition:opacity .15s;
+}
+.sidebar:hover .nav-link .badge,body.sb-pinned .nav-link .badge{opacity:1}
+.backdrop{
+  position:fixed;inset:0;z-index:44;background:rgba(8,9,14,.6);
+  opacity:0;visibility:hidden;transition:opacity .2s,visibility .2s;
+}
+.backdrop.show{opacity:1;visibility:visible}
+
+/* ============================================================
+   5. Shell
+   ============================================================ */
+.main{padding:calc(var(--hdr) + var(--gap)) var(--gap) 84px calc(var(--sb) + var(--gap));min-height:100vh;display:flex;flex-direction:column}
+.page-head{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px;margin-bottom:var(--gap)}
+.page-head h1{font-size:21px;letter-spacing:-.015em}
+.crumbs{font-size:12.5px;color:var(--ink-3)}
+.crumbs span{color:var(--ink-2)}
+.page-head .spacer{flex:1 1 auto}
+
+/* ============================================================
+   6. Grid + cards
+   ============================================================ */
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:var(--gap);align-content:start}
+.card{
+  grid-column:span 12;
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:18px;
+  min-width:0;
+}
+.card-head{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.card-head h2{font-size:15px;letter-spacing:-.01em}
+.card-head .sub{font-size:12.5px;color:var(--ink-3)}
+.card-head .tools{margin-left:auto;display:flex;align-items:center;gap:6px}
+.chip{
+  font-size:11.5px;font-weight:600;padding:4px 10px;border-radius:999px;
+  background:var(--surface-2);color:var(--ink-2);border:1px solid transparent;
+}
+.chip:hover{color:var(--ink)}
+.chip[aria-pressed="true"]{background:var(--brand-soft);color:var(--brand-2)}
+.seg{display:flex;gap:2px;padding:3px;border-radius:999px;background:var(--surface-2)}
+.seg button{font-size:11.5px;font-weight:600;padding:4px 11px;border-radius:999px;color:var(--ink-3)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.2)}
+
+/* column spans */
+@media(min-width:720px){
+  .c6{grid-column:span 6}
+  .c4,.c3{grid-column:span 6}
+  .c5,.c7,.c8{grid-column:span 12}
+}
+@media(min-width:1180px){
+  .c3{grid-column:span 3}
+  .c4{grid-column:span 4}
+  .c5{grid-column:span 5}
+  .c6{grid-column:span 6}
+  .c7{grid-column:span 7}
+  .c8{grid-column:span 8}
+}
+
+/* ============================================================
+   7. Stat tiles
+   ============================================================ */
+.stat .label{font-size:12.5px;color:var(--ink-3);font-weight:500}
+.stat .value{font-size:28px;font-weight:650;letter-spacing:-.02em;margin-top:2px}
+.stat-row{display:flex;align-items:flex-start;gap:14px}
+.stat-ico{
+  width:44px;height:44px;border-radius:12px;flex:0 0 auto;
+  display:grid;place-items:center;background:var(--surface-2);color:var(--ink-2);
+}
+.delta{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:650;margin-top:6px}
+.delta .icon{width:14px;height:14px;stroke-width:2.25}
+.up{color:var(--good)}
+.down{color:var(--crit)}
+.muted{color:var(--ink-3);font-weight:500}
+.card.brand{
+  background:linear-gradient(135deg,var(--brand) 0%,#5a74f0 55%,#4f8ef7 100%);
+  border-color:transparent;color:#fff;
+}
+.card.brand .label,.card.brand .sub{color:rgba(255,255,255,.78)}
+.card.brand .stat-ico{background:rgba(255,255,255,.16);color:#fff}
+.meter{height:6px;border-radius:999px;background:var(--track);overflow:hidden;margin-top:12px}
+.card.brand .meter{background:rgba(255,255,255,.22)}
+.meter i{display:block;height:100%;border-radius:999px;background:var(--brand)}
+.card.brand .meter i{background:#fff}
+
+/* summary strip above a chart */
+.summary{display:flex;flex-wrap:wrap;gap:8px 28px;margin:10px 0 2px}
+.summary > div{min-width:96px}
+.summary .label{font-size:12px;color:var(--ink-3)}
+.summary .value{font-size:19px;font-weight:650;letter-spacing:-.015em}
+
+/* ============================================================
+   8. Charts
+   ============================================================ */
+.chart{position:relative;margin-top:10px}
+.chart svg{width:100%;height:auto;overflow:visible}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:12px}
+.legend span{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink-2)}
+.legend i{width:10px;height:10px;border-radius:3px;flex:0 0 auto}
+.legend i.line{width:14px;height:3px;border-radius:2px}
+.viz-tip{
+  position:fixed;z-index:80;pointer-events:none;opacity:0;
+  transform:translate(-50%,-100%);transition:opacity .1s;
+  background:var(--surface);color:var(--ink);
+  border:1px solid var(--line);border-radius:10px;
+  box-shadow:0 8px 28px rgba(0,0,0,.35);
+  padding:8px 10px;font-size:12.5px;min-width:120px;
+}
+.viz-tip.show{opacity:1}
+.viz-tip b{display:block;font-size:11.5px;color:var(--ink-3);font-weight:600;margin-bottom:5px}
+.viz-tip .row{display:flex;align-items:center;gap:8px;white-space:nowrap}
+.viz-tip .row i{width:9px;height:9px;border-radius:3px;flex:0 0 auto}
+.viz-tip .row em{font-style:normal;color:var(--ink-2)}
+.viz-tip .row strong{margin-left:auto;font-variant-numeric:tabular-nums}
+
+/* table view (the accessible alternative to every chart) */
+.data-table{width:100%;border-collapse:collapse;margin-top:12px;font-size:12.5px}
+.data-table caption{text-align:left;color:var(--ink-3);font-size:12px;padding-bottom:8px}
+.data-table th,.data-table td{padding:7px 10px;border-bottom:1px solid var(--line);text-align:right}
+.data-table th:first-child,.data-table td:first-child{text-align:left}
+.data-table thead th{color:var(--ink-3);font-weight:600;font-size:11.5px;text-transform:uppercase;letter-spacing:.05em}
+.data-table td{font-variant-numeric:tabular-nums;color:var(--ink-2)}
+.data-table td:first-child{color:var(--ink)}
+.data-table .key{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:8px}
+[hidden]{display:none !important}
+
+/* hero figure (gauge card) */
+.hero{text-align:center;margin-top:-6px}
+.hero .fig{font-size:40px;font-weight:650;letter-spacing:-.025em;line-height:1.1}
+.hero .meta{display:flex;justify-content:center;gap:18px;margin-top:8px;font-size:12.5px;color:var(--ink-2)}
+.hero .meta b{color:var(--ink);font-weight:650}
+
+/* ============================================================
+   9. Lists (top products, regional, locations)
+   ============================================================ */
+.rows{margin-top:6px}
+.rows li{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+.rows li:last-child{border-bottom:0}
+.thumb{
+  width:38px;height:38px;border-radius:10px;flex:0 0 auto;
+  display:grid;place-items:center;background:var(--surface-2);color:var(--ink-2);
+}
+.rows .nm{min-width:0}
+.rows .nm b{display:block;font-size:13.5px;font-weight:600}
+.rows .nm span{font-size:12px;color:var(--ink-3)}
+.rows .amt{margin-left:auto;text-align:right;font-size:13.5px;font-weight:650;font-variant-numeric:tabular-nums}
+.total{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-top:14px;padding-top:14px;border-top:1px solid var(--line);
+}
+.total .label{font-size:13px;color:var(--ink-2)}
+.total .value{font-size:18px;font-weight:700;color:var(--brand-2);letter-spacing:-.015em}
+
+/* ============================================================
+   10. Right panel (Quick Actions)
+   ============================================================ */
+.rightbar{
+  position:fixed;top:0;right:0;bottom:0;z-index:46;width:min(340px,100%);
+  background:var(--surface);border-left:1px solid var(--line);
+  transform:translateX(101%);transition:transform .24s ease;
+  display:flex;flex-direction:column;
+}
+.rightbar.open{transform:none}
+.rightbar-head{display:flex;align-items:center;gap:10px;padding:16px 18px;border-bottom:1px solid var(--line)}
+.rightbar-head h2{font-size:15px}
+.rightbar-head .sub{font-size:12px;color:var(--ink-3)}
+.rightbar-body{overflow:auto;padding:18px;display:flex;flex-direction:column;gap:22px;scrollbar-width:thin}
+.panel-title{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);margin-bottom:10px}
+.quick{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.quick a{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  padding:11px 4px;border-radius:11px;background:var(--surface-2);
+  color:var(--ink-2);font-size:10.5px;text-align:center;line-height:1.2;
+}
+.quick a:hover{color:var(--brand-2);background:var(--brand-soft)}
+.steps li{display:flex;gap:12px;padding-bottom:16px;position:relative}
+.steps li::before{
+  content:"";position:absolute;left:7px;top:20px;bottom:0;width:2px;background:var(--line);
+}
+.steps li:last-child{padding-bottom:0}
+.steps li:last-child::before{display:none}
+.steps .pin{width:16px;height:16px;border-radius:50%;flex:0 0 auto;margin-top:3px;border:3px solid var(--surface);box-shadow:0 0 0 2px currentColor}
+.steps .nm b{display:block;font-size:13px}
+.steps .nm span{font-size:11.5px;color:var(--ink-3)}
+.msgs li{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:12.5px}
+.msgs li:last-child{border-bottom:0}
+.msgs time{color:var(--ink-3);font-variant-numeric:tabular-nums;flex:0 0 auto;font-size:11.5px;padding-top:1px}
+.msgs .nm span{color:var(--ink-3);font-size:11.5px}
+.toggles li{display:flex;align-items:center;gap:10px;padding:9px 0;font-size:13px;color:var(--ink-2)}
+.switch{
+  margin-left:auto;width:38px;height:22px;border-radius:999px;background:var(--track);
+  position:relative;flex:0 0 auto;transition:background .16s;
+}
+.switch::after{
+  content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;
+  background:var(--ink-3);transition:transform .16s,background .16s;
+}
+.switch[aria-pressed="true"]{background:var(--brand-soft)}
+.switch[aria-pressed="true"]::after{transform:translateX(16px);background:var(--brand)}
+.cart li{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)}
+.cart li:last-child{border-bottom:0}
+.btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;height:42px;border-radius:11px;font-weight:650;font-size:13.5px;
+  background:linear-gradient(135deg,var(--brand),#5a74f0);color:#fff;
+}
+.btn:hover{filter:brightness(1.08)}
+
+/* ============================================================
+   11. Chat popup
+   ============================================================ */
+.chat-fab{
+  position:fixed;right:20px;bottom:20px;z-index:50;
+  width:52px;height:52px;border-radius:50%;display:grid;place-items:center;
+  background:linear-gradient(135deg,var(--brand),#5a74f0);color:#fff;
+  box-shadow:0 10px 28px rgba(80,50,200,.42);
+}
+.chat{
+  position:fixed;right:20px;bottom:20px;z-index:51;
+  width:min(320px,calc(100vw - 32px));
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  box-shadow:0 18px 50px rgba(0,0,0,.45);
+  display:flex;flex-direction:column;overflow:hidden;
+  transform-origin:100% 100%;
+}
+.chat[hidden]{display:none !important}
+.chat-head{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line)}
+.chat-head .nm b{display:block;font-size:13.5px}
+.chat-head .nm span{font-size:11.5px;color:var(--good);display:inline-flex;align-items:center;gap:5px}
+.chat-head .nm span::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--good)}
+.chat-log{padding:14px;display:flex;flex-direction:column;gap:12px;max-height:280px;overflow:auto;scrollbar-width:thin}
+.msg{display:flex;gap:9px;max-width:88%}
+.msg .bub{padding:8px 11px;border-radius:12px;font-size:12.5px;background:var(--surface-2);color:var(--ink)}
+.msg time{display:block;font-size:10.5px;color:var(--ink-3);margin-top:4px}
+.msg.self{margin-left:auto;flex-direction:row-reverse}
+.msg.self .bub{background:var(--brand);color:#fff}
+.msg.self time{text-align:right}
+.chat-input{display:flex;gap:8px;padding:11px;border-top:1px solid var(--line)}
+.chat-input input{
+  flex:1 1 auto;height:38px;padding:0 12px;border-radius:10px;
+  border:1px solid transparent;background:var(--surface-2);color:var(--ink);font:inherit;
+}
+.chat-input input:focus{border-color:var(--brand);outline:none}
+.chat-input button{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;background:var(--brand);color:#fff}
+
+/* ============================================================
+   12. Footer
+   ============================================================ */
+.footer{
+  margin:var(--gap) calc(var(--gap) * -1) 0;
+  padding:16px var(--gap);
+  border-top:1px solid var(--line);
+  display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;
+  font-size:12.5px;color:var(--ink-3);
+}
+.footer nav{margin-left:auto;display:flex;gap:16px}
+.footer a:hover{color:var(--ink-2)}
+
+/* ============================================================
+   13. Small screens
+   ============================================================ */
+@media(max-width:991px){
+  :root{--gap:14px}
+  .main{padding-left:var(--gap)}
+  .sidebar{transform:translateX(-101%);width:var(--sb-wide);top:0;padding-top:14px}
+  .sidebar .nav-group,.sidebar .nav-link .label,.sidebar .nav-link .badge{opacity:1}
+  body.sb-open .sidebar{transform:none}
+  .search{max-width:none}
+}
+@media(max-width:600px){
+  .search{display:none}
+  .stat .value{font-size:24px}
+  .hero .fig{font-size:34px}
+}
+@media(prefers-reduced-motion:reduce){
+  *{transition-duration:.01ms !important;animation-duration:.01ms !important}
+}
+@media print{
+  .header,.sidebar,.rightbar,.chat,.chat-fab,.backdrop,.card-head .tools{display:none !important}
+  .main{padding:0}
+  .card{break-inside:avoid;box-shadow:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     Inline icon sprite - replaces the icon font the original used
+     ============================================================ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+<symbol id="i-menu" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></symbol>
+<symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></symbol>
+<symbol id="i-mail" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 6 10-6"/></symbol>
+<symbol id="i-cog" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.6"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></symbol>
+<symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></symbol>
+<symbol id="i-bars" viewBox="0 0 24 24"><path d="M3 20h18M7 20v-7M12 20V8M17 20v-4"/></symbol>
+<symbol id="i-pie" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v9l7.8 4.5"/></symbol>
+<symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9"/></symbol>
+<symbol id="i-case" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></symbol>
+<symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 9 9 0 0 1-4.2-1L3 20l1.1-4.1A8.4 8.4 0 0 1 12 3.1a8.4 8.4 0 0 1 9 8.4z"/></symbol>
+<symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></symbol>
+<symbol id="i-file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h5"/></symbol>
+<symbol id="i-card" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></symbol>
+<symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></symbol>
+<symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0z"/><circle cx="12" cy="10" r="3"/></symbol>
+<symbol id="i-cart" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1.4"/><circle cx="18" cy="21" r="1.4"/><path d="M2 3h2.6l2.6 12.6a2 2 0 0 0 2 1.6h8.4a2 2 0 0 0 2-1.6L21 7H5.2"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></symbol>
+<symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.4"/><path d="M12 1v2.5M12 20.5V23M3.5 3.5l1.8 1.8M18.7 18.7l1.8 1.8M1 12h2.5M20.5 12H23M3.5 20.5l1.8-1.8M18.7 5.3l1.8-1.8"/></symbol>
+<symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></symbol>
+<symbol id="i-up" viewBox="0 0 24 24"><path d="M22 7l-8.5 8.5-4-4L2 19"/><path d="M16 7h6v6"/></symbol>
+<symbol id="i-down" viewBox="0 0 24 24"><path d="M22 17l-8.5-8.5-4 4L2 5"/><path d="M16 17h6v-6"/></symbol>
+<symbol id="i-send" viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/></symbol>
+<symbol id="i-more" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="12" cy="19" r="1.4"/></symbol>
+<symbol id="i-package" viewBox="0 0 24 24"><path d="M21 8l-9-5-9 5v8l9 5 9-5z"/><path d="M3 8l9 5 9-5M12 13v10"/></symbol>
+<symbol id="i-activity" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></symbol>
+<symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 12l10 5 10-5M2 17l10 5 10-5"/></symbol>
+<symbol id="i-dollar" viewBox="0 0 24 24"><path d="M12 1.5v21"/><path d="M17 5.5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></symbol>
+<symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5"/><path d="M9.2 9.2a3 3 0 0 1 5.8 1c0 2-2.9 2.6-2.9 4"/><path d="M12 17.4h.01"/></symbol>
+<symbol id="i-right" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+<symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.4"/></symbol>
+<symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/></symbol>
+<symbol id="i-table" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9.5h18M9 9.5V20"/></symbol>
+<symbol id="i-store" viewBox="0 0 24 24"><path d="M4 9.5V20a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V9.5"/><path d="M2 9.5l2.2-5.1A1 1 0 0 1 5.1 3.8h13.8a1 1 0 0 1 .9.6L22 9.5z"/><path d="M9.5 21v-6h5v6"/></symbol>
+</defs></svg>
+
+<!-- ============================================================
+     Header
+     ============================================================ -->
+<header class="header">
+  <button class="icon-btn" id="sbToggle" aria-label="Przełącz menu"><svg class="icon"><use href="#i-menu"/></svg></button>
+
+  <a class="brand" href="#">
+    <span class="brand-mark" aria-hidden="true">C</span>
+    <span>CRM<span style="color:var(--brand-2)">i</span></span>
+  </a>
+
+  <form class="search" role="search" onsubmit="return false">
+    <svg class="icon icon-sm"><use href="#i-search"/></svg>
+    <label class="sr-only" for="q">Szukaj</label>
+    <input id="q" type="search" placeholder="Szukaj klientów, zamówień, raportów…">
+  </form>
+
+  <div class="header-right">
+    <button class="icon-btn" id="themeBtn" aria-label="Przełącz motyw">
+      <svg class="icon" id="themeIcon"><use href="#i-sun"/></svg>
+    </button>
+    <button class="icon-btn" aria-label="Powiadomienia (5 nowych)">
+      <svg class="icon"><use href="#i-bell"/></svg><span class="dot"></span>
+    </button>
+    <button class="icon-btn" aria-label="Wiadomości">
+      <svg class="icon"><use href="#i-mail"/></svg>
+    </button>
+    <button class="icon-btn" id="rbToggle" aria-label="Szybkie akcje" aria-expanded="false">
+      <svg class="icon"><use href="#i-grid"/></svg>
+    </button>
+    <span class="avatar" aria-hidden="true">TP</span>
+    <span class="who"><b>Tomasz P.</b><span>Administrator</span></span>
+  </div>
+</header>
+
+<!-- ============================================================
+     Sidebar
+     ============================================================ -->
+<nav class="sidebar" id="sidebar" aria-label="Menu główne">
+  <div class="nav-group">Główne</div>
+  <a class="nav-link" href="#" aria-current="page"><svg class="icon"><use href="#i-grid"/></svg><span class="label">Dashboard</span></a>
+  <a class="nav-link" href="#"><svg class="icon"><use href="#i-bars"/></svg><span class="label">Raporty</span></a>
+  <a class="nav-link" href="#"><svg class="icon"><use href="#i-card"/></svg><span class="label">Wydatki</span></a>
+  <a class="nav-link" href="#"><svg class="icon"><use href="#i-help"/></svg><span class="label">Wsparcie</span><span class="badge">23</span></a>
+  <a class="nav-link" href="#"><svg class="icon"><use href="#i-chat"/></svg><span class="label">Czat</span></a>
+  <a class="nav-link" href="#"><svg class="icon"><use href="#i-users"/></svg><span class="label">Kontakty</span></a>
+
+  <div class="nav-group">Sprzedaż</div>
+  <a class="nav-link" href="#"><svg class="icon"><use href="#i-cart"/></svg><span class="label">Zamówienia</span></a>
+  <a class="nav-link" href="#"><svg class="icon"><use href="#i-package"/></svg><span class="label">Produkty</span></a>
+  <a class="nav-link" href="#"><svg class="icon"><use href="#i-case"/></svg><span class="label">Projekty</span></a>
+  <a class="nav-link" href="#"><svg class="icon"><use href="#i-file"/></svg><span class="label">Faktury</span></a>
+
+  <div class="nav-group">System</div>
+  <a class="nav-link" href="#"><svg class="icon"><use href="#i-shield"/></svg><span class="label">Uprawnienia</span></a>
+  <a class="nav-link" href="#"><svg class="icon"><use href="#i-activity"/></svg><span class="label">Dziennik zdarzeń</span></a>
+  <a class="nav-link" href="#"><svg class="icon"><use href="#i-cog"/></svg><span class="label">Ustawienia</span></a>
+</nav>
+<div class="backdrop" id="backdrop"></div>
+
+<!-- ============================================================
+     Main
+     ============================================================ -->
+<main class="main">
+  <div class="page-head">
+    <div>
+      <h1>Dashboard</h1>
+      <p class="crumbs">CRMi &nbsp;/&nbsp; <span>Sprzedaż</span></p>
+    </div>
+    <div class="spacer"></div>
+    <div class="seg" role="group" aria-label="Zakres danych w przeglądzie sprzedaży">
+      <button type="button" data-range="6" aria-pressed="false">6 mies.</button>
+      <button type="button" data-range="12" aria-pressed="true">12 mies.</button>
+      <button type="button" data-range="24" aria-pressed="false">24 mies.</button>
+    </div>
+  </div>
+
+  <div class="grid">
+
+    <!-- ---------- KPI row ---------- -->
+    <section class="card brand c3">
+      <div class="stat stat-row">
+        <span class="stat-ico" aria-hidden="true"><svg class="icon"><use href="#i-store"/></svg></span>
+        <div>
+          <p class="label">Status sklepu</p>
+          <p class="value">Dobry</p>
+        </div>
+      </div>
+      <div class="meter" role="img" aria-label="Kondycja sklepu: 88 procent"><i style="width:88%"></i></div>
+      <p class="label" style="margin-top:8px;font-size:11.5px">88% — wszystkie usługi online</p>
+    </section>
+
+    <section class="card c3">
+      <div class="stat stat-row">
+        <span class="stat-ico" aria-hidden="true"><svg class="icon"><use href="#i-dollar"/></svg></span>
+        <div>
+          <p class="label">Sprzedaż łącznie</p>
+          <p class="value">$314k</p>
+          <p class="delta up"><svg class="icon"><use href="#i-up"/></svg>8,4% <span class="muted">vs poprz. okres</span></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="card c3">
+      <div class="stat stat-row">
+        <span class="stat-ico" aria-hidden="true"><svg class="icon"><use href="#i-up"/></svg></span>
+        <div>
+          <p class="label">Zysk łącznie</p>
+          <p class="value">$90k</p>
+          <p class="delta up"><svg class="icon"><use href="#i-up"/></svg>2,4% <span class="muted">vs poprz. okres</span></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="card c3">
+      <div class="stat stat-row">
+        <span class="stat-ico" aria-hidden="true"><svg class="icon"><use href="#i-activity"/></svg></span>
+        <div>
+          <p class="label">Przychód łącznie</p>
+          <p class="value">$9 102k</p>
+          <p class="delta down"><svg class="icon"><use href="#i-down"/></svg>1,9% <span class="muted">vs poprz. okres</span></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- Sales overview ---------- -->
+    <section class="card c8">
+      <div class="card-head">
+        <div>
+          <h2>Przegląd sprzedaży</h2>
+          <p class="sub">Zysk i koszty miesięcznie, w tys. USD</p>
+        </div>
+        <div class="tools">
+          <button class="chip" data-table-for="salesOverview" aria-pressed="false">
+            <svg class="icon icon-sm" style="display:inline-block;vertical-align:-3px"><use href="#i-table"/></svg> Tabela
+          </button>
+          <button class="chip" data-csv-for="salesOverview" aria-label="Pobierz CSV">
+            <svg class="icon icon-sm" style="display:inline-block;vertical-align:-3px"><use href="#i-download"/></svg> CSV
+          </button>
+        </div>
+      </div>
+
+      <div class="summary">
+        <div>
+          <p class="label">Zysk</p>
+          <p class="value">$25K</p>
+          <p class="delta up"><svg class="icon"><use href="#i-up"/></svg>2,37%</p>
+        </div>
+        <div>
+          <p class="label">Koszty</p>
+          <p class="value">$39K</p>
+          <p class="delta up"><svg class="icon"><use href="#i-up"/></svg>1,74%</p>
+        </div>
+        <div>
+          <p class="label">Przychód</p>
+          <p class="value">$208B</p>
+          <p class="delta down"><svg class="icon"><use href="#i-down"/></svg>7,37%</p>
+        </div>
+      </div>
+
+      <div class="chart" data-chart="salesOverview">
+        <div class="chart-svg"></div>
+        <div class="chart-table" hidden></div>
+      </div>
+      <div class="legend" data-legend="salesOverview"></div>
+    </section>
+
+    <!-- ---------- Production by unit ---------- -->
+    <section class="card c4">
+      <div class="card-head">
+        <div>
+          <h2>Produkcja wg zakładu</h2>
+          <p class="sub">Udział w wolumenie, ostatni kwartał</p>
+        </div>
+        <div class="tools">
+          <button class="chip" data-table-for="production" aria-pressed="false">
+            <svg class="icon icon-sm" style="display:inline-block;vertical-align:-3px"><use href="#i-table"/></svg> Tabela
+          </button>
+        </div>
+      </div>
+      <div class="chart" data-chart="production">
+        <div class="chart-svg"></div>
+        <div class="chart-table" hidden></div>
+      </div>
+      <div class="legend" data-legend="production"></div>
+    </section>
+
+    <!-- ---------- Plant productivity (hero + gauge) ---------- -->
+    <section class="card c4">
+      <div class="card-head">
+        <div>
+          <h2>Wydajność zakładu</h2>
+          <p class="sub">Realizacja celu, bieżący miesiąc</p>
+        </div>
+      </div>
+      <div class="chart" data-chart="productivity">
+        <div class="chart-svg"></div>
+      </div>
+      <div class="hero">
+        <div class="meta">
+          <span>Cel: <b>85,00%</b></span>
+          <span class="delta up" style="margin:0"><svg class="icon"><use href="#i-up"/></svg>5,0% m/m</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- Order overview ---------- -->
+    <section class="card c5">
+      <div class="card-head">
+        <div>
+          <h2>Przegląd zamówień</h2>
+          <p class="sub">Liczba zamówień wg kanału</p>
+        </div>
+        <div class="tools">
+          <div class="seg" role="group" aria-label="Ziarnistość">
+            <button type="button" data-grain="monthly" aria-pressed="true">Mies.</button>
+            <button type="button" data-grain="weekly" aria-pressed="false">Tyg.</button>
+          </div>
+          <button class="chip" data-table-for="orderOverview" aria-pressed="false" aria-label="Widok tabeli">
+            <svg class="icon icon-sm" style="display:inline-block;vertical-align:-3px"><use href="#i-table"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="chart" data-chart="orderOverview">
+        <div class="chart-svg"></div>
+        <div class="chart-table" hidden></div>
+      </div>
+      <div class="legend" data-legend="orderOverview"></div>
+    </section>
+
+    <!-- ---------- Top products ---------- -->
+    <section class="card c3">
+      <div class="card-head">
+        <div><h2>Najlepsze produkty</h2></div>
+        <div class="tools"><button class="icon-btn" style="width:30px;height:30px" aria-label="Więcej"><svg class="icon icon-sm"><use href="#i-more"/></svg></button></div>
+      </div>
+      <ul class="rows" id="topProducts"></ul>
+      <div class="total">
+        <span class="label">Sprzedaż łącznie</span>
+        <span class="value">$8 459k</span>
+      </div>
+    </section>
+
+    <!-- ---------- Regional sales ---------- -->
+    <section class="card c7">
+      <div class="card-head">
+        <div>
+          <h2>Sprzedaż regionalna</h2>
+          <p class="sub">Online vs. stacjonarnie, w tys. USD</p>
+        </div>
+        <div class="tools">
+          <button class="chip" data-table-for="regional" aria-pressed="false">
+            <svg class="icon icon-sm" style="display:inline-block;vertical-align:-3px"><use href="#i-table"/></svg> Tabela
+          </button>
+          <button class="chip" data-csv-for="regional" aria-label="Pobierz CSV">
+            <svg class="icon icon-sm" style="display:inline-block;vertical-align:-3px"><use href="#i-download"/></svg> CSV
+          </button>
+        </div>
+      </div>
+      <div class="chart" data-chart="regional">
+        <div class="chart-svg"></div>
+        <div class="chart-table" hidden></div>
+      </div>
+      <div class="legend" data-legend="regional"></div>
+    </section>
+
+    <!-- ---------- Sales by customer location ---------- -->
+    <section class="card c5">
+      <div class="card-head">
+        <div>
+          <h2>Sprzedaż wg lokalizacji</h2>
+          <p class="sub">Udział w przychodzie, top 7 rynków</p>
+        </div>
+        <div class="tools">
+          <button class="chip" data-table-for="locations" aria-pressed="false" aria-label="Widok tabeli">
+            <svg class="icon icon-sm" style="display:inline-block;vertical-align:-3px"><use href="#i-table"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="chart" data-chart="locations">
+        <div class="chart-svg"></div>
+        <div class="chart-table" hidden></div>
+      </div>
+    </section>
+
+  </div>
+
+  <footer class="footer">
+    <span>&copy; <span id="yr"></span> CRMi — szkielet dashboardu</span>
+    <nav>
+      <a href="#">Dokumentacja</a>
+      <a href="#">Pomoc</a>
+      <a href="#">Prywatność</a>
+    </nav>
+  </footer>
+</main>
+
+<!-- ============================================================
+     Right panel - Quick Actions
+     ============================================================ -->
+<aside class="rightbar" id="rightbar" aria-label="Szybkie akcje" aria-hidden="true">
+  <div class="rightbar-head">
+    <div>
+      <h2>Szybkie akcje</h2>
+      <p class="sub">23 zadania w toku</p>
+    </div>
+    <button class="icon-btn" id="rbClose" style="margin-left:auto" aria-label="Zamknij panel"><svg class="icon"><use href="#i-x"/></svg></button>
+  </div>
+
+  <div class="rightbar-body">
+    <section>
+      <p class="panel-title">Skróty</p>
+      <div class="quick">
+        <a href="#"><svg class="icon"><use href="#i-card"/></svg>Księgowość</a>
+        <a href="#"><svg class="icon"><use href="#i-users"/></svg>Zespół</a>
+        <a href="#"><svg class="icon"><use href="#i-case"/></svg>Projekty</a>
+        <a href="#"><svg class="icon"><use href="#i-pin"/></svg>Klienci</a>
+        <a href="#"><svg class="icon"><use href="#i-mail"/></svg>E-mail</a>
+        <a href="#"><svg class="icon"><use href="#i-cog"/></svg>Ustawienia</a>
+        <a href="#"><svg class="icon"><use href="#i-cart"/></svg>Zamówienia</a>
+        <a href="#"><svg class="icon"><use href="#i-shield"/></svg>Audyt</a>
+      </div>
+    </section>
+
+    <section>
+      <p class="panel-title">Przebieg zadań</p>
+      <ul class="steps" id="steps"></ul>
+    </section>
+
+    <section>
+      <p class="panel-title">Komunikaty systemowe</p>
+      <ul class="msgs" id="msgs"></ul>
+    </section>
+
+    <section>
+      <p class="panel-title">Przełączniki</p>
+      <ul class="toggles" id="toggles"></ul>
+    </section>
+
+    <section>
+      <p class="panel-title">Koszyk</p>
+      <ul class="cart" id="cart"></ul>
+      <div class="total"><span class="label">Suma częściowa</span><span class="value" style="color:var(--ink)">$4 125,00</span></div>
+      <div class="total" style="margin-top:0;border-top:0;padding-top:4px"><span class="label">Do zapłaty</span><span class="value">$1 248,00</span></div>
+      <button class="btn" style="margin-top:12px"><svg class="icon icon-sm"><use href="#i-cart"/></svg> Złóż zamówienie</button>
+    </section>
+  </div>
+</aside>
+
+<!-- ============================================================
+     Chat popup
+     ============================================================ -->
+<button class="chat-fab" id="chatFab" aria-label="Otwórz czat"><svg class="icon"><use href="#i-chat"/></svg></button>
+
+<section class="chat" id="chat" hidden aria-label="Czat">
+  <div class="chat-head">
+    <span class="avatar" style="width:34px;height:34px;font-size:12px" aria-hidden="true">MS</span>
+    <div class="nm"><b>Mayra Sibley</b><span>Aktywna</span></div>
+    <button class="icon-btn" id="chatClose" style="margin-left:auto;width:30px;height:30px" aria-label="Zamknij czat"><svg class="icon icon-sm"><use href="#i-x"/></svg></button>
+  </div>
+  <div class="chat-log" id="chatLog" role="log" aria-live="polite"></div>
+  <form class="chat-input" id="chatForm">
+    <label class="sr-only" for="chatText">Wiadomość</label>
+    <input id="chatText" placeholder="Napisz wiadomość…" autocomplete="off">
+    <button type="submit" aria-label="Wyślij"><svg class="icon icon-sm"><use href="#i-send"/></svg></button>
+  </form>
+</section>
+
+<div class="viz-tip" id="vizTip" role="status" aria-live="polite"></div>
+
+<script>
+"use strict";
+/* ============================================================
+   DATA - the single place to repoint at your own tooling.
+   Every widget below is generated from this object.
+   ============================================================ */
+const MONTHS = ["Sty","Lut","Mar","Kwi","Maj","Cze","Lip","Sie","Wrz","Paź","Lis","Gru"];
+
+const DATA = {
+  /* 24 months; the range control slices the tail */
+  salesOverview: {
+    startMonth: 0, startYear: 24,
+    profit:  [14,17,15,19,18,21,20,23,19,25,22,26,21,24,22,28,25,30,27,32,29,34,31,25],
+    expense: [22,25,23,27,26,29,28,31,27,33,30,34,29,32,30,36,33,38,35,40,37,42,39,39]
+  },
+
+  production: [
+    { name:"Zakład Północ",  value:1520 },
+    { name:"Zakład Wschód",  value:1080 },
+    { name:"Zakład Zachód",  value: 840 },
+    { name:"Zakład Południe",value: 560 }
+  ],
+
+  productivity: { value:88.11, target:85.00 },
+
+  /* values recovered from the original chart's rendered SVG */
+  orderOverview: {
+    monthly: {
+      categories: ["Sty","Lut","Mar","Kwi","Maj","Cze","Lip"],
+      online: [31,40,28,51,42,109,100],
+      store:  [11,32,45,32,34,52,41]
+    },
+    weekly: {
+      categories: ["T1","T2","T3","T4","T5","T6","T7","T8"],
+      online: [18,24,21,29,26,34,31,38],
+      store:  [9,14,12,17,15,19,16,22]
+    }
+  },
+
+  topProducts: [
+    { name:"iPod",     note:"Audio",   amount:  250 },
+    { name:"iMac",     note:"Desktop", amount: -589 },
+    { name:"iPhone X", note:"Mobile",  amount: 1292 }
+  ],
+  topProductsTotal: "$8 459k",
+
+  regional: {
+    categories: ["Północ","Południe","Wschód","Zachód","Centrum"],
+    online: [128,164,96,142,118],
+    store:  [ 96,112,74,118, 88]
+  },
+
+  locations: [
+    { name:"Stany Zjednoczone", value:32.4 },
+    { name:"Niemcy",            value:14.8 },
+    { name:"Wielka Brytania",   value:11.2 },
+    { name:"Francja",           value: 9.6 },
+    { name:"Japonia",           value: 8.1 },
+    { name:"Hiszpania",         value: 6.5 },
+    { name:"Polska",            value: 5.3 }
+  ],
+
+  steps: [
+    { name:"Brief projektu",      who:"Project Manager", color:"--s1" },
+    { name:"Koncepcja i design",  who:"Art Director",    color:"--s2" },
+    { name:"Logika funkcjonalna", who:"Lead Developer",  color:"--s3" },
+    { name:"Wdrożenie",           who:"DevOps",          color:"--s4" },
+    { name:"Testy i QA",          who:"QA Manager",      color:"--brand" }
+  ],
+
+  msgs: [
+    { t:"10:10", text:"Nowy lead z kampanii Q4 przypisany do zespołu.", who:"Johne" },
+    { t:"08:40", text:"Eksport raportu sprzedaży zakończony.",          who:"Amla"  },
+    { t:"07:10", text:"Integracja z magazynem wznowiona.",              who:"Josef" },
+    { t:"01:15", text:"Backup bazy klientów wykonany.",                 who:"Rima"  },
+    { t:"23:12", text:"3 faktury oczekują na zatwierdzenie.",           who:"Alaxa" }
+  ],
+
+  toggles: [
+    { label:"Powiadomienia push", on:true  },
+    { label:"Śledzenie zgłoszeń", on:true  },
+    { label:"Portal wsparcia",    on:false },
+    { label:"Eksport raportów",   on:true  },
+    { label:"Rejestracja członków", on:false }
+  ],
+
+  cart: [
+    { name:"Licencja CRMi Pro", note:"12 miesięcy", price:125, qty:4 },
+    { name:"Moduł raportów",    note:"dodatek",     price:125, qty:4 },
+    { name:"Pakiet integracji", note:"API",         price:125, qty:4 },
+    { name:"Wsparcie premium",  note:"SLA 24/7",    price:125, qty:4 }
+  ],
+
+  chat: [
+    { from:"them", text:"Cześć, tu Mayra — w czym mogę pomóc?", time:"2 godz." },
+    { from:"me",   text:"Potrzebuję eksportu sprzedaży za Q3.", time:"3 min"   },
+    { from:"them", text:"Jasne, przygotuję plik i wyślę w ciągu godziny.", time:"40 sek." }
+  ]
+};
+
+/* ============================================================
+   Small helpers
+   ============================================================ */
+const NS = "http://www.w3.org/2000/svg";
+const $  = (s, r) => (r || document).querySelector(s);
+const $$ = (s, r) => Array.prototype.slice.call((r || document).querySelectorAll(s));
+
+function S(tag, attrs, text) {
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) if (attrs[k] !== null && attrs[k] !== undefined) e.setAttribute(k, attrs[k]);
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+function tok(name) {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+const nf  = (n, d) => Number(n).toLocaleString("pl-PL", { minimumFractionDigits: d || 0, maximumFractionDigits: d === undefined ? 0 : d });
+const usd = (n, d) => "$" + nf(n, d);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
+
+/* A clean axis: every tick lands on a round number (1/2/2.5/5 x 10^k).
+   Tries 4 and 5 intervals and keeps whichever wastes less headroom. */
+function niceScale(v) {
+  if (!(v > 0)) return { max: 1, step: 0.25, ticks: 4 };
+  let best = null;
+  [4, 5].forEach(t => {
+    const raw  = v / t;
+    const mag  = Math.pow(10, Math.floor(Math.log10(raw)));
+    const norm = raw / mag;
+    const step = (norm <= 1 ? 1 : norm <= 2 ? 2 : norm <= 2.5 ? 2.5 : norm <= 5 ? 5 : 10) * mag;
+    const max  = step * t;
+    if (!best || max < best.max) best = { max: max, step: step, ticks: t };
+  });
+  return best;
+}
+/* 4px rounded data-end, square at the baseline */
+function capTop(x, y, w, h, r) {
+  r = Math.min(r, w / 2, h);
+  return `M${x} ${y + h}L${x} ${y + r}Q${x} ${y} ${x + r} ${y}L${x + w - r} ${y}Q${x + w} ${y} ${x + w} ${y + r}L${x + w} ${y + h}Z`;
+}
+function capRight(x, y, w, h, r) {
+  r = Math.min(r, w, h / 2);
+  return `M${x} ${y}L${x + w - r} ${y}Q${x + w} ${y} ${x + w} ${y + r}L${x + w} ${y + h - r}Q${x + w} ${y + h} ${x + w - r} ${y + h}L${x} ${y + h}Z`;
+}
+function ringArc(cx, cy, rIn, rOut, a0, a1) {
+  const p = (r, a) => [cx + r * Math.cos(a), cy + r * Math.sin(a)];
+  const big = (a1 - a0) > Math.PI ? 1 : 0;
+  const [x0, y0] = p(rOut, a0), [x1, y1] = p(rOut, a1);
+  const [x2, y2] = p(rIn,  a1), [x3, y3] = p(rIn,  a0);
+  return `M${x0} ${y0}A${rOut} ${rOut} 0 ${big} 1 ${x1} ${y1}L${x2} ${y2}A${rIn} ${rIn} 0 ${big} 0 ${x3} ${y3}Z`;
+}
+/* white-or-ink for a label set inside a colored fill */
+function onColor(hex) {
+  const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
+  if (!m) return "#fff";
+  const n = parseInt(m[1], 16);
+  const srgb = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map(v => {
+    v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+  });
+  const L = 0.2126 * srgb[0] + 0.7152 * srgb[1] + 0.0722 * srgb[2];
+  return L > 0.42 ? "#15171f" : "#ffffff";
+}
+
+/* ---- shared tooltip ---- */
+const TIP = $("#vizTip");
+function tipShow(html, x, y) {
+  TIP.innerHTML = html;
+  TIP.classList.add("show");
+  const w = TIP.offsetWidth || 140;
+  TIP.style.left = Math.min(Math.max(x, w / 2 + 8), window.innerWidth - w / 2 - 8) + "px";
+  TIP.style.top  = Math.max(y - 14, 56) + "px";
+}
+function tipHide() { TIP.classList.remove("show"); }
+function tipRows(title, items) {
+  return "<b>" + esc(title) + "</b>" + items.map(i =>
+    '<div class="row"><i style="background:' + i.color + '"></i><em>' + esc(i.name) + "</em><strong>" + i.value + "</strong></div>"
+  ).join("");
+}
+
+/* ============================================================
+   Chart builders
+   Each returns { build(width) -> <svg>, data() -> table model,
+   legend() -> [{name,color,shape}] }
+   ============================================================ */
+
+/* ---- grouped columns ---- */
+function groupedColumns(cfg) {
+  return {
+    legend: () => cfg.series.map(s => ({ name: s.name, color: tok(s.color), shape: "box" })),
+    data() {
+      return {
+        caption: cfg.caption,
+        head: [cfg.xTitle].concat(cfg.series.map(s => s.name + (cfg.unit ? " (" + cfg.unit + ")" : ""))),
+        rows: cfg.categories().map((c, i) => [c].concat(cfg.series.map(s => nf(s.data()[i]))))
+      };
+    },
+    build(w) {
+      const cats = cfg.categories(), series = cfg.series;
+      const h = cfg.height || 260;
+      const pad = { t: 16, r: 10, b: 32, l: 46 };
+      const iw = Math.max(40, w - pad.l - pad.r), ih = h - pad.t - pad.b;
+      const all = series.reduce((a, s) => a.concat(s.data()), []);
+      const sc = niceScale(Math.max.apply(null, all));
+      const max = sc.max;
+      const y = v => pad.t + ih - (v / max) * ih;
+
+      const svg = S("svg", { viewBox: "0 0 " + w + " " + h, role: "img",
+        "aria-label": cfg.aria + " — dane dostępne też w widoku tabeli." });
+      const grid = tok("--grid"), ink3 = tok("--ink-3"), surf = tok("--surface");
+
+      /* gridlines + y ticks */
+      for (let i = 0; i <= sc.ticks; i++) {
+        const v  = sc.step * i, yy = y(v);
+        svg.appendChild(S("line", { x1: pad.l, y1: yy, x2: pad.l + iw, y2: yy, stroke: grid, "stroke-width": 1 }));
+        svg.appendChild(S("text", { x: pad.l - 10, y: yy + 4, "text-anchor": "end", "font-size": 11, fill: ink3 },
+          nf(v, sc.step < 1 ? 1 : 0)));
+      }
+
+      const band = iw / cats.length;
+      const groupW = Math.min(band - 8, series.length * 24 + (series.length - 1) * 2);
+      const barW   = Math.max(3, (groupW - (series.length - 1) * 2) / series.length);
+
+      /* hover highlight sits behind the bars */
+      const hi = S("rect", { y: pad.t, height: ih, width: band, x: pad.l, fill: tok("--surface-2"), opacity: 0, rx: 8 });
+      svg.appendChild(hi);
+
+      cats.forEach((c, i) => {
+        const x0 = pad.l + i * band + (band - groupW) / 2;
+        series.forEach((s, j) => {
+          const v  = s.data()[i];
+          const bh = Math.max(2, (v / max) * ih);
+          const bx = x0 + j * (barW + 2);
+          svg.appendChild(S("path", { d: capTop(bx, pad.t + ih - bh, barW, bh, 4), fill: tok(s.color) }));
+        });
+
+        /* x tick - thin out labels when the band gets narrow */
+        if (band > 34 || i % Math.ceil(34 / band) === 0) {
+          svg.appendChild(S("text", { x: pad.l + i * band + band / 2, y: h - 10,
+            "text-anchor": "middle", "font-size": 11, fill: ink3 }, c));
+        }
+
+        /* hit target spans the full plot height */
+        const hit = S("rect", { x: pad.l + i * band, y: pad.t, width: band, height: ih, fill: "transparent" });
+        hit.addEventListener("pointerenter", ev => {
+          hi.setAttribute("x", pad.l + i * band);
+          hi.setAttribute("opacity", 0.55);
+          tipShow(tipRows(c, series.map(s => ({
+            name: s.name, color: tok(s.color), value: (cfg.fmt || nf)(s.data()[i])
+          }))), ev.clientX, ev.clientY);
+        });
+        hit.addEventListener("pointerleave", () => { hi.setAttribute("opacity", 0); tipHide(); });
+        svg.appendChild(hit);
+      });
+
+      /* baseline */
+      svg.appendChild(S("line", { x1: pad.l, y1: pad.t + ih, x2: pad.l + iw, y2: pad.t + ih, stroke: grid, "stroke-width": 1 }));
+      svg.dataset.surface = surf;
+      return svg;
+    }
+  };
+}
+
+/* ---- line chart with crosshair ---- */
+function lineChart(cfg) {
+  return {
+    legend: () => cfg.series.map(s => ({ name: s.name, color: tok(s.color), shape: "line" })),
+    data() {
+      const d = cfg.get();
+      return {
+        caption: cfg.caption,
+        head: [cfg.xTitle].concat(cfg.series.map(s => s.name)),
+        rows: d.categories.map((c, i) => [c].concat(cfg.series.map(s => nf(d[s.key][i]))))
+      };
+    },
+    build(w) {
+      const d = cfg.get(), cats = d.categories, series = cfg.series;
+      const h = cfg.height || 240;
+      const pad = { t: 18, r: 74, b: 30, l: 42 };
+      const iw = Math.max(40, w - pad.l - pad.r), ih = h - pad.t - pad.b;
+      const all = series.reduce((a, s) => a.concat(d[s.key]), []);
+      const sc = niceScale(Math.max.apply(null, all));
+      const max = sc.max;
+      const step = cats.length > 1 ? iw / (cats.length - 1) : 0;
+      const X = i => pad.l + i * step;
+      const Y = v => pad.t + ih - (v / max) * ih;
+
+      const svg  = S("svg", { viewBox: "0 0 " + w + " " + h, role: "img",
+        "aria-label": cfg.aria + " — dane dostępne też w widoku tabeli." });
+      const grid = tok("--grid"), ink3 = tok("--ink-3"), ink2 = tok("--ink-2"), surf = tok("--surface");
+
+      for (let i = 0; i <= sc.ticks; i++) {
+        const v = sc.step * i, yy = Y(v);
+        svg.appendChild(S("line", { x1: pad.l, y1: yy, x2: pad.l + iw, y2: yy, stroke: grid, "stroke-width": 1 }));
+        svg.appendChild(S("text", { x: pad.l - 9, y: yy + 4, "text-anchor": "end", "font-size": 11, fill: ink3 },
+          nf(v, sc.step < 1 ? 1 : 0)));
+      }
+      cats.forEach((c, i) => {
+        if (step > 30 || i % Math.ceil(30 / Math.max(step, 1)) === 0) {
+          svg.appendChild(S("text", { x: X(i), y: h - 9, "text-anchor": "middle", "font-size": 11, fill: ink3 }, c));
+        }
+      });
+
+      const cross = S("line", { y1: pad.t, y2: pad.t + ih, stroke: ink3, "stroke-width": 1, "stroke-dasharray": "3 3", opacity: 0 });
+      svg.appendChild(cross);
+
+      const focus = [];
+      series.forEach(s => {
+        const col = tok(s.color), vals = d[s.key];
+        const pts = vals.map((v, i) => X(i) + " " + Y(v));
+        svg.appendChild(S("path", { d: "M" + pts.join("L"), fill: "none", stroke: col,
+          "stroke-width": 2, "stroke-linecap": "round", "stroke-linejoin": "round" }));
+
+        /* end marker: >=8px, 2px surface ring */
+        const li = vals.length - 1;
+        svg.appendChild(S("circle", { cx: X(li), cy: Y(vals[li]), r: 4.5, fill: col, stroke: surf, "stroke-width": 2 }));
+
+        /* direct end label - the series separate at the right edge */
+        svg.appendChild(S("text", { x: X(li) + 11, y: Y(vals[li]) - 2, "font-size": 11.5, fill: ink2 }, s.name));
+        svg.appendChild(S("text", { x: X(li) + 11, y: Y(vals[li]) + 12, "font-size": 12, "font-weight": 650, fill: tok("--ink") }, nf(vals[li])));
+
+        const f = S("circle", { r: 5, fill: col, stroke: surf, "stroke-width": 2, opacity: 0 });
+        svg.appendChild(f);
+        focus.push({ el: f, vals: vals, color: col, name: s.name });
+      });
+
+      const overlay = S("rect", { x: pad.l - step / 2, y: pad.t, width: iw + step, height: ih, fill: "transparent" });
+      overlay.addEventListener("pointermove", ev => {
+        const box = svg.getBoundingClientRect();
+        const px  = (ev.clientX - box.left) * (w / box.width);
+        let i = Math.round((px - pad.l) / (step || 1));
+        i = Math.max(0, Math.min(cats.length - 1, i));
+        cross.setAttribute("x1", X(i)); cross.setAttribute("x2", X(i)); cross.setAttribute("opacity", 1);
+        focus.forEach(f => {
+          f.el.setAttribute("cx", X(i)); f.el.setAttribute("cy", Y(f.vals[i])); f.el.setAttribute("opacity", 1);
+        });
+        tipShow(tipRows(cats[i], focus.map(f => ({ name: f.name, color: f.color, value: nf(f.vals[i]) }))), ev.clientX, ev.clientY);
+      });
+      overlay.addEventListener("pointerleave", () => {
+        cross.setAttribute("opacity", 0);
+        focus.forEach(f => f.el.setAttribute("opacity", 0));
+        tipHide();
+      });
+      svg.appendChild(overlay);
+      return svg;
+    }
+  };
+}
+
+/* ---- donut ---- */
+function donut(cfg) {
+  return {
+    legend() {
+      const total = cfg.slices.reduce((a, s) => a + s.value, 0);
+      return cfg.slices.map((s, i) => ({
+        name: s.name + " · " + nf(s.value / total * 100, 1) + "%",
+        color: tok(cfg.colors[i]), shape: "box"
+      }));
+    },
+    data() {
+      const total = cfg.slices.reduce((a, s) => a + s.value, 0);
+      return {
+        caption: cfg.caption,
+        head: [cfg.xTitle, cfg.unit, "Udział"],
+        keys: cfg.slices.map((s, i) => tok(cfg.colors[i])),
+        rows: cfg.slices.map(s => [s.name, nf(s.value), nf(s.value / total * 100, 1) + "%"])
+      };
+    },
+    build(w) {
+      const h = cfg.height || 236;
+      const svg = S("svg", { viewBox: "0 0 " + w + " " + h, role: "img",
+        "aria-label": cfg.aria + " — dane dostępne też w widoku tabeli." });
+      const cx = w / 2, cy = h / 2;
+      const rOut = Math.min(w, h) / 2 - 10, rIn = rOut * 0.62, rMid = (rOut + rIn) / 2;
+      const total = cfg.slices.reduce((a, s) => a + s.value, 0);
+      const gap = 2 / rMid;                 /* a 2px surface gap, expressed as an angle */
+      let a = -Math.PI / 2;
+
+      cfg.slices.forEach((s, i) => {
+        const span = (s.value / total) * Math.PI * 2;
+        const a0 = a + gap / 2, a1 = a + span - gap / 2;
+        const col = tok(cfg.colors[i]);
+        if (a1 > a0) {
+          const p = S("path", { d: ringArc(cx, cy, rIn, rOut, a0, a1), fill: col });
+          p.addEventListener("pointerenter", ev => tipShow(tipRows(s.name, [{
+            name: cfg.unit, color: col, value: nf(s.value) + " · " + nf(s.value / total * 100, 1) + "%"
+          }]), ev.clientX, ev.clientY));
+          p.addEventListener("pointerleave", tipHide);
+          svg.appendChild(p);
+
+          /* direct % label, but only where it fits */
+          if (span > 0.38) {
+            const am = (a0 + a1) / 2;
+            svg.appendChild(S("text", {
+              x: cx + rMid * Math.cos(am), y: cy + rMid * Math.sin(am) + 4,
+              "text-anchor": "middle", "font-size": 11.5, "font-weight": 650, fill: onColor(col)
+            }, nf(s.value / total * 100, 0) + "%"));
+          }
+        }
+        a += span;
+      });
+
+      svg.appendChild(S("text", { x: cx, y: cy - 4, "text-anchor": "middle", "font-size": 12, fill: tok("--ink-3") }, cfg.centerLabel));
+      svg.appendChild(S("text", { x: cx, y: cy + 20, "text-anchor": "middle", "font-size": 22, "font-weight": 650, fill: tok("--ink") }, nf(total)));
+      return svg;
+    }
+  };
+}
+
+/* ---- radial gauge (hero figure) ---- */
+function gauge(cfg) {
+  return {
+    legend: () => [],
+    data: () => ({
+      caption: cfg.caption,
+      head: ["Miara", "Wartość"],
+      rows: [["Wydajność", nf(cfg.value, 2) + "%"], ["Cel", nf(cfg.target, 2) + "%"]]
+    }),
+    build(w) {
+      const h = cfg.height || 210;
+      const svg = S("svg", { viewBox: "0 0 " + w + " " + h, role: "img",
+        "aria-label": "Wydajność zakładu " + nf(cfg.value, 2) + " procent przy celu " + nf(cfg.target, 2) + " procent." });
+      const cx = w / 2, cy = h * 0.62, r = Math.min(w / 2 - 22, h * 0.52);
+      const A0 = 135 * Math.PI / 180, SPAN = 270 * Math.PI / 180;
+      const at = p => A0 + SPAN * Math.max(0, Math.min(1, p / 100));
+      const arc = (a0, a1, col, sw) => {
+        const p = (ang) => [cx + r * Math.cos(ang), cy + r * Math.sin(ang)];
+        const [x0, y0] = p(a0), [x1, y1] = p(a1);
+        return S("path", { d: `M${x0} ${y0}A${r} ${r} 0 ${(a1 - a0) > Math.PI ? 1 : 0} 1 ${x1} ${y1}`,
+          fill: "none", stroke: col, "stroke-width": sw || 13, "stroke-linecap": "round" });
+      };
+
+      svg.appendChild(arc(A0, A0 + SPAN, tok("--track")));
+      const col = cfg.value >= cfg.target ? tok("--good") : tok("--warn");
+      svg.appendChild(arc(A0, at(cfg.value), col));
+
+      /* target tick */
+      const ta = at(cfg.target);
+      svg.appendChild(S("line", {
+        x1: cx + (r - 11) * Math.cos(ta), y1: cy + (r - 11) * Math.sin(ta),
+        x2: cx + (r + 11) * Math.cos(ta), y2: cy + (r + 11) * Math.sin(ta),
+        stroke: tok("--ink-2"), "stroke-width": 2, "stroke-linecap": "round"
+      }));
+
+      svg.appendChild(S("text", { x: cx, y: cy + 2, "text-anchor": "middle", "font-size": 48, "font-weight": 650, fill: tok("--ink") }, nf(cfg.value, 2) + "%"));
+      svg.appendChild(S("text", { x: cx, y: cy + 26, "text-anchor": "middle", "font-size": 12, fill: tok("--ink-3") }, "realizacja celu"));
+      return svg;
+    }
+  };
+}
+
+/* ---- horizontal bars (one hue - magnitude) ---- */
+function hbars(cfg) {
+  return {
+    legend: () => [],
+    data: () => ({
+      caption: cfg.caption,
+      head: [cfg.xTitle, cfg.unit],
+      rows: cfg.rows.map(r => [r.name, nf(r.value, cfg.dec || 0) + (cfg.suffix || "")])
+    }),
+    build(w) {
+      const rows = cfg.rows, rowH = 34, h = rows.length * rowH + 6;
+      const svg = S("svg", { viewBox: "0 0 " + w + " " + h, role: "img",
+        "aria-label": cfg.aria + " — dane dostępne też w widoku tabeli." });
+      const labelW = Math.min(132, Math.max(88, w * 0.36));
+      const valW = 54;
+      const bw = Math.max(30, w - labelW - valW - 8);
+      const max = Math.max.apply(null, rows.map(r => r.value));
+      const col = tok("--s1"), track = tok("--track");
+
+      rows.forEach((r, i) => {
+        const y = i * rowH + 6, barH = 12, by = y + 5;
+        svg.appendChild(S("text", { x: 0, y: by + 10, "font-size": 12.5, fill: tok("--ink") }, r.name));
+        svg.appendChild(S("path", { d: capRight(labelW, by, bw, barH, 4), fill: track }));
+        const len = Math.max(4, (r.value / max) * bw);
+        const bar = S("path", { d: capRight(labelW, by, len, barH, 4), fill: col });
+        svg.appendChild(bar);
+        svg.appendChild(S("text", { x: w, y: by + 10, "text-anchor": "end", "font-size": 12.5,
+          "font-weight": 650, fill: tok("--ink") }, nf(r.value, cfg.dec || 0) + (cfg.suffix || "")));
+
+        const hit = S("rect", { x: 0, y: y, width: w, height: rowH, fill: "transparent" });
+        hit.addEventListener("pointerenter", ev => tipShow(tipRows(r.name, [{
+          name: cfg.unit, color: col, value: nf(r.value, cfg.dec || 0) + (cfg.suffix || "")
+        }]), ev.clientX, ev.clientY));
+        hit.addEventListener("pointerleave", tipHide);
+        svg.appendChild(hit);
+      });
+      return svg;
+    }
+  };
+}
+
+/* ============================================================
+   Chart instances
+   ============================================================ */
+let RANGE = 12;   /* months shown in Sales overview */
+let GRAIN = "monthly";
+
+function soMonths() {
+  const a = DATA.salesOverview, n = a.profit.length, from = n - RANGE;
+  const out = [];
+  for (let i = from; i < n; i++) {
+    const m = (a.startMonth + i) % 12;
+    const y = a.startYear + Math.floor((a.startMonth + i) / 12);
+    out.push(MONTHS[m] + (RANGE > 12 ? " " + y : ""));
+  }
+  return out;
+}
+const soSlice = key => DATA.salesOverview[key].slice(-RANGE);
+
+const CHARTS = {
+  salesOverview: groupedColumns({
+    aria: "Zysk i koszty miesięcznie w tysiącach dolarów",
+    caption: "Przegląd sprzedaży — zysk i koszty miesięcznie (tys. USD)",
+    xTitle: "Miesiąc", unit: "tys. USD", height: 268,
+    categories: soMonths,
+    fmt: v => usd(v) + "K",
+    series: [
+      { name: "Zysk",   color: "--s1", data: () => soSlice("profit")  },
+      { name: "Koszty", color: "--s2", data: () => soSlice("expense") }
+    ]
+  }),
+
+  production: donut({
+    aria: "Udział zakładów w wolumenie produkcji",
+    caption: "Produkcja wg zakładu (tys. szt.)",
+    xTitle: "Zakład", unit: "tys. szt.", centerLabel: "Razem", height: 236,
+    slices: DATA.production,
+    colors: ["--s1", "--s2", "--s3", "--s4"]
+  }),
+
+  productivity: gauge({
+    caption: "Wydajność zakładu",
+    value: DATA.productivity.value,
+    target: DATA.productivity.target,
+    height: 196
+  }),
+
+  orderOverview: lineChart({
+    aria: "Liczba zamówień wg kanału w czasie",
+    caption: "Przegląd zamówień — liczba zamówień wg kanału",
+    xTitle: "Okres", height: 232,
+    get: () => DATA.orderOverview[GRAIN],
+    series: [
+      { name: "Online",   key: "online", color: "--s1" },
+      { name: "Sklep",    key: "store",  color: "--s2" }
+    ]
+  }),
+
+  regional: groupedColumns({
+    aria: "Sprzedaż regionalna online i stacjonarnie",
+    caption: "Sprzedaż regionalna (tys. USD)",
+    xTitle: "Region", unit: "tys. USD", height: 262,
+    categories: () => DATA.regional.categories,
+    fmt: v => usd(v) + "K",
+    series: [
+      { name: "Online",       color: "--s1", data: () => DATA.regional.online },
+      { name: "Stacjonarnie", color: "--s3", data: () => DATA.regional.store  }
+    ]
+  }),
+
+  locations: hbars({
+    aria: "Udział rynków w przychodzie",
+    caption: "Sprzedaż wg lokalizacji — udział w przychodzie",
+    xTitle: "Rynek", unit: "udział", suffix: "%", dec: 1,
+    rows: DATA.locations
+  })
+};
+
+/* ============================================================
+   Render / re-render
+   ============================================================ */
+function tableHTML(m) {
+  let html = '<table class="data-table"><caption>' + esc(m.caption) + "</caption><thead><tr>";
+  m.head.forEach((hd, i) => html += "<th" + (i ? "" : "") + ">" + esc(hd) + "</th>");
+  html += "</tr></thead><tbody>";
+  m.rows.forEach((r, ri) => {
+    html += "<tr>";
+    r.forEach((c, ci) => {
+      const key = (ci === 0 && m.keys) ? '<span class="key" style="background:' + m.keys[ri] + '"></span>' : "";
+      html += (ci === 0 ? "<th scope='row'>" + key + esc(c) + "</th>" : "<td>" + esc(c) + "</td>");
+    });
+    html += "</tr>";
+  });
+  return html + "</tbody></table>";
+}
+
+function legendHTML(items) {
+  return items.map(i =>
+    '<span><i class="' + (i.shape === "line" ? "line" : "") + '" style="background:' + i.color + '"></i>' + esc(i.name) + "</span>"
+  ).join("");
+}
+
+function drawAll() {
+  Object.keys(CHARTS).forEach(key => {
+    const host = $('[data-chart="' + key + '"]');
+    if (!host) return;
+    const c = CHARTS[key];
+    const svgHost = $(".chart-svg", host);
+    const w = Math.max(240, Math.round(svgHost.getBoundingClientRect().width) || 320);
+
+    svgHost.textContent = "";
+    svgHost.appendChild(c.build(w));
+
+    const tHost = $(".chart-table", host);
+    if (tHost) tHost.innerHTML = tableHTML(c.data());
+
+    const lHost = $('[data-legend="' + key + '"]');
+    if (lHost) lHost.innerHTML = legendHTML(c.legend());
+  });
+}
+
+/* ============================================================
+   Static lists
+   ============================================================ */
+function renderLists() {
+  $("#topProducts").innerHTML = DATA.topProducts.map(p => {
+    const up = p.amount >= 0;
+    return '<li><span class="thumb"><svg class="icon icon-sm"><use href="#i-package"/></svg></span>'
+      + '<span class="nm"><b>' + esc(p.name) + "</b><span>" + esc(p.note) + "</span></span>"
+      + '<span class="amt ' + (up ? "up" : "down") + '">' + (up ? "+" : "−") + usd(Math.abs(p.amount)) + "</span></li>";
+  }).join("");
+
+  $("#steps").innerHTML = DATA.steps.map(s =>
+    '<li><span class="pin" style="color:' + tok(s.color) + ';background:' + tok(s.color) + '"></span>'
+    + '<span class="nm"><b>' + esc(s.name) + "</b><span>" + esc(s.who) + "</span></span></li>"
+  ).join("");
+
+  $("#msgs").innerHTML = DATA.msgs.map(m =>
+    "<li><time>" + esc(m.t) + '</time><span class="nm">' + esc(m.text) + "<span> — " + esc(m.who) + "</span></span></li>"
+  ).join("");
+
+  $("#toggles").innerHTML = DATA.toggles.map(t =>
+    "<li>" + esc(t.label) + '<button class="switch" type="button" aria-pressed="' + (t.on ? "true" : "false")
+    + '"><span class="sr-only">' + esc(t.label) + "</span></button></li>"
+  ).join("");
+
+  $("#cart").innerHTML = DATA.cart.map(c =>
+    '<li><span class="thumb"><svg class="icon icon-sm"><use href="#i-package"/></svg></span>'
+    + '<span class="nm"><b>' + esc(c.name) + "</b><span>" + esc(c.note) + " · " + c.qty + " szt.</span></span>"
+    + '<span class="amt">' + usd(c.price, 2) + "</span></li>"
+  ).join("");
+
+  $("#chatLog").innerHTML = DATA.chat.map(m =>
+    '<div class="msg ' + (m.from === "me" ? "self" : "") + '">'
+    + '<span class="avatar" style="width:28px;height:28px;font-size:10px" aria-hidden="true">'
+    + (m.from === "me" ? "TP" : "MS") + "</span>"
+    + '<div><div class="bub">' + esc(m.text) + "</div><time>" + esc(m.time) + "</time></div></div>"
+  ).join("");
+
+  $("#yr").textContent = new Date().getFullYear();
+}
+
+/* ============================================================
+   UI wiring
+   ============================================================ */
+/* theme */
+function setTheme(t) {
+  document.documentElement.dataset.theme = t;
+  $("#themeIcon").firstElementChild.setAttribute("href", t === "dark" ? "#i-sun" : "#i-moon");
+  try { localStorage.setItem("crmi-theme", t); } catch (e) {}
+  renderLists();
+  drawAll();
+}
+try {
+  const saved = localStorage.getItem("crmi-theme");
+  if (saved === "light" || saved === "dark") document.documentElement.dataset.theme = saved;
+} catch (e) {}
+$("#themeBtn").addEventListener("click", () =>
+  setTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark"));
+
+/* sidebar */
+const isNarrow = () => window.matchMedia("(max-width:991px)").matches;
+$("#sbToggle").addEventListener("click", () => {
+  if (isNarrow()) {
+    document.body.classList.toggle("sb-open");
+    $("#backdrop").classList.toggle("show", document.body.classList.contains("sb-open"));
+  } else {
+    document.body.classList.toggle("sb-pinned");
+    requestAnimationFrame(drawAll);
+    setTimeout(drawAll, 220);
+  }
+});
+$("#backdrop").addEventListener("click", () => {
+  document.body.classList.remove("sb-open");
+  $("#backdrop").classList.remove("show");
+  closeRight();
+});
+
+/* right panel */
+function openRight() {
+  $("#rightbar").classList.add("open");
+  $("#rightbar").setAttribute("aria-hidden", "false");
+  $("#rbToggle").setAttribute("aria-expanded", "true");
+  $("#backdrop").classList.add("show");
+}
+function closeRight() {
+  $("#rightbar").classList.remove("open");
+  $("#rightbar").setAttribute("aria-hidden", "true");
+  $("#rbToggle").setAttribute("aria-expanded", "false");
+  if (!document.body.classList.contains("sb-open")) $("#backdrop").classList.remove("show");
+}
+$("#rbToggle").addEventListener("click", () =>
+  $("#rightbar").classList.contains("open") ? closeRight() : openRight());
+$("#rbClose").addEventListener("click", closeRight);
+
+/* chat */
+$("#chatFab").addEventListener("click", () => {
+  $("#chat").hidden = false; $("#chatFab").hidden = true; $("#chatText").focus();
+});
+$("#chatClose").addEventListener("click", () => { $("#chat").hidden = true; $("#chatFab").hidden = false; });
+$("#chatForm").addEventListener("submit", ev => {
+  ev.preventDefault();
+  const v = $("#chatText").value.trim();
+  if (!v) return;
+  DATA.chat.push({ from: "me", text: v, time: "teraz" });
+  renderLists();
+  $("#chatText").value = "";
+  $("#chatLog").scrollTop = $("#chatLog").scrollHeight;
+});
+
+/* switches in the right panel */
+document.addEventListener("click", ev => {
+  const sw = ev.target.closest(".switch");
+  if (!sw) return;
+  sw.setAttribute("aria-pressed", sw.getAttribute("aria-pressed") === "true" ? "false" : "true");
+});
+
+/* table-view toggles */
+$$("[data-table-for]").forEach(btn => btn.addEventListener("click", () => {
+  const key  = btn.dataset.tableFor;
+  const host = $('[data-chart="' + key + '"]');
+  const show = btn.getAttribute("aria-pressed") !== "true";
+  btn.setAttribute("aria-pressed", show ? "true" : "false");
+  $(".chart-svg", host).hidden = show;
+  $(".chart-table", host).hidden = !show;
+  const lg = $('[data-legend="' + key + '"]');
+  if (lg) lg.hidden = show;
+}));
+
+/* CSV export - built in the page, no network */
+function downloadCSV(name, model) {
+  const q = v => /[";\n]/.test(v) ? '"' + String(v).replace(/"/g, '""') + '"' : v;
+  const csv = [model.head.map(q).join(";")].concat(model.rows.map(r => r.map(q).join(";"))).join("\r\n");
+  const url = URL.createObjectURL(new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8" }));
+  const a = document.createElement("a");
+  a.href = url; a.download = name + ".csv"; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
+}
+$$("[data-csv-for]").forEach(btn => btn.addEventListener("click", () => {
+  const key = btn.dataset.csvFor;
+  downloadCSV(key, CHARTS[key].data());
+}));
+
+/* range (Sales overview) */
+$$("[data-range]").forEach(btn => btn.addEventListener("click", () => {
+  $$("[data-range]").forEach(b => b.setAttribute("aria-pressed", "false"));
+  btn.setAttribute("aria-pressed", "true");
+  RANGE = Number(btn.dataset.range);
+  drawAll();
+}));
+
+/* grain (Order overview) */
+$$("[data-grain]").forEach(btn => btn.addEventListener("click", () => {
+  $$("[data-grain]").forEach(b => b.setAttribute("aria-pressed", "false"));
+  btn.setAttribute("aria-pressed", "true");
+  GRAIN = btn.dataset.grain;
+  drawAll();
+}));
+
+/* escape closes overlays */
+document.addEventListener("keydown", ev => {
+  if (ev.key !== "Escape") return;
+  closeRight();
+  document.body.classList.remove("sb-open");
+  $("#backdrop").classList.remove("show");
+  if (!$("#chat").hidden) { $("#chat").hidden = true; $("#chatFab").hidden = false; }
+});
+
+/* redraw on resize */
+let rt;
+window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(drawAll, 120); });
+window.addEventListener("scroll", tipHide, { passive: true });
+
+/* go */
+renderLists();
+setTheme(document.documentElement.dataset.theme || "dark");
+</script>
+</body>
+</html>
