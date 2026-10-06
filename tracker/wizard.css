@@ -91,3 +91,12 @@
 .wz-summary { display: grid; grid-template-columns: auto 1fr; gap: 6px var(--sp-4); font-size: 13px; margin: 0; }
 .wz-summary dt { color: var(--muted); }
 .wz-summary dd { margin: 0; }
+
+/* kafelki presetów zakładek: ikona, nazwa i jedno zdanie opisu */
+.wz-preset { align-items: flex-start; }
+.wz-preset span { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.wz-preset b { font-weight: 600; }
+.wz-preset small { color: var(--muted); font-size: 12px; line-height: 1.35; }
+.wz-preset:disabled { opacity: .5; cursor: not-allowed; }
+.wz-preset:disabled:hover { border-color: var(--border); background: var(--surface); }
+.wz-presets { grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); }

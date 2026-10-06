@@ -30,6 +30,11 @@ await wz.locator('#wz-step-4 .wz-row-main').first().click();
 await wz.waitForTimeout(400);
 await wz.locator('#wz-step-4').screenshot({ path: SHOTS + '/4-wizard-menu-actions.png' });
 
+/* krok Tabs: kafelki presetów; zrzut z elementu, bo karta jest pod listą zakładek */
+await wz.locator('#wz-rail a', { hasText: 'Tabs' }).click();
+await wz.waitForTimeout(200);
+await wz.locator('#wz-step-3').screenshot({ path: SHOTS + '/4b-wizard-tab-presets.png' });
+
 await wz.locator('#wz-rail a', { hasText: 'Alerts' }).click();
 await wz.waitForTimeout(300);
 await wz.locator('#wz-step-5 .wz-row').first().locator('.wz-mini').first().click();

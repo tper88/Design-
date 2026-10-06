@@ -16,13 +16,13 @@ Tomasz's five styleguide HTMLs are the visual foundation. They sit untouched in
 
 ## Current state
 
-**Done and verified.** Branch `tracker-wizard`, head `18a4676`, pushed.
+**Done and verified.** Branch `tracker-wizard`, pushed.
 **No pull request has been opened** — Tomasz has not asked for one.
 
-Build + 5 test parts: **151 assertions, zero console errors**, Chromium.
+Build + 6 test parts: **197 assertions, zero console errors**, Chromium.
 
 ```
-43 + 30 + 25 + 24 + 29 = 151
+43 + 30 + 25 + 24 + 29 + 46 = 197
 ```
 
 | | |
@@ -40,7 +40,7 @@ plan's number was simply wrong.
 ```bash
 python3 tracker/build-themes.py     # sources/*.html  -> themes/*.css + themes.json
 python3 tracker/build-wizard.py     # everything      -> dist/tracker-wizard.html
-sh tracker/tests/run-all.sh         # build + all 151 assertions (needs Chromium)
+sh tracker/tests/run-all.sh         # build + all 197 assertions (needs Chromium)
 node tracker/tests/e2e5.mjs         # one part on its own
 ```
 
@@ -66,7 +66,7 @@ it by hand is pointless — the next build overwrites it. Sources live in
 | `tb-runtime.js` | 112 KB | the tracker engine — **the big one** |
 | `tracker-shell.html` | 1.5 KB | output template, 9 `<!--TB:*-->` markers |
 | `wizard-src.html` + `wizard.css` + `wizard.js` | 3.3 + 3.9 + 85 KB | the builder itself |
-| `tests/e2e*.mjs` + `run-all.sh` | — | 5 parts, 24 phases |
+| `tests/e2e*.mjs` + `run-all.sh` | — | 6 parts, 29 phases |
 | `sources/` | — | Tomasz's 6 uploaded files, md5-verified. **Read-only.** |
 
 `design-system/` is **not** touched. `savance.css` and `savance-charts.js` were
@@ -81,6 +81,8 @@ e2e3.mjs  10 setup · 11 typed export + multi-sheet · 12 rebuild keeps data
           13 restoring a column restores its data · 14 all 5 themes · 15 style baked in, no switcher
 e2e4.mjs  16 paste Excel header · 17 paste Excel data · 18 search/quick filter/pagination · 19 note pinned to row
 e2e5.mjs  20 Request log template · 21 alerts · 22 profile + avatar · 23 profile photo · 24 number/date format picker
+e2e6.mjs  25 preset tiles · 26 each preset fits the columns · 27 quick filter chip editor
+          28 dataset without dates · 29 preset tabs work in the tracker
 ```
 
 ## Invariants — break these and things fail quietly
@@ -131,19 +133,15 @@ e2e5.mjs  20 Request log template · 21 alerts · 22 profile + avatar · 23 prof
 - Real `.xlsx` export, 4 scopes: selected rows / current view / whole dataset /
   whole tracker (a sheet per dataset).
 - Import is CSV + paste from Excel (TSV). No `.xlsx` input.
+- **Tab presets** guess column roles from names and types (see README). A miss
+  yields fewer components, never a broken tab — keep it that way.
 
 ## Open items
 
-**One question for Tomasz, unanswered:**
-Code comments and commit messages are still **Polish** while the product UI is
-English. He said "wszystko ma być po angielsku" in the context of the product.
-If that was meant to cover the source too, it is one translation pass over
-`tb-runtime.js`, `wizard.js`, `tracker.css`, the Python builders and the test
-runner's console output (which is also Polish). Ask before doing it — it touches
-every file and the tests assert on some of that output.
+**Settled:** code comments, commit messages and test output stay **Polish**;
+only the product UI is English. Tomasz confirmed this.
 
 **Not built, and Tomasz knows:**
-- Tab presets exist only through the 3 starting templates; a new tab starts empty.
 - Tooltip, accordion, stepper and breadcrumbs have styles in `tracker.css` but no
   component uses them and they are not in the wizard catalogue.
 - Skeleton is unused.

@@ -988,7 +988,14 @@ font-family: var(--font-mono); font-size: 11.5px; color: var(--muted);
 }
 .wz-summary { display: grid; grid-template-columns: auto 1fr; gap: 6px var(--sp-4); font-size: 13px; margin: 0; }
 .wz-summary dt { color: var(--muted); }
-.wz-summary dd { margin: 0; }</style>
+.wz-summary dd { margin: 0; }
+.wz-preset { align-items: flex-start; }
+.wz-preset span { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.wz-preset b { font-weight: 600; }
+.wz-preset small { color: var(--muted); font-size: 12px; line-height: 1.35; }
+.wz-preset:disabled { opacity: .5; cursor: not-allowed; }
+.wz-preset:disabled:hover { border-color: var(--border); background: var(--surface); }
+.wz-presets { grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); }</style>
 </head>
 <body class="tb-body">
 
@@ -1881,7 +1888,7 @@ idSeq++;
 return prefix + Date.now().toString(36).slice(-4) + idSeq.toString(36) +
 Math.floor(Math.random() * 1296).toString(36);
 }
-var W = { step: 0, cfg: null, tab: 0, cmp: null, ds: 0, alert: null };
+var W = { step: 0, cfg: null, tab: 0, cmp: null, ds: 0, alert: null, presetDs: null };
 var STEPS = [
 { id: 0, label: 'Start', icon: '◆' },
 { id: 1, label: 'Basics', icon: '⚙' },
@@ -2040,6 +2047,7 @@ table: [
 { k: 'opts.search', kind: 'bool', label: 'Search box' },
 { k: 'opts.rowNotes', kind: 'bool', label: 'Notes on rows' },
 { k: 'opts.columns', kind: 'columns', label: 'Columns to show', wide: true },
+{ k: 'opts.quickFilters', kind: 'quickfilters', label: 'Quick filter chips above the table', wide: true },
 { k: 'opts.filter', kind: 'filter', label: 'Fixed filter (this is how you make a saved view)', wide: true },
 { k: 'opts.contextMenu', kind: 'ctxmenu', label: 'Right-click menu', wide: true }
 ],
@@ -2862,7 +2870,7 @@ top.appendChild(vs);
 }
 main.appendChild(top);
 main.appendChild(el('div', 'wz-row-meta',
-(t.components || []).length + ' components · ' +
+(t.components || []).length + ((t.components || []).length === 1 ? ' component · ' : ' components · ') +
 (t.components || []).map(function (c) { return typeLabel(c.type); }).join(', ')));
 row.appendChild(main);
 var acts = el('div', 'wz-row-actions');
@@ -2896,17 +2904,242 @@ renderStep3();
 row.appendChild(acts);
 body.appendChild(row);
 });
-if (!W.cfg.tabs.length) body.appendChild(el('p', 'tb-dim', 'No tabs yet. Add the first one.'));
-var add = btn('+ Add tab', 'btn-primary', function () {
-W.cfg.tabs.push({
-id: mintId('t_'), label: 'New tab', icon: '▦',
-layout: { cols: 1, variant: 'even' }, components: []
-});
+if (!W.cfg.tabs.length) body.appendChild(el('p', 'tb-dim', 'No tabs yet. Add the first one below.'));
+host.appendChild(card('Tabs', body));
+host.appendChild(presetPicker());
+}
+var TAB_PRESETS = [
+{ v: 'summary', l: 'Summary', i: '◷', needsDs: true,
+text: 'KPI cards and charts over one dataset.' },
+{ v: 'query', l: 'Query', i: '▤', needsDs: true,
+text: 'A searchable, editable table with quick filters and right-click actions.' },
+{ v: 'agenda', l: 'Agenda', i: '🗓', needsDs: true, needsDate: true,
+text: 'Overdue and upcoming dates, taken from a date column.' },
+{ v: 'notes', l: 'Notes', i: '🗒', text: 'A board of sticky notes.' },
+{ v: 'checklist', l: 'Checklist', i: '☑', text: 'A daily routine. The ticks clear every morning.' },
+{ v: 'todo', l: 'To-do', i: '✓', text: 'One-off items with due dates, with notes on the side.' },
+{ v: 'blank', l: 'Blank', i: '▦', text: 'An empty tab. You add the components yourself.' }
+];
+var DUE_RE = /due|deadline|until|expir|termin|do kiedy/i;
+var OWNER_RE = /owner|assign|responsible|handled|opiekun|odpowiedzialn|przypisan/i;
+var CLOSED_RE = /done|closed|complete|resolved|finished|zamkni|zako[nń]cz|gotow|zrobion/i;
+function clone(o) { return o == null ? o : JSON.parse(JSON.stringify(o)); }
+function colsOfType(ds, type) {
+return ds.columns.filter(function (c) { return c.type === type; });
+}
+function guessRoles(ds) {
+var dates = colsOfType(ds, 'date');
+var due = dates.filter(function (c) { return DUE_RE.test(c.label); })[0] || null;
+var texts = colsOfType(ds, 'text');
+var title = ds.columns.filter(function (c) { return c.id === ds.titleField; })[0] ||
+texts[0] || ds.columns[0] || null;
+var owner = texts.filter(function (c) {
+return c !== title && (c.default === '@user' || OWNER_RE.test(c.label));
+})[0] || null;
+return {
+due: due,
+when: dates.filter(function (c) { return c !== due; })[0] || null,
+enm: colsOfType(ds, 'enum')[0] || null,
+num: colsOfType(ds, 'number')[0] || null,
+bool: colsOfType(ds, 'bool')[0] || null,
+title: title,
+owner: owner,
+other: texts.filter(function (c) { return c !== title && c !== owner; })[0] || null
+};
+}
+function closedOf(g) {
+if (g.enm) {
+var o = (g.enm.options || []).filter(function (x) {
+return CLOSED_RE.test(x.value + ' ' + x.label);
+})[0];
+if (o) return { field: g.enm.id, value: o.value, label: o.label, bool: false };
+}
+if (g.bool && CLOSED_RE.test(g.bool.label)) {
+return { field: g.bool.id, value: 'true', label: g.bool.label, bool: true };
+}
+return null;
+}
+function rules() {
+var out = [];
+for (var i = 0; i < arguments.length; i++) if (arguments[i]) out.push(arguments[i]);
+return out.length ? { op: 'and', rules: out } : null;
+}
+function presetCmp(type, title, col, order, extra) {
+var c = { id: mintId('k_'), type: type, title: title, col: col, order: order, span: 1,
+dataset: null, agg: { op: 'count' }, opts: {} };
+Object.keys(extra || {}).forEach(function (k) { c[k] = extra[k]; });
+return c;
+}
+function uniqueLabel(base) {
+var taken = {};
+W.cfg.tabs.forEach(function (t) { taken[t.label] = 1; });
+if (!taken[base]) return base;
+for (var n = 2; ; n++) if (!taken[base + ' ' + n]) return base + ' ' + n;
+}
+function buildPreset(kind, ds) {
+var p = TAB_PRESETS.filter(function (x) { return x.v === kind; })[0];
+var tab = { id: mintId('t_'), label: uniqueLabel(p.l), icon: p.i, preset: kind,
+layout: { cols: 1, variant: 'even' }, components: [] };
+var C = tab.components;
+var g = ds ? guessRoles(ds) : null;
+var closed = g ? closedOf(g) : null;
+var openRule = closed ? { field: closed.field, cmp: 'ne', value: closed.value } : null;
+var overdueRule = g && g.due ? { field: g.due.id, cmp: 'relDate', value: 'overdue' } : null;
+if (kind === 'summary') {
+tab.layout = { cols: 2, variant: 'main' };
+if (openRule) {
+C.push(presetCmp('banner', 'Open ' + ds.name.toLowerCase(), 0, 5, {
+span: 'full', dataset: ds.id, agg: { op: 'count', filter: rules(openRule) },
+opts: { tone: 'accent', icon: 'ℹ', text: '{{v}} still open.', format: 'integer' } }));
+}
+C.push(presetCmp('kpi', 'All ' + ds.name.toLowerCase(), 0, 10, {
+dataset: ds.id, agg: { op: 'count' }, opts: { format: 'integer' } }));
+if (overdueRule) {
+C.push(presetCmp('kpi', 'Overdue', 1, 11, {
+dataset: ds.id, agg: { op: 'count', filter: rules(overdueRule, clone(openRule)) },
+opts: { format: 'integer' } }));
+} else if (openRule) {
+C.push(presetCmp('kpi', 'Open', 1, 11, {
+dataset: ds.id, agg: { op: 'count', filter: rules(clone(openRule)) },
+opts: { format: 'integer' } }));
+}
+if (g.num) {
+C.push(presetCmp('kpi', 'Total ' + g.num.label.toLowerCase(), 0, 12, {
+dataset: ds.id, agg: { op: 'sum', field: g.num.id },
+opts: { format: g.num.format || 'number' } }));
+}
+if (g.when) {
+C.push(presetCmp('chart', ds.name + ' over time', 0, 20, {
+dataset: ds.id,
+agg: { op: 'count', groupBy: { field: g.when.id, grain: 'month', sort: 'key_asc' } },
+opts: { kind: 'bar' } }));
+}
+if (g.enm) {
+C.push(presetCmp('chart', 'By ' + g.enm.label.toLowerCase(), 1, 21, {
+dataset: ds.id, agg: { op: 'count', groupBy: { field: g.enm.id, sort: 'value_desc' } },
+opts: { kind: 'donut' } }));
+} else if (g.other || g.owner) {
+var rk = g.owner || g.other;
+C.push(presetCmp('chart', 'Top ' + rk.label.toLowerCase(), 1, 21, {
+dataset: ds.id,
+agg: { op: 'count', groupBy: { field: rk.id, sort: 'value_desc', limit: 8 } },
+opts: { kind: 'hbar' } }));
+}
+}
+if (kind === 'query') {
+var qf = [];
+if (openRule) qf.push({ label: 'Open', filter: rules(clone(openRule)) });
+if (overdueRule) qf.push({ label: 'Overdue', filter: rules(clone(overdueRule), clone(openRule)) });
+if (g.due) {
+qf.push({ label: 'Due this week', filter: rules(
+{ field: g.due.id, cmp: 'relDate', value: 'next7' }, clone(openRule)) });
+}
+if (g.owner) {
+qf.push({ label: 'Mine', filter: rules(
+{ field: g.owner.id, cmp: 'eq', value: '@user' }, clone(openRule)) });
+}
+var acts = [];
+if (closed) {
+acts.push({ id: mintId('a_'), label: closed.bool ? 'Mark as done' : 'Mark as ' + closed.label.toLowerCase(),
+icon: '✓', kind: 'setField', field: closed.field, value: closed.value });
+}
+if (g.due) acts.push({ id: mintId('a_'), label: 'Due today', icon: '📅',
+kind: 'setField', field: g.due.id, value: '@today' });
+if (g.owner) acts.push({ id: mintId('a_'), label: 'Assign to me', icon: '👤',
+kind: 'setField', field: g.owner.id, value: '@user' });
+C.push(presetCmp('table', ds.name, 0, 10, {
+span: 'full', dataset: ds.id,
+opts: {
+pageSize: 50, editable: true, selectable: true, search: true, rowNotes: true,
+columns: ds.columns.filter(function (c) { return c.type !== 'longtext'; })
+.slice(0, 7).map(function (c) { return c.id; }),
+quickFilters: qf,
+contextMenu: {
+builtins: ['edit', 'duplicate', 'delete', 'addNote', 'copyRow', 'exportSelected'],
+actions: acts
+}
+} }));
+}
+if (kind === 'agenda') {
+tab.layout = { cols: 2, variant: 'main' };
+var dateCol = g.due || g.when;
+C.push(presetCmp('agenda', 'What is due', 0, 10, {
+opts: { range: 'next30', showOverdue: true, display: 'list',
+sources: [{ dataset: ds.id, dateField: dateCol.id, titleField: g.title ? g.title.id : null,
+metaField: g.owner ? g.owner.id : null, toneField: g.enm ? g.enm.id : null,
+filter: rules(clone(openRule)) }] } }));
+C.push(presetCmp('kpi', 'Next 7 days', 1, 11, {
+dataset: ds.id, agg: { op: 'count', filter: rules(
+{ field: dateCol.id, cmp: 'relDate', value: 'next7' }, clone(openRule)) },
+opts: { format: 'integer' } }));
+if (g.due) {
+C.push(presetCmp('kpi', 'Overdue', 1, 12, {
+dataset: ds.id, agg: { op: 'count', filter: rules(clone(overdueRule), clone(openRule)) },
+opts: { format: 'integer' } }));
+}
+}
+if (kind === 'notes') {
+C.push(presetCmp('notes', 'Sticky notes', 0, 10, { span: 'full' }));
+}
+if (kind === 'checklist') {
+C.push(presetCmp('checklist', 'Daily routine', 0, 10, {
+opts: { resetDaily: true, showDue: false } }));
+}
+if (kind === 'todo') {
+tab.layout = { cols: 2, variant: 'main' };
+C.push(presetCmp('checklist', 'To-do', 0, 10, { opts: { resetDaily: false, showDue: true } }));
+C.push(presetCmp('notes', 'Notes', 1, 11));
+}
+return tab;
+}
+function presetDataset(p) {
+if (!p.needsDs) return null;
+var ds = dsOf(W.presetDs) || W.cfg.datasets[0] || null;
+if (ds && !ds.columns.length) ds = null;
+if (ds && p.needsDate && !colsOfType(ds, 'date').length) {
+ds = W.cfg.datasets.filter(function (d) { return colsOfType(d, 'date').length; })[0] || null;
+}
+return ds;
+}
+function presetPicker() {
+var body = el('div', '');
+body.appendChild(hint('Pick what the tab is for. It comes with components already wired to ' +
+'your columns — change anything in the Components step.'));
+if (W.cfg.datasets.length > 1) {
+if (!dsOf(W.presetDs)) W.presetDs = W.cfg.datasets[0].id;
+var dsf = field('Built on dataset', select(
+W.cfg.datasets.map(function (d) { return { v: d.id, l: d.name }; }),
+W.presetDs, function (v) { W.presetDs = v; renderStep3(); }));
+dsf.style.maxWidth = '280px';
+dsf.style.marginBottom = '10px';
+body.appendChild(dsf);
+}
+var grid = el('div', 'wz-types wz-presets');
+TAB_PRESETS.forEach(function (p) {
+var ds = presetDataset(p);
+var why = '';
+if (p.needsDs && !ds) {
+why = p.needsDate ? 'Needs a dataset with a date column (Data step).'
+: 'Needs a dataset with columns (Data step).';
+}
+var b = el('button', 'wz-type wz-preset');
+b.type = 'button';
+b.setAttribute('data-preset', p.v);
+b.innerHTML = '<i>' + esc(p.i) + '</i><span><b>' + esc(p.l) + '</b>' +
+'<small>' + esc(why || p.text) + '</small></span>';
+if (why) b.disabled = true;
+b.addEventListener('click', function () {
+var tab = buildPreset(p.v, presetDataset(p));
+W.cfg.tabs.push(tab);
+var n = tab.components.length;
+TBUI.toast('Added “' + tab.label + '”' +
+(n ? ' with ' + n + (n === 1 ? ' component' : ' components') : ''), 'success');
 renderStep3();
 });
-add.style.marginTop = '10px';
-body.appendChild(add);
-host.appendChild(card('Tabs', body));
+grid.appendChild(b);
+});
+body.appendChild(grid);
+return card('Add a tab', body);
 }
 function newComponent(type, tab) {
 var ds = W.cfg.datasets[0];
@@ -3054,7 +3287,8 @@ var grid = el('div', 'wz-fields');
 if (f.when && !f.when(cmp)) return;
 var ctrl = buildControl(f, cmp);
 if (!ctrl) return;
-if (f.kind === 'filter' || f.kind === 'ctxmenu' || f.kind === 'columns' || f.kind === 'sources') {
+if (f.kind === 'filter' || f.kind === 'ctxmenu' || f.kind === 'columns' ||
+f.kind === 'sources' || f.kind === 'quickfilters') {
 var box = el('div', 'tb-field wz-wide');
 box.appendChild(el('label', null, f.label));
 box.appendChild(ctrl);
@@ -3102,6 +3336,7 @@ W.cfg.datasets.map(function (d) { return { v: d.id, l: d.name }; })),
 val || '', function (v) {
 setPath(cmp, f.k, v || null);
 if (cmp.opts && cmp.opts.columns) cmp.opts.columns = [];
+if (cmp.opts && cmp.opts.quickFilters) cmp.opts.quickFilters = [];
 renderStep4();
 });
 }
@@ -3125,7 +3360,43 @@ if (!ds) return el('p', 'tb-dim', 'Choose a dataset first.');
 return ctxMenuEditor(cmp, ds);
 }
 if (f.kind === 'sources') return sourcesEditor(cmp);
+if (f.kind === 'quickfilters') {
+if (!ds) return el('p', 'tb-dim', 'Choose a dataset first.');
+return quickFiltersEditor(cmp, ds);
+}
 return null;
+}
+function quickFiltersEditor(cmp, ds) {
+cmp.opts.quickFilters = cmp.opts.quickFilters || [];
+var list = cmp.opts.quickFilters;
+var box = el('div', 'wz-quickfilters');
+box.appendChild(hint('One click narrows the table; a second click clears it. ' +
+'They sit next to the search box.'));
+list.forEach(function (q, i) {
+var row = el('div', 'wz-row');
+row.style.alignItems = 'flex-start';
+var m = el('div', '');
+m.style.flex = '1';
+var li = small(input(q.label || '', function (v) { q.label = v.trim() || 'Filter'; }), '0 1 220px');
+li.setAttribute('aria-label', 'Chip label');
+m.appendChild(li);
+m.appendChild(filterEditor(q, 'filter', ds, renderStep4));
+row.appendChild(m);
+var a = el('div', 'wz-row-actions');
+a.appendChild(mini('✕', 'Remove chip', function () {
+list.splice(i, 1);
+renderStep4();
+}, true));
+row.appendChild(a);
+box.appendChild(row);
+});
+var add = btn('+ Add a chip', 'btn-ghost', function () {
+list.push({ label: 'Filter ' + (list.length + 1), filter: { op: 'and', rules: [] } });
+renderStep4();
+});
+add.style.marginTop = '6px';
+box.appendChild(add);
+return box;
 }
 function columnsPicker(cmp, ds) {
 cmp.opts.columns = cmp.opts.columns || [];
@@ -3508,6 +3779,13 @@ p.push('Agenda “' + (c.title || '') + '” has no source with a date column.')
 if (c.type === 'table' && !((c.opts || {}).columns || []).length) {
 p.push('Table “' + (c.title || '') + '” shows no columns.');
 }
+if (c.type === 'table') {
+((c.opts || {}).quickFilters || []).forEach(function (q) {
+if (!(q.filter && (q.filter.rules || []).length)) {
+p.push('Quick filter “' + q.label + '” in “' + (c.title || '') + '” has no conditions.');
+}
+});
+}
 });
 });
 (cfg.alerts || []).forEach(function (a) {
@@ -3767,7 +4045,8 @@ render();
 if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', init);
 else init();
 global.TBWizard = {
-state: W, emit: emit, validate: validate, synth: synth, parseDelimited: parseDelimited
+state: W, emit: emit, validate: validate, synth: synth, parseDelimited: parseDelimited,
+presets: { build: buildPreset, roles: guessRoles }
 };
 })(window);</script>
 </body>

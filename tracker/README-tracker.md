@@ -23,7 +23,7 @@ touches the rows people have typed.
 ```bash
 python3 tracker/build-themes.py     # extracts the 5 themes from tracker/sources/
 python3 tracker/build-wizard.py     # assembles dist/tracker-wizard.html
-sh tracker/tests/run-all.sh         # build + 150 end-to-end assertions in Chromium
+sh tracker/tests/run-all.sh         # build + 197 end-to-end assertions in Chromium
 ```
 
 `dist/tracker-wizard.html` is a **build artifact**. Editing it by hand is
@@ -78,6 +78,25 @@ the tab you nominated.
 They are deliberately **in-app only**. A plain HTML file cannot notify anyone
 while it is closed — there is nothing running in the background — so a desktop
 notification would only ever fire while the tracker is already open.
+
+## Tab presets
+
+In the Tabs step, **Add a tab** offers seven kinds: Summary, Query, Agenda,
+Notes, Checklist, To-do and Blank. Each comes with components already wired to
+the chosen dataset. Column roles are guessed from types and names:
+
+| role | how it is recognised |
+|---|---|
+| due date | a date column named like *due, deadline, until, termin* |
+| event date (time axis) | the first other date column |
+| closed state | a pick-list option or yes/no column named like *done, closed, complete* |
+| owner | a text column defaulting to `@user`, or named like *owner, assigned* |
+
+A miss only means fewer components, never a broken tab: with no closed state
+there is no "Open" filter, with no due date there is no "Overdue". Agenda is
+disabled until some dataset has a date column. Everything a preset creates is
+ordinary configuration, editable in the Components step — including the quick
+filter chips above a table, which now have their own editor.
 
 ## Style
 
@@ -136,8 +155,6 @@ table straight through the menu.
 
 ## Not built yet
 
-- **Tab presets** only exist through the three starting templates. A new tab
-  starts empty.
 - **Tooltip, accordion, stepper, breadcrumbs** have styles in `tracker.css`, but
   no component uses them and they are not in the wizard's catalogue. The toggle
   is used (the wizard's own switches).
