@@ -1,0 +1,1944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The UI Encyclopedia — how to order HTML tools from AI</title>
+<style>
+:root{
+  --ink:#0E1013; --shell:#16191F; --panel:#1C2029; --panel-2:#232833;
+  --line:#2E3440; --line-2:#3A4150;
+  --text:#E8E6E1; --muted:#9AA1AE; --dim:#6B7280;
+  --amber:#D9A441; --steel:#7FA8C9; --mint:#6FCF97;
+  --r:14px; --r-sm:9px;
+  --mono:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,monospace;
+  --disp:'Segoe UI Variable Display','Segoe UI',system-ui,-apple-system,'Helvetica Neue',sans-serif;
+  --body:system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--ink);color:var(--text);font-family:var(--body);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+::selection{background:var(--amber);color:#111}
+a{color:var(--steel)}
+h1,h2,h3,h4{font-family:var(--disp);font-weight:700;letter-spacing:-.022em;margin:0}
+code,kbd{font-family:var(--mono)}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--amber);outline-offset:2px;border-radius:4px}
+.ic{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;display:inline-block;vertical-align:-2px}
+
+.top{position:sticky;top:0;z-index:60;background:rgba(14,16,19,.9);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.top-in{max-width:1280px;margin:0 auto;padding:12px 20px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--disp);font-weight:700;font-size:17px;letter-spacing:-.03em}
+.brand i{width:26px;height:26px;display:grid;place-items:center;background:var(--amber);color:#14161a;border-radius:7px}
+.search{flex:1;min-width:190px;position:relative}
+.search .ic{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--dim)}
+.search input{width:100%;padding:9px 12px 9px 34px;background:var(--panel);border:1px solid var(--line);color:var(--text);border-radius:99px;font-size:14px}
+.search input::placeholder{color:var(--dim)}
+.tabs{max-width:1280px;margin:0 auto;padding:0 20px 10px;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{white-space:nowrap;padding:7px 14px;border-radius:99px;border:1px solid transparent;background:transparent;color:var(--muted);font-size:13.5px;font-weight:500;display:flex;align-items:center;gap:7px}
+.tab:hover{color:var(--text);background:var(--panel)}
+.tab.on{background:var(--text);color:var(--ink);font-weight:600}
+
+main{max-width:1280px;margin:0 auto;padding:28px 20px 120px}
+.view{display:none}.view.on{display:block}
+
+.hero{border:1px solid var(--line);border-radius:22px;background:radial-gradient(900px 300px at 85% -30%,rgba(217,164,65,.14),transparent 60%),var(--shell);padding:34px;margin-bottom:34px;display:grid;grid-template-columns:1.15fr .85fr;gap:34px;align-items:center}
+.hero h1{font-size:clamp(28px,4.2vw,46px);line-height:1.03;font-weight:700;margin-bottom:14px;letter-spacing:-.035em}
+.hero p{color:var(--muted);max-width:56ch;margin:0 0 20px}
+.hero-stats{display:flex;gap:26px;flex-wrap:wrap}
+.hero-stats div{font-family:var(--disp);font-size:26px;font-weight:700}
+.hero-stats span{display:block;font-family:var(--body);font-size:12.5px;font-weight:400;color:var(--dim);letter-spacing:0}
+.swatchbox{display:flex;flex-direction:column;gap:12px}
+.swatch-stage{height:210px;display:grid;place-items:center;border-radius:16px;transition:background .35s}
+.swatch-pick{display:flex;flex-wrap:wrap;gap:6px}
+.swatch-pick button{padding:5px 11px;font-size:12px;border-radius:99px;border:1px solid var(--line-2);background:var(--panel);color:var(--muted)}
+.swatch-pick button.on{background:var(--amber);border-color:var(--amber);color:#14161a;font-weight:600}
+
+.lede{max-width:70ch;color:var(--muted);margin:0 0 26px}
+.lede strong{color:var(--text);font-weight:600}
+.secthead{display:flex;align-items:baseline;gap:12px;margin:38px 0 16px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.secthead h2{font-size:21px}
+.secthead p{margin:0;color:var(--dim);font-size:13.5px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:18px}
+.grid.wide{grid-template-columns:repeat(auto-fill,minmax(520px,1fr))}
+.item{border:1px solid var(--line);border-radius:var(--r);background:var(--panel);overflow:hidden;display:flex;flex-direction:column}
+.item.hide{display:none}
+.stage{padding:26px 22px;background:var(--panel-2);border-bottom:1px solid var(--line);display:grid;place-items:center;min-height:150px;position:relative;overflow:hidden}
+.stage.light{background:#EFEFF2}
+.stage.flow{display:block;place-items:stretch}
+.body{padding:16px 18px 18px;display:flex;flex-direction:column;gap:9px;flex:1}
+.body h3{font-size:16.5px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.body h3 .pill{font-family:var(--body);font-size:10.5px;font-weight:600;color:var(--amber);background:rgba(217,164,65,.12);border:1px solid rgba(217,164,65,.28);padding:2px 8px;border-radius:99px;letter-spacing:0}
+.body p{margin:0;font-size:13.5px;color:var(--muted)}
+.say{margin-top:auto;display:flex;gap:8px;align-items:flex-start;background:var(--ink);border:1px solid var(--line);border-radius:var(--r-sm);padding:10px 11px}
+.say code{flex:1;font-size:12px;color:var(--steel);line-height:1.5}
+.say-btns{display:flex;flex-direction:column;gap:5px}
+.mini{border:1px solid var(--line-2);background:var(--panel-2);color:var(--muted);border-radius:6px;padding:4px 7px;font-size:11px;display:flex;align-items:center;gap:5px;white-space:nowrap}
+.mini .ic{width:12px;height:12px}
+.mini:hover{color:var(--text);border-color:var(--muted)}
+.mini.done{color:var(--mint);border-color:var(--mint)}
+
+.d-card{background:#1A1E27;border:1px solid #2F3643;border-radius:12px;padding:14px 16px;min-width:170px}
+.d-lab{font-size:11.5px;color:#8B93A3;margin-bottom:4px}
+.d-val{font-family:var(--disp);font-size:27px;font-weight:700;line-height:1}
+.d-delta{font-size:11.5px;display:inline-flex;align-items:center;gap:4px;margin-top:6px}
+.up{color:#6FCF97}.down{color:#E4736B}
+.d-btn{background:var(--amber);color:#14161a;border:none;border-radius:8px;padding:9px 15px;font-size:13.5px;font-weight:600}
+.d-btn.ghost{background:transparent;color:var(--text);border:1px solid var(--line-2)}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center}
+.col{display:flex;flex-direction:column;gap:10px;width:100%}
+.sw{width:44px;height:25px;border-radius:99px;background:#39414F;position:relative;transition:background .22s;border:none;padding:0}
+.sw::after{content:'';position:absolute;top:3px;left:3px;width:19px;height:19px;border-radius:50%;background:#fff;transition:transform .22s cubic-bezier(.4,1.6,.5,1)}
+.sw.on{background:var(--mint)}
+.sw.on::after{transform:translateX(19px)}
+.seg{display:inline-flex;background:#151920;border:1px solid var(--line);border-radius:9px;padding:3px}
+.seg button{border:none;background:transparent;color:var(--muted);padding:6px 13px;border-radius:6px;font-size:13px}
+.seg button.on{background:var(--panel-2);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.4)}
+.chip{padding:5px 11px;border-radius:99px;border:1px solid var(--line-2);background:transparent;color:var(--muted);font-size:12.5px}
+.chip.on{background:rgba(217,164,65,.14);border-color:var(--amber);color:var(--amber)}
+.bar{height:7px;border-radius:99px;background:#2B313D;overflow:hidden;width:100%}
+.bar i{display:block;height:100%;background:var(--amber);border-radius:99px;transition:width .6s}
+
+pre{margin:0;background:#0B0D11;border:1px solid var(--line);border-radius:var(--r-sm);padding:14px;overflow:auto;font-size:12px;line-height:1.6;max-height:340px}
+pre code{color:#C8D0DE}
+.k{color:#C792EA}.s{color:#C3E88D}.c{color:#5F6B7D}.f{color:#82AAFF}.t{color:#F78C6C}
+
+.basket-fab{position:fixed;right:22px;bottom:22px;z-index:80;background:var(--amber);color:#14161a;border:none;border-radius:99px;padding:13px 19px;font-weight:700;display:flex;gap:9px;align-items:center;box-shadow:0 12px 30px rgba(0,0,0,.5)}
+.drawer{position:fixed;inset:0;z-index:90;display:none}
+.drawer.on{display:block}
+.drawer-bg{position:absolute;inset:0;background:rgba(6,8,11,.65);backdrop-filter:blur(3px)}
+.drawer-in{position:absolute;right:0;top:0;bottom:0;width:min(560px,100%);background:var(--shell);border-left:1px solid var(--line);padding:24px;display:flex;flex-direction:column;gap:14px;overflow:auto}
+.drawer h3{font-size:19px}
+.drawer textarea{flex:1;min-height:320px;background:#0B0D11;border:1px solid var(--line);border-radius:var(--r-sm);color:#C8D0DE;padding:14px;font-family:var(--mono);font-size:12.5px;line-height:1.6;resize:vertical}
+.toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);background:var(--text);color:var(--ink);padding:10px 18px;border-radius:99px;font-weight:600;font-size:13.5px;opacity:0;pointer-events:none;transition:.25s;z-index:100}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.cheat{width:100%;border-collapse:collapse;font-size:13.5px}
+.cheat th,.cheat td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+.cheat th{color:var(--dim);font-weight:500;font-size:12px}
+.cheat td:first-child{font-family:var(--mono);font-size:12px;color:var(--amber);white-space:nowrap}
+.note{border-left:3px solid var(--amber);background:rgba(217,164,65,.07);padding:12px 16px;border-radius:0 var(--r-sm) var(--r-sm) 0;font-size:13.5px;color:var(--muted)}
+.note b{color:var(--text)}
+@media(max-width:900px){.hero{grid-template-columns:1fr;padding:24px}.grid,.grid.wide{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5 21 21"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+<symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+<symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></symbol>
+<symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol>
+<symbol id="i-chevron-left" viewBox="0 0 24 24"><path d="m15 5-7 7 7 7"/></symbol>
+<symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="m5 9 7 7 7-7"/></symbol>
+<symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M4 20h16"/></symbol>
+<symbol id="i-printer" viewBox="0 0 24 24"><path d="M6 9V3h12v6M6 18H4v-6h16v6h-2"/><rect x="7" y="14" width="10" height="7" rx="1"/></symbol>
+<symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 9a6 6 0 1 0-12 0c0 6-3 8-3 8h18s-3-2-3-8M10.4 21a1.9 1.9 0 0 0 3.2 0"/></symbol>
+<symbol id="i-home" viewBox="0 0 24 24"><path d="m3 11 9-8 9 8M5 11v9h14v-9"/></symbol>
+<symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.2 3.6-6 8-6s8 1.8 8 6"/></symbol>
+<symbol id="i-trending-up" viewBox="0 0 24 24"><path d="m3 17 6-6 4 4 8-8M15 7h6v6"/></symbol>
+<symbol id="i-alert-triangle" viewBox="0 0 24 24"><path d="M12 3 2.5 20h19L12 3zM12 9v5M12 17.5h.01"/></symbol>
+<symbol id="i-help-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.3 9.2a2.8 2.8 0 1 1 3.9 2.6c-.8.4-1.2 1-1.2 1.9v.4M12 17.4h.01"/></symbol>
+<symbol id="i-inbox" viewBox="0 0 24 24"><path d="M3 13h5l1.5 3h5L16 13h5"/><path d="M5.5 4h13l2.5 9v7H3v-7L5.5 4z"/></symbol>
+<symbol id="i-file-spreadsheet" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5z"/><path d="M14 3v5h5M8 13h8M8 17h8M12 13v4"/></symbol>
+<symbol id="i-file-down" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5z"/><path d="M14 3v5h5M12 11v6m-2.5-2.5L12 17l2.5-2.5"/></symbol>
+<symbol id="i-rotate-ccw" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 2.6-6.4L3 8"/><path d="M3 3v5h5"/></symbol>
+<symbol id="i-clipboard-list" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1M9 10h6M9 14h6M9 18h4"/></symbol>
+<symbol id="i-panel-left-close" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M16 10l-2 2 2 2"/></symbol>
+<symbol id="i-layout-dashboard" viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="9" rx="1"/><rect x="13" y="3" width="8" height="5" rx="1"/><rect x="13" y="10" width="8" height="11" rx="1"/><rect x="3" y="14" width="8" height="7" rx="1"/></symbol>
+<symbol id="i-layout-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></symbol>
+<symbol id="i-list-checks" viewBox="0 0 24 24"><path d="M11 6h10M11 12h10M11 18h10M3 6l1.5 1.5L7 5M3 12l1.5 1.5L7 11M3 18l1.5 1.5L7 17"/></symbol>
+<symbol id="i-chart-pie" viewBox="0 0 24 24"><path d="M21 12A9 9 0 1 1 12 3v9h9z"/></symbol>
+<symbol id="i-chart-column" viewBox="0 0 24 24"><path d="M4 20h16M7 20v-7M12 20V6M17 20v-10"/></symbol>
+<symbol id="i-ban" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m5.6 5.6 12.8 12.8"/></symbol>
+<symbol id="i-book-open-text" viewBox="0 0 24 24"><path d="M12 6c-2-2-5-2-9-2v14c4 0 7 0 9 2 2-2 5-2 9-2V4c-4 0-7 0-9 2zM12 6v14"/></symbol>
+<symbol id="i-play" viewBox="0 0 24 24"><path d="M6 4l14 8-14 8z"/></symbol>
+<symbol id="i-palette" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.7-.9 1.5-1.7-.3-1.2.6-2.3 1.8-2.3H18a3 3 0 0 0 3-3c0-6-4-11-9-11z"/><path d="M7.5 12h.01M10 8h.01M15 8.5h.01"/></symbol>
+<symbol id="i-wand-sparkles" viewBox="0 0 24 24"><path d="m3 21 12-12M14 4l1.2 2.8L18 8l-2.8 1.2L14 12l-1.2-2.8L10 8l2.8-1.2zM19 14l.7 1.6 1.6.7-1.6.7-.7 1.6-.7-1.6-1.6-.7 1.6-.7z"/></symbol>
+<symbol id="i-gallery-horizontal-end" viewBox="0 0 24 24"><path d="M2 7v10M6 5v14"/><rect x="10" y="3" width="12" height="18" rx="2"/></symbol>
+<symbol id="i-code" viewBox="0 0 24 24"><path d="m9 18-6-6 6-6M15 6l6 6-6 6"/></symbol>
+<symbol id="i-message-square-quote" viewBox="0 0 24 24"><path d="M21 4H3v13h5v4l5-4h8z"/><path d="M8.5 9.5h2v2h-2zM13.5 9.5h2v2h-2z"/></symbol>
+<symbol id="i-component" viewBox="0 0 24 24"><path d="m12 2 3 3-3 3-3-3zM5 9l3 3-3 3-3-3zM19 9l3 3-3 3-3-3zM12 16l3 3-3 3-3-3z"/></symbol>
+<symbol id="i-navigation" viewBox="0 0 24 24"><path d="m3 11 18-8-8 18-2-8z"/></symbol>
+<symbol id="i-check-circle-2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.5 2.5 4.5-5"/></symbol>
+<symbol id="i-timer" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></symbol>
+<symbol id="i-flag" viewBox="0 0 24 24"><path d="M5 21V4h13l-2.5 4L18 12H5"/></symbol>
+<symbol id="i-graduation-cap" viewBox="0 0 24 24"><path d="M12 4 2 9l10 5 10-5-10-5zM6 12v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/></symbol>
+</defs></svg>
+
+<header class="top">
+  <div class="top-in">
+    <div class="brand"><i data-l="book-open-text"></i> The UI Encyclopedia</div>
+    <div class="search">
+      <span data-l="search"></span>
+      <input id="q" type="search" placeholder="Search: kpi, toggle, neon, carousel, excel…">
+    </div>
+    <button class="mini" id="expandAll"><span data-l="list"></span> Contents</button>
+    <button class="mini" id="printBtn"><span data-l="printer"></span> Print cheat sheet</button>
+  </div>
+  <nav class="tabs" id="tabs">
+    <button class="tab on" data-v="start"><span data-l="play"></span> Start</button>
+    <button class="tab" data-v="layout"><span data-l="layout-grid"></span> Layouts</button>
+    <button class="tab" data-v="komp"><span data-l="component"></span> Components</button>
+    <button class="tab" data-v="nav"><span data-l="navigation"></span> Navigation</button>
+    <button class="tab" data-v="style"><span data-l="palette"></span> Styles</button>
+    <button class="tab" data-v="motion"><span data-l="wand-sparkles"></span> Motion</button>
+    <button class="tab" data-v="karuzela"><span data-l="gallery-horizontal-end"></span> Carousels</button>
+    <button class="tab" data-v="wykresy"><span data-l="chart-column"></span> Charts</button>
+    <button class="tab" data-v="snip"><span data-l="code"></span> Snippets</button>
+    <button class="tab" data-v="prompty"><span data-l="message-square-quote"></span> Prompts</button>
+    <button class="tab" data-v="warsztat"><span data-l="graduation-cap"></span> Workshop</button>
+  </nav>
+</header>
+
+<main>
+
+<!-- ============ START ============ -->
+<section class="view on" id="v-start">
+  <div class="hero">
+    <div>
+      <h1>You don't need to code.<br>You need the right words.</h1>
+      <p>This is a dictionary of the parts every tracker, dashboard and HTML report is built from. Find what fits, copy its name into your AI prompt, and get what you actually pictured instead of something that's fine but not quite it.</p>
+      <div class="row" style="justify-content:flex-start;margin-bottom:22px">
+        <button class="d-btn" data-goto="komp">Start with components</button>
+        <button class="d-btn ghost" data-goto="prompty">Jump to ready-made prompts</button>
+      </div>
+      <div class="hero-stats">
+        <div id="cnt-items">—<span>entries in the catalogue</span></div>
+        <div>11<span>tabs</span></div>
+        <div>10<span>visual styles</span></div>
+      </div>
+    </div>
+    <div class="swatchbox">
+      <div class="swatch-stage" id="swStage"></div>
+      <div class="swatch-pick" id="swPick"></div>
+      <p style="margin:0;font-size:12.5px;color:var(--dim)">One KPI card, ten styles. That is the whole difference between "build me a dashboard" and "build me a dashboard in glassmorphism".</p>
+    </div>
+  </div>
+
+  <div class="secthead"><h2>How to use this</h2><p>three steps</p></div>
+  <div class="grid">
+    <div class="item"><div class="body">
+      <h3><span class="pill">1</span> Find the part</h3>
+      <p>Browse the tabs or type what you're after into the search box. Every card shows a live, working example — not a screenshot. Click them, they all respond.</p>
+    </div></div>
+    <div class="item"><div class="body">
+      <h3><span class="pill">2</span> Add it to the prompt basket</h3>
+      <p>The "+" button on each card drops its description into the basket (bottom right). Collect 5–15 things your tool should be made of.</p>
+    </div></div>
+    <div class="item"><div class="body">
+      <h3><span class="pill">3</span> Send it as one paste</h3>
+      <p>The basket assembles everything into a properly worded prompt. Copy, paste, get your tool. Then refine single parts using the same vocabulary.</p>
+    </div></div>
+  </div>
+
+  <div class="secthead"><h2>Anatomy of a good request</h2><p>what separates a prompt that works</p></div>
+  <div class="grid wide">
+    <div class="item"><div class="body">
+      <h3>Weak prompt</h3>
+      <p>Missing everything that decides the outcome: the data, the layout, the style, how it gets used.</p>
+      <div class="say"><code>Build me an HTML tracker for tax queries.</code></div>
+      <p style="color:var(--dim)">The model guesses your columns, invents data, picks a random style. You get a demo, not a tool.</p>
+    </div></div>
+    <div class="item"><div class="body">
+      <h3>Strong prompt</h3>
+      <p>Five ingredients: <strong>what</strong> it is, <strong>what data</strong>, <strong>which parts</strong>, <strong>which style</strong>, <strong>how it's used</strong>.</p>
+      <div class="say"><code>Build a single-file HTML tracker for tax queries. Data loaded from Excel via SheetJS; columns: ID, country, client, status, deadline, owner. Four KPI cards with count-up at the top, then a filter bar of chips plus a live search box, then a sortable table with statuses as coloured badges and a progress bar. Light/dark toggle, minimal corporate style, state saved to localStorage. Must run from a file, offline, in Edge.</code></div>
+    </div></div>
+  </div>
+
+  <div class="note" style="margin-top:22px"><b>The rule for today:</b> AI can't read your mind, but it does know names. "KPI card with a delta badge and a sparkline" is a specific thing the model recognises — "a nice tile with a number on it" is a lottery. This whole encyclopedia is just a list of names.</div>
+</section>
+<!-- ============ LAYOUTS ============ -->
+<section class="view" id="v-layout">
+  <p class="lede"><strong>The layout is the skeleton.</strong> Before AI draws a single tile it needs to know how the screen is divided. These cover about 95% of internal tools — pick one, then fill it in with components.</p>
+  <div class="grid">
+
+    <article class="item" data-tags="layout sidebar shell dashboard app">
+      <div class="stage flow">
+        <div style="display:grid;grid-template-columns:52px 1fr;gap:8px;height:120px;width:100%">
+          <div style="background:#2B3140;border-radius:8px;padding:8px;display:flex;flex-direction:column;gap:6px">
+            <div style="height:8px;background:var(--amber);border-radius:3px"></div><div style="height:8px;background:#3E4657;border-radius:3px"></div><div style="height:8px;background:#3E4657;border-radius:3px"></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="height:22px;background:#2B3140;border-radius:8px"></div>
+            <div style="flex:1;display:grid;grid-template-columns:repeat(3,1fr);gap:8px"><div style="background:#2B3140;border-radius:8px"></div><div style="background:#2B3140;border-radius:8px"></div><div style="background:#2B3140;border-radius:8px"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="body">
+        <h3>App shell <span class="pill">default</span></h3>
+        <p>Side navigation, top header, content area. The classic internal-tool skeleton: many sections, navigation always visible, content scrolls on its own.</p>
+        <div class="say"><code data-prompt="Layout: app shell — left sidebar navigation (collapsible to icons), top header with title and actions, content area scrolling independently.">Layout: app shell — left sidebar, top header, content scrolls independently.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="layout bento grid tiles">
+      <div class="stage flow">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:34px;gap:8px;height:120px">
+          <div style="grid-column:span 2;grid-row:span 2;background:#2B3140;border-radius:10px"></div>
+          <div style="grid-column:span 2;background:#2B3140;border-radius:10px"></div>
+          <div style="background:var(--amber);opacity:.75;border-radius:10px"></div>
+          <div style="background:#2B3140;border-radius:10px"></div>
+          <div style="grid-column:span 4;background:#2B3140;border-radius:10px"></div>
+        </div>
+      </div>
+      <div class="body">
+        <h3>Bento grid</h3>
+        <p>Uneven tiles of different sizes, like a bento box. Best when some numbers matter more than others — big tile, big weight. Looks excellent on a leadership screen.</p>
+        <div class="say"><code data-prompt="Layout: bento grid — tiles of varying sizes (2x2, 2x1, 1x1), with the most important metric in the largest tile.">Layout: bento grid — tiles of different sizes, key metric in the biggest one.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="layout split master detail list record">
+      <div class="stage flow">
+        <div style="display:grid;grid-template-columns:.8fr 1.2fr;gap:8px;height:120px">
+          <div style="background:#2B3140;border-radius:8px;padding:8px;display:flex;flex-direction:column;gap:6px">
+            <div style="height:14px;background:var(--amber);opacity:.8;border-radius:4px"></div><div style="height:14px;background:#3E4657;border-radius:4px"></div><div style="height:14px;background:#3E4657;border-radius:4px"></div><div style="height:14px;background:#3E4657;border-radius:4px"></div>
+          </div>
+          <div style="background:#2B3140;border-radius:8px"></div>
+        </div>
+      </div>
+      <div class="body">
+        <h3>Master–detail (split view)</h3>
+        <p>List on the left, details of the selected item on the right. Perfect for case trackers: you open a record without losing the list. On a phone it becomes two screens.</p>
+        <div class="say"><code data-prompt="Layout: master–detail — record list on the left, detail panel on the right, selected row highlighted; on mobile the detail panel becomes a full screen.">Layout: master–detail — list left, details right, full screen on mobile.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="layout kanban board status columns">
+      <div class="stage flow">
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;height:120px">
+          <div style="background:#252B37;border-radius:8px;padding:6px;display:flex;flex-direction:column;gap:5px"><div style="height:9px;background:#3E4657;border-radius:3px"></div><div style="height:22px;background:#333B4B;border-radius:5px"></div><div style="height:22px;background:#333B4B;border-radius:5px"></div></div>
+          <div style="background:#252B37;border-radius:8px;padding:6px;display:flex;flex-direction:column;gap:5px"><div style="height:9px;background:var(--amber);opacity:.7;border-radius:3px"></div><div style="height:22px;background:#333B4B;border-radius:5px"></div></div>
+          <div style="background:#252B37;border-radius:8px;padding:6px;display:flex;flex-direction:column;gap:5px"><div style="height:9px;background:#3E4657;border-radius:3px"></div><div style="height:22px;background:#333B4B;border-radius:5px"></div><div style="height:22px;background:#333B4B;border-radius:5px"></div></div>
+        </div>
+      </div>
+      <div class="body">
+        <h3>Kanban board</h3>
+        <p>Columns are statuses, cards are cases, dragging changes the status. Great when a process has clear stages and you want to see where it clogs up.</p>
+        <div class="say"><code data-prompt="Layout: kanban board — columns represent statuses, cards dragged between columns (drag & drop), card count in each column header.">Layout: kanban — columns as statuses, drag & drop cards, count in column header.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="layout scroll landing presentation sections">
+      <div class="stage flow">
+        <div style="height:120px;overflow:hidden;border-radius:8px;display:flex;flex-direction:column;gap:6px">
+          <div style="height:46px;background:linear-gradient(135deg,#2B3140,#3A4358);border-radius:8px;display:grid;place-items:center;font-size:11px;color:#9AA1AE">full-screen section</div>
+          <div style="height:46px;background:#2B3140;border-radius:8px;display:grid;place-items:center;font-size:11px;color:#9AA1AE">full-screen section</div>
+          <div style="height:20px;background:#252B37;border-radius:8px"></div>
+        </div>
+      </div>
+      <div class="body">
+        <h3>Scrollytelling</h3>
+        <p>Full-screen sections stacked vertically, content appearing as you scroll. For presentations, onboarding and reports that should tell a story rather than just list numbers.</p>
+        <div class="say"><code data-prompt="Layout: scrollytelling — full-screen stacked sections, elements animating in on scroll (GSAP ScrollTrigger), smooth scrolling with Lenis, reading progress bar at the top.">Layout: scrollytelling — full-screen sections, scroll animations (GSAP + Lenis), progress bar.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="layout report document print a4">
+      <div class="stage light flow">
+        <div style="height:120px;background:#fff;border-radius:6px;box-shadow:0 2px 10px rgba(0,0,0,.14);padding:12px;display:flex;flex-direction:column;gap:6px">
+          <div style="height:10px;width:55%;background:#111;border-radius:2px"></div>
+          <div style="height:5px;background:#D8D8DE;border-radius:2px"></div>
+          <div style="height:5px;width:80%;background:#D8D8DE;border-radius:2px"></div>
+          <div style="flex:1;background:#F0F0F4;border-radius:4px;margin-top:4px"></div>
+        </div>
+      </div>
+      <div class="body">
+        <h3>Report / printable document</h3>
+        <p>Fixed-width column, document margins, separate print styles. For anything that ends up as a PDF or on paper rather than only on screen.</p>
+        <div class="say"><code data-prompt="Layout: document-style report — single fixed-width column on an A4 sheet, header and footer, dedicated @media print rules (buttons hidden, black on white, clean page breaks).">Layout: A4 report — single column, header/footer, @media print without buttons.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="layout sticky table of contents scrollspy">
+      <div class="stage flow">
+        <div style="display:grid;grid-template-columns:.5fr 1.5fr;gap:8px;height:120px">
+          <div style="display:flex;flex-direction:column;gap:5px;padding-top:6px">
+            <div style="height:7px;background:var(--amber);opacity:.8;border-radius:3px"></div><div style="height:7px;background:#3E4657;border-radius:3px;width:85%"></div><div style="height:7px;background:#3E4657;border-radius:3px;width:70%"></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px"><div style="height:36px;background:#2B3140;border-radius:8px"></div><div style="height:36px;background:#2B3140;border-radius:8px"></div><div style="height:36px;background:#2B3140;border-radius:8px"></div></div>
+        </div>
+      </div>
+      <div class="body">
+        <h3>Sticky table of contents</h3>
+        <p>A pinned section list that highlights where you currently are. Saves long documents, procedures and multi-section reports.</p>
+        <div class="say"><code data-prompt="Layout: sticky table of contents on the left highlighting the active section while scrolling (scrollspy), clicking scrolls smoothly to that section.">Layout: sticky contents with scrollspy highlighting the active section.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="layout responsive mobile breakpoint">
+      <div class="stage">
+        <div class="row">
+          <div style="width:86px;height:104px;border:2px solid var(--line-2);border-radius:10px;padding:6px;display:flex;flex-direction:column;gap:4px"><div style="height:8px;background:#3E4657;border-radius:2px"></div><div style="flex:1;background:#2B3140;border-radius:4px"></div></div>
+          <div style="width:44px;height:80px;border:2px solid var(--amber);border-radius:8px;padding:5px;display:flex;flex-direction:column;gap:4px"><div style="height:6px;background:var(--amber);opacity:.7;border-radius:2px"></div><div style="flex:1;background:#2B3140;border-radius:3px"></div></div>
+        </div>
+      </div>
+      <div class="body">
+        <h3>Responsiveness</h3>
+        <p>Not a component — a quality condition. If you don't ask, you'll often get something that falls apart on a phone. Worth one sentence in every request.</p>
+        <div class="say"><code data-prompt="Must be fully responsive: columns collapse to one on mobile, the table either scrolls horizontally or turns into cards, tap targets at least 44px tall.">Fully responsive: one column on mobile, table becomes cards, 44px tap targets.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- ============ COMPONENTS ============ -->
+<section class="view" id="v-komp">
+  <p class="lede"><strong>The building blocks.</strong> Every one of these works — click them. The name in the heading is exactly the word to use when you talk to AI.</p>
+
+  <div class="secthead"><h2>Numbers and indicators</h2><p>the first thing anyone looks at</p></div>
+  <div class="grid">
+
+    <article class="item" data-tags="kpi card metric counter number">
+      <div class="stage">
+        <div class="d-card" style="min-width:210px">
+          <div class="d-lab">Open queries</div>
+          <div class="d-val" data-count="1247">0</div>
+          <div class="d-delta up"><span data-l="trending-up"></span> +12.4% MoM</div>
+        </div>
+      </div>
+      <div class="body">
+        <h3>KPI card <span class="pill">must have</span></h3>
+        <p>One number, a label, and the change against the previous period. The number can count up from zero on load. Usually three to five of them in a row at the top.</p>
+        <div class="say"><code data-prompt="KPI cards: a row of 4 cards, each with a label, a large number animating from zero (count-up) and a percentage change with an arrow (green up / red down).">KPI cards: row of 4, big count-up number and % change with a coloured arrow.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="sparkline mini chart trend card">
+      <div class="stage">
+        <div class="d-card" style="min-width:210px">
+          <div class="d-lab">Average handling time</div>
+          <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px">
+            <div class="d-val">18<span style="font-size:14px;color:var(--muted)"> days</span></div>
+            <svg width="86" height="34" viewBox="0 0 86 34"><polyline points="0,26 12,22 24,27 36,16 48,19 60,10 72,13 84,4" fill="none" stroke="#6FCF97" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+        </div>
+      </div>
+      <div class="body">
+        <h3>KPI with sparkline</h3>
+        <p>A card with a tiny trend chart beside or behind the number. It adds the context a bare figure can't give — is this better or worse than last month?</p>
+        <div class="say"><code data-prompt="KPI card with a sparkline: a small line chart of the last 8 periods next to the number, no axes or labels.">KPI card with sparkline — small trend chart next to the number, no axes.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="progress bar ring donut completion">
+      <div class="stage">
+        <div class="row" style="gap:22px">
+          <div style="width:130px">
+            <div style="display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted);margin-bottom:6px"><span>Completion</span><span>68%</span></div>
+            <div class="bar"><i style="width:68%"></i></div>
+          </div>
+          <svg width="66" height="66" viewBox="0 0 66 66">
+            <circle cx="33" cy="33" r="27" fill="none" stroke="#2B313D" stroke-width="7"/>
+            <circle cx="33" cy="33" r="27" fill="none" stroke="#D9A441" stroke-width="7" stroke-linecap="round" stroke-dasharray="170" stroke-dashoffset="54" transform="rotate(-90 33 33)"/>
+            <text x="33" y="38" text-anchor="middle" fill="#E8E6E1" font-size="15" font-weight="700" font-family="system-ui">68%</text>
+          </svg>
+        </div>
+      </div>
+      <div class="body">
+        <h3>Progress bar and ring</h3>
+        <p>How much of something is done. Bars when you need many of them inside a table. A ring when it's the one number in the middle of the screen.</p>
+        <div class="say"><code data-prompt="Progress indicators: bars inside table rows plus one large ring (donut) with the percentage in the middle, animated on load.">Progress bars in table rows + one large ring with % in the middle, animated.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="badge status label colour pill">
+      <div class="stage">
+        <div class="row">
+          <span style="background:rgba(111,207,151,.14);color:#6FCF97;border:1px solid rgba(111,207,151,.3);padding:4px 11px;border-radius:99px;font-size:12px;font-weight:600">Completed</span>
+          <span style="background:rgba(217,164,65,.14);color:#D9A441;border:1px solid rgba(217,164,65,.3);padding:4px 11px;border-radius:99px;font-size:12px;font-weight:600">In progress</span>
+          <span style="background:rgba(228,115,107,.14);color:#E4736B;border:1px solid rgba(228,115,107,.3);padding:4px 11px;border-radius:99px;font-size:12px;font-weight:600">Overdue</span>
+          <span style="background:#262C38;color:#9AA1AE;border:1px solid #333B4B;padding:4px 11px;border-radius:99px;font-size:12px;font-weight:600">On hold</span>
+        </div>
+      </div>
+      <div class="body">
+        <h3>Status badge</h3>
+        <p>A coloured pill instead of raw text in a column. The eye catches colour faster than words — across 200 rows that's the difference between a second and a minute.</p>
+        <div class="say"><code data-prompt="Statuses as coloured badges (pills) with a fixed colour map: green = completed, amber = in progress, red = overdue, grey = on hold.">Statuses as coloured badges: green / amber / red / grey per a fixed status map.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+  </div>
+
+  <div class="secthead"><h2>Controls and filtering</h2><p>what people actually click</p></div>
+  <div class="grid">
+
+    <article class="item" data-tags="toggle switch dark mode control">
+      <div class="stage">
+        <div class="row" style="gap:18px">
+          <div style="display:flex;align-items:center;gap:9px"><button class="sw on" data-sw></button><span style="font-size:13px;color:var(--muted)">Mine only</span></div>
+          <div style="display:flex;align-items:center;gap:9px"><button class="sw" data-sw></button><span style="font-size:13px;color:var(--muted)">Overdue</span></div>
+        </div>
+      </div>
+      <div class="body">
+        <h3>Toggle / switch</h3>
+        <p>On–off, applied instantly, no save button. For binary filters and dark mode. If the change needs confirming, use a checkbox instead — a switch promises immediacy.</p>
+        <div class="say"><code data-prompt="Toggle switches for binary filters: 'mine only', 'overdue', 'dark mode' — applied instantly, state remembered.">Toggle switches for binary filters and dark mode, applied instantly, state remembered.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="segmented control range view switch">
+      <div class="stage">
+        <div class="seg" data-seg><button class="on">Day</button><button>Week</button><button>Month</button><button>Quarter</button></div>
+      </div>
+      <div class="body">
+        <h3>Segmented control</h3>
+        <p>A few mutually exclusive options side by side — time range, view mode, currency. Clearer than a dropdown whenever there are two to five choices.</p>
+        <div class="say"><code data-prompt="Segmented control for switching the range (day / week / month / quarter) — one active option, switching refreshes the charts and KPI cards.">Segmented control: day/week/month/quarter, switching refreshes KPIs and charts.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="chip filter tag categories">
+      <div class="stage">
+        <div class="row" style="gap:7px">
+          <button class="chip on" data-chip>All</button><button class="chip" data-chip>Germany</button><button class="chip" data-chip>France</button><button class="chip" data-chip>Switzerland</button><button class="chip" data-chip>Italy</button>
+        </div>
+      </div>
+      <div class="body">
+        <h3>Filter chips</h3>
+        <p>Clickable pills above a list. Single or multi-select, ideally with a result count on each. The fastest filter you can hand someone.</p>
+        <div class="say"><code data-prompt="Filter bar as chips (pills) above the table, multi-select, a result count on each chip, and a 'Clear filters' chip appearing when anything is selected.">Filter chips above the table, multi-select, counts on each, plus "Clear filters".</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="search live filter typing">
+      <div class="stage">
+        <div style="width:100%;max-width:280px">
+          <div style="position:relative">
+            <input id="demoSearch" placeholder="Search country…" style="width:100%;padding:9px 12px 9px 32px;background:#151920;border:1px solid var(--line);border-radius:8px;color:var(--text);font-size:13px">
+            <span data-l="search" style="position:absolute;left:10px;top:9px;color:var(--dim)"></span>
+          </div>
+          <div id="demoSearchOut" style="margin-top:9px;display:flex;flex-direction:column;gap:5px;font-size:12.5px;color:var(--muted)"></div>
+        </div>
+      </div>
+      <div class="body">
+        <h3>Live search</h3>
+        <p>Filters as you type, no search button. It should look across every column at once and highlight the matching fragment.</p>
+        <div class="say"><code data-prompt="Live search above the table: filters while typing across all columns, highlights the matched fragment, shows a result count and a clear message when nothing matches.">Live search filtering as you type across all columns, with a result count.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="dropdown select menu">
+      <div class="stage">
+        <div style="position:relative">
+          <button class="d-btn ghost" id="ddBtn" style="display:flex;gap:8px;align-items:center">Owner: everyone <span data-l="chevron-down"></span></button>
+          <div id="ddMenu" style="display:none;position:absolute;top:110%;left:0;background:#151920;border:1px solid var(--line);border-radius:9px;padding:5px;min-width:180px;z-index:5;box-shadow:0 12px 26px rgba(0,0,0,.5)">
+            <div class="dd-i" style="padding:7px 10px;border-radius:6px;font-size:13px;color:var(--muted)">Everyone</div>
+            <div class="dd-i" style="padding:7px 10px;border-radius:6px;font-size:13px;color:var(--muted)">Warsaw team</div>
+            <div class="dd-i" style="padding:7px 10px;border-radius:6px;font-size:13px;color:var(--muted)">Dublin team</div>
+          </div>
+        </div>
+      </div>
+      <div class="body">
+        <h3>Dropdown / select</h3>
+        <p>A list for choosing one of many. Above roughly eight options, put a search field inside it, or it becomes a scrolling chore.</p>
+        <div class="say"><code data-prompt="Custom dropdown (not a native select): a menu with a search field inside, the selected option marked, closing on outside click and on Escape.">Dropdown with a search field inside, selected option marked, closes on outside click.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="slider range threshold">
+      <div class="stage">
+        <div style="width:230px;text-align:center">
+          <input type="range" min="0" max="90" value="30" id="rng" style="width:100%;accent-color:#D9A441">
+          <div style="font-size:12.5px;color:var(--muted);margin-top:8px">Deadline within <b id="rngV" style="color:var(--amber)">30</b> days</div>
+        </div>
+      </div>
+      <div class="body">
+        <h3>Range slider</h3>
+        <p>For continuous values: amounts, days, alert thresholds. Always show the current value as a number — a slider without one is unusable.</p>
+        <div class="say"><code data-prompt="Range slider with the numeric value shown next to it, filtering results live.">Range slider with visible numeric value, filtering live.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="date range calendar picker">
+      <div class="stage">
+        <div class="row" style="gap:8px">
+          <input type="date" value="2026-09-01" style="background:#151920;border:1px solid var(--line);border-radius:8px;color:var(--text);padding:8px 10px;font-size:12.5px;color-scheme:dark">
+          <span style="color:var(--dim)">to</span>
+          <input type="date" value="2026-09-30" style="background:#151920;border:1px solid var(--line);border-radius:8px;color:var(--text);padding:8px 10px;font-size:12.5px;color-scheme:dark">
+        </div>
+      </div>
+      <div class="body">
+        <h3>Date range</h3>
+        <p>Two from–to fields plus shortcuts ("last 30 days", "this quarter"). The shortcuts matter more than the calendar — that's what nine people in ten actually click.</p>
+        <div class="say"><code data-prompt="Date range filter: from–to fields plus quick shortcuts (last 7 days, last 30 days, current quarter, year to date).">Date range from–to plus shortcuts: 7 days, 30 days, current quarter, YTD.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="button variants cta primary">
+      <div class="stage">
+        <div class="row">
+          <button class="d-btn">Save changes</button>
+          <button class="d-btn ghost">Cancel</button>
+          <button class="d-btn ghost" style="color:#E4736B;border-color:rgba(228,115,107,.4)">Delete</button>
+          <button class="d-btn" disabled style="opacity:.4;cursor:not-allowed">Export</button>
+        </div>
+      </div>
+      <div class="body">
+        <h3>Buttons — four variants</h3>
+        <p>Primary (one per screen), secondary, destructive and disabled. The label says what happens: "Save changes", not "Submit".</p>
+        <div class="say"><code data-prompt="Buttons in four variants: primary (only one per view), secondary/ghost, destructive (red) and disabled; labels name the actual action rather than 'Submit'.">Buttons: primary, ghost, destructive, disabled — labels name the real action.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+  </div>
+
+  <div class="secthead"><h2>Data and tables</h2><p>the heart of every tracker</p></div>
+  <div class="grid wide">
+
+    <article class="item" data-tags="table sorting data rows">
+      <div class="stage flow" style="padding:14px">
+        <table class="cheat" id="demoTable" style="font-size:12.5px">
+          <thead><tr><th data-sort="0" style="cursor:pointer">Country ⇅</th><th data-sort="1" style="cursor:pointer">Cases ⇅</th><th data-sort="2" style="cursor:pointer">Amount ⇅</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td style="color:var(--text);font-family:inherit">Germany</td><td>412</td><td>1 240 000</td><td><span style="color:#6FCF97">Completed</span></td></tr>
+            <tr><td style="color:var(--text);font-family:inherit">France</td><td>238</td><td>860 500</td><td><span style="color:#D9A441">In progress</span></td></tr>
+            <tr><td style="color:var(--text);font-family:inherit">Switzerland</td><td>119</td><td>2 015 300</td><td><span style="color:#E4736B">Overdue</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="body">
+        <h3>Sortable table <span class="pill">click the headers</span></h3>
+        <p>Clicking a header sorts ascending or descending. Add a sticky header while scrolling, numbers right-aligned, and thousands separators.</p>
+        <div class="say"><code data-prompt="Data table: click-to-sort headers (ascending/descending with an arrow), sticky header while scrolling, numbers right-aligned with thousands separators, zebra striping and row hover highlight.">Table: click-to-sort headers, sticky header, right-aligned numbers, row hover.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="excel import upload sheetjs xlsx dropzone">
+      <div class="stage">
+        <div id="dz" style="width:100%;max-width:330px;border:2px dashed var(--line-2);border-radius:12px;padding:24px;text-align:center;transition:.2s">
+          <span data-l="file-spreadsheet" style="color:var(--amber)"></span>
+          <div style="font-size:13.5px;margin-top:8px">Drop an .xlsx file here</div>
+          <div style="font-size:11.5px;color:var(--dim);margin-top:3px">or click to pick one from disk</div>
+        </div>
+      </div>
+      <div class="body">
+        <h3>Excel import (dropzone) <span class="pill">key piece</span></h3>
+        <p>You drag a file in, the tool reads the sheet and builds the table and charts from it. The SheetJS library does this entirely inside the browser — the file never leaves the machine.</p>
+        <div class="say"><code data-prompt="Excel import: a drag & drop area for .xlsx/.csv, parsed with SheetJS entirely in the browser (no data leaves the machine), automatic header detection, a preview of the first rows before confirming, and a clear message when a required column is missing.">Excel import: drag & drop .xlsx, parsed locally with SheetJS, preview before confirming, clear missing-column error.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="export csv excel download print">
+      <div class="stage">
+        <div class="row">
+          <button class="d-btn ghost" style="display:flex;gap:7px;align-items:center"><span data-l="download"></span> CSV</button>
+          <button class="d-btn ghost" style="display:flex;gap:7px;align-items:center"><span data-l="file-down"></span> Excel</button>
+          <button class="d-btn ghost" style="display:flex;gap:7px;align-items:center"><span data-l="printer"></span> Print / PDF</button>
+        </div>
+      </div>
+      <div class="body">
+        <h3>Data export</h3>
+        <p>The filtered view goes back out to a file. Important: the export must contain what the user currently sees, not the full dataset — that's the single most common flaw in generated tools.</p>
+        <div class="say"><code data-prompt="Export: CSV, XLSX and print/PDF buttons; only the rows currently visible after filtering are exported, and the filename includes the date.">Export CSV/XLSX/PDF — only rows visible after filters, date in the filename.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="empty state no data zero results">
+      <div class="stage">
+        <div style="text-align:center;max-width:280px">
+          <span data-l="inbox" style="color:var(--dim)"></span>
+          <div style="font-family:var(--disp);font-weight:700;margin-top:8px">No results for these filters</div>
+          <p style="font-size:12.5px;color:var(--muted);margin:6px 0 12px">You've narrowed the selection down to zero records. Clear the filters or widen the date range.</p>
+          <button class="d-btn" style="font-size:12.5px;padding:7px 13px">Clear filters</button>
+        </div>
+      </div>
+      <div class="body">
+        <h3>Empty state</h3>
+        <p>The screen when there's nothing to show. It should say <em>why</em> it's empty and <em>what to do</em> — not just "no results". Models skip this unless you ask.</p>
+        <div class="say"><code data-prompt="Empty state: when filters return nothing, show an icon, a sentence explaining the cause and a recovery button (e.g. 'Clear filters'). Same treatment for the state before any file is loaded.">Empty state explaining the cause with a recovery button, not just "no results".</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="skeleton loading shimmer placeholder">
+      <div class="stage">
+        <div style="width:100%;max-width:280px;display:flex;flex-direction:column;gap:9px">
+          <div class="skel" style="height:13px;width:60%"></div><div class="skel" style="height:13px"></div><div class="skel" style="height:13px;width:80%"></div><div class="skel" style="height:46px;border-radius:9px"></div>
+        </div>
+      </div>
+      <div class="body">
+        <h3>Skeleton loading</h3>
+        <p>Grey shapes standing in for content that's about to arrive, with a sweeping shimmer. Better than a spinner: the layout doesn't jump when the data lands.</p>
+        <div class="say"><code data-prompt="Loading state as a skeleton: grey blocks shaped like the final content with a shimmer animation, instead of a spinner.">Loading as a skeleton with shimmer instead of a spinner.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="pagination pages rows virtual">
+      <div class="stage">
+        <div class="row" style="gap:5px">
+          <button class="chip" style="padding:5px 9px">←</button><button class="chip on" style="padding:5px 11px">1</button><button class="chip" style="padding:5px 11px">2</button><button class="chip" style="padding:5px 11px">3</button><span style="color:var(--dim);padding:0 4px">…</span><button class="chip" style="padding:5px 11px">18</button><button class="chip" style="padding:5px 9px">→</button>
+        </div>
+      </div>
+      <div class="body">
+        <h3>Pagination</h3>
+        <p>For lists beyond roughly 100 rows. Alternatives: virtual scrolling (smooth at thousands of rows) or a "load more" button. At 5,000 rows, ask for virtualisation explicitly.</p>
+        <div class="say"><code data-prompt="Pagination under the table: page numbers, previous/next buttons, rows-per-page selector (25/50/100) and a 'showing X of Y' line.">Pagination: page numbers, 25/50/100 per page, "showing X of Y".</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+  </div>
+
+  <div class="secthead"><h2>Messages and layers</h2><p>things that appear above the content</p></div>
+  <div class="grid">
+
+    <article class="item" data-tags="modal dialog confirm window">
+      <div class="stage">
+        <button class="d-btn" id="modalOpen">Show modal</button>
+        <div id="modalDemo" style="display:none;position:absolute;inset:0;background:rgba(8,10,14,.7);backdrop-filter:blur(2px);place-items:center;padding:16px">
+          <div style="background:#1A1E27;border:1px solid var(--line-2);border-radius:13px;padding:20px;max-width:290px;box-shadow:0 20px 50px rgba(0,0,0,.6)">
+            <h4 style="font-size:15.5px;margin-bottom:6px">Delete 12 records?</h4>
+            <p style="font-size:12.5px;color:var(--muted);margin:0 0 14px">This can't be undone.</p>
+            <div class="row" style="justify-content:flex-end;gap:8px">
+              <button class="d-btn ghost" style="font-size:12.5px;padding:7px 12px" data-modal-close>Cancel</button>
+              <button class="d-btn" style="font-size:12.5px;padding:7px 12px;background:#E4736B;color:#fff" data-modal-close>Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="body">
+        <h3>Modal</h3>
+        <p>A window that blocks everything behind it. Only for decisions that must happen now — delete confirmations, short forms. Must close on Escape and on a background click.</p>
+        <div class="say"><code data-prompt="Modal: dimmed backdrop, centred window, closes on Escape and on backdrop click, focus trapped inside, destructive action on the right.">Modal with dimmed backdrop, closes on Escape and backdrop click, focus trapped.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="drawer side panel slide-over details">
+      <div class="stage flow" style="padding:0">
+        <div style="position:relative;height:160px;overflow:hidden;background:#20252F">
+          <div style="position:absolute;inset:0;padding:14px;font-size:12px;color:var(--dim)">record list…</div>
+          <div style="position:absolute;right:0;top:0;bottom:0;width:62%;background:#1A1E27;border-left:1px solid var(--line-2);padding:14px;box-shadow:-16px 0 34px rgba(0,0,0,.45)">
+            <div style="font-family:var(--disp);font-weight:700;font-size:14px;margin-bottom:8px">TRQ-2026-0412</div>
+            <div class="skel" style="height:9px;width:70%;margin-bottom:6px"></div><div class="skel" style="height:9px;width:90%;margin-bottom:6px"></div><div class="skel" style="height:9px;width:55%"></div>
+          </div>
+        </div>
+      </div>
+      <div class="body">
+        <h3>Drawer (side panel)</h3>
+        <p>Slides in from the edge without hiding the list entirely. Better than a modal for record details — you keep the context and can keep clicking.</p>
+        <div class="say"><code data-prompt="Drawer: a panel sliding in from the right edge with the selected record's details, the list stays visible, closes on Escape and on outside click.">Drawer sliding in from the right with record details, list stays visible.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="toast notification snackbar alert message">
+      <div class="stage">
+        <div class="col" style="max-width:300px">
+          <div style="display:flex;gap:10px;align-items:center;background:#1A2420;border:1px solid rgba(111,207,151,.35);border-radius:9px;padding:10px 12px"><span data-l="check-circle-2" style="color:#6FCF97"></span><span style="font-size:12.5px">24 records saved</span></div>
+          <div style="display:flex;gap:10px;align-items:center;background:#2A1E1D;border:1px solid rgba(228,115,107,.35);border-radius:9px;padding:10px 12px"><span data-l="alert-triangle" style="color:#E4736B"></span><span style="font-size:12.5px">No "Deadline" column in the file</span></div>
+        </div>
+      </div>
+      <div class="body">
+        <h3>Toast / alert</h3>
+        <p>A short confirmation that fades after about three seconds. Errors name what went wrong and how to fix it — never a bare "an error occurred".</p>
+        <div class="say"><code data-prompt="Toasts: short action confirmations disappearing after 3 s (success / warning / error); error messages name the specific cause and the fix.">Toasts for success/warning/error, fading after 3 s, errors naming cause and fix.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="tooltip hint hover definition">
+      <div class="stage">
+        <div style="position:relative;display:inline-block" class="tipwrap">
+          <button class="d-btn ghost" style="display:flex;gap:7px;align-items:center">On-time rate <span data-l="help-circle" style="color:var(--dim)"></span></button>
+          <div class="tip" style="position:absolute;bottom:118%;left:50%;transform:translateX(-50%);background:#0B0D11;border:1px solid var(--line-2);padding:8px 11px;border-radius:7px;font-size:11.5px;color:var(--muted);width:190px;opacity:0;transition:.18s;pointer-events:none">Cases closed within the deadline divided by all cases closed in the period.</div>
+        </div>
+      </div>
+      <div class="body">
+        <h3>Tooltip</h3>
+        <p>The definition of a metric behind a question mark. Invaluable in reports, where half the argument is usually about how a number was calculated.</p>
+        <div class="say"><code data-prompt="Tooltips on '?' icons next to metric names, containing the metric definition; they appear on hover and on keyboard focus.">Tooltips with metric definitions on "?" icons, working on hover and keyboard focus.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="accordion collapsible faq sections">
+      <div class="stage flow" style="padding:14px">
+        <div class="acc">
+          <button class="acc-h" style="width:100%;text-align:left;background:#1A1E27;border:1px solid var(--line);border-radius:8px;padding:10px 12px;color:var(--text);font-size:13px;display:flex;justify-content:space-between">How is the deadline calculated? <span>+</span></button>
+          <div class="acc-b" style="display:none;padding:10px 12px;font-size:12.5px;color:var(--muted)">From the date the query arrives, in working days, excluding public holidays in the source country.</div>
+        </div>
+        <div class="acc" style="margin-top:7px">
+          <button class="acc-h" style="width:100%;text-align:left;background:#1A1E27;border:1px solid var(--line);border-radius:8px;padding:10px 12px;color:var(--text);font-size:13px;display:flex;justify-content:space-between">What does "on hold" mean? <span>+</span></button>
+          <div class="acc-b" style="display:none;padding:10px 12px;font-size:12.5px;color:var(--muted)">We're waiting on a document from the client — the deadline clock stops.</div>
+        </div>
+      </div>
+      <div class="body">
+        <h3>Accordion</h3>
+        <p>Collapsible sections. For procedures, FAQs and long forms — headings visible, detail on demand. One open at a time, or several; your call.</p>
+        <div class="say"><code data-prompt="Accordion: collapsible sections with a smooth height animation, all collapsed by default, several can be open at once.">Accordion — collapsible sections with smooth animation, collapsed by default.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="stepper timeline process stages history">
+      <div class="stage flow" style="padding:18px 14px">
+        <div style="display:flex;align-items:center;gap:0">
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:24px;height:24px;border-radius:50%;background:var(--mint);color:#11241B;display:grid;place-items:center;font-size:12px;font-weight:700">✓</div><span style="font-size:10.5px;color:var(--muted)">Received</span></div>
+          <div style="height:2px;flex:1;background:var(--mint);margin-top:-16px"></div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:24px;height:24px;border-radius:50%;background:var(--amber);color:#14161a;display:grid;place-items:center;font-size:12px;font-weight:700">2</div><span style="font-size:10.5px;color:var(--text)">Review</span></div>
+          <div style="height:2px;flex:1;background:#2B313D;margin-top:-16px"></div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:24px;height:24px;border-radius:50%;background:#2B313D;color:var(--dim);display:grid;place-items:center;font-size:12px;font-weight:700">3</div><span style="font-size:10.5px;color:var(--dim)">Payment</span></div>
+        </div>
+      </div>
+      <div class="body">
+        <h3>Stepper / timeline</h3>
+        <p>Process stages: done, current, upcoming. The vertical version works beautifully as a record's change history with dates.</p>
+        <div class="say"><code data-prompt="Horizontal stepper showing process stages (done / current / upcoming) plus a vertical timeline version as the record's change history with dates and authors.">Stepper of process stages + vertical timeline as change history with dates.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+  </div>
+</section>
+<!-- ============ NAVIGATION ============ -->
+<section class="view" id="v-nav">
+  <p class="lede"><strong>Navigation decides whether anyone ever finds the feature you built.</strong> Pick one pattern and stay with it — mixing two is the usual reason a tool "feels a bit odd to use".</p>
+  <div class="grid wide">
+
+    <article class="item" data-tags="nav topbar header horizontal">
+      <div class="stage flow" style="padding:16px">
+        <div style="background:#1A1E27;border:1px solid var(--line);border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:14px">
+          <div style="font-family:var(--disp);font-weight:700;font-size:13px">Tracker</div>
+          <div style="display:flex;gap:14px;font-size:12.5px;color:var(--muted)"><span style="color:var(--text);border-bottom:2px solid var(--amber);padding-bottom:2px">Overview</span><span>Cases</span><span>Reports</span></div>
+          <div style="margin-left:auto;display:flex;gap:8px;align-items:center"><span data-l="bell" style="color:var(--dim)"></span><div style="width:24px;height:24px;border-radius:50%;background:var(--steel);color:#12202B;display:grid;place-items:center;font-size:10.5px;font-weight:700">TP</div></div>
+        </div>
+      </div>
+      <div class="body">
+        <h3>Top bar</h3>
+        <p>A horizontal strip: name on the left, three to six tabs in the middle, user actions on the right. Best when there are few sections and you want maximum width for content.</p>
+        <div class="say"><code data-prompt="Navigation: top bar with the tool name on the left, 3–6 tabs in the middle (active one underlined in the accent colour) and user actions on the right; the bar stays pinned while scrolling.">Top bar with tabs, active one underlined, pinned while scrolling.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="nav sidebar collapsible rail icons">
+      <div class="stage flow" style="padding:16px">
+        <div style="display:flex;gap:10px;height:128px">
+          <div id="navRail" style="width:150px;background:#1A1E27;border:1px solid var(--line);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:6px;transition:width .3s">
+            <button class="mini" id="railBtn" style="align-self:flex-end;margin-bottom:4px"><span data-l="panel-left-close"></span></button>
+            <div class="rail-i" style="display:flex;gap:9px;align-items:center;background:rgba(217,164,65,.13);color:var(--amber);padding:6px 8px;border-radius:7px;font-size:12.5px"><span data-l="layout-dashboard"></span><span class="rail-t">Overview</span></div>
+            <div class="rail-i" style="display:flex;gap:9px;align-items:center;color:var(--muted);padding:6px 8px;font-size:12.5px"><span data-l="list-checks"></span><span class="rail-t">Cases</span></div>
+            <div class="rail-i" style="display:flex;gap:9px;align-items:center;color:var(--muted);padding:6px 8px;font-size:12.5px"><span data-l="chart-pie"></span><span class="rail-t">Reports</span></div>
+          </div>
+          <div style="flex:1;background:#20252F;border-radius:10px"></div>
+        </div>
+      </div>
+      <div class="body">
+        <h3>Collapsible sidebar <span class="pill">click the icon</span></h3>
+        <p>Full labels or icons only. Collapsing gives you both: wide while navigating, narrow while working in a table. Icon-only states need tooltips.</p>
+        <div class="say"><code data-prompt="Navigation: left sidebar collapsible to icons via a button, icon set with labels, active item highlighted, tooltips when collapsed, state saved to localStorage.">Sidebar collapsible to icons, tooltips when collapsed, state remembered.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="nav tabs counters views">
+      <div class="stage">
+        <div style="border-bottom:1px solid var(--line);display:flex;gap:2px;width:100%;max-width:340px">
+          <button class="ntab on" style="background:none;border:none;border-bottom:2px solid var(--amber);color:var(--text);padding:9px 14px;font-size:13px;margin-bottom:-1px">All (412)</button>
+          <button class="ntab" style="background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);padding:9px 14px;font-size:13px;margin-bottom:-1px">Mine (38)</button>
+          <button class="ntab" style="background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);padding:9px 14px;font-size:13px;margin-bottom:-1px">Overdue (7)</button>
+        </div>
+      </div>
+      <div class="body">
+        <h3>Tabs with counters</h3>
+        <p>Slices of the same list. The count next to each name is the detail that turns a tab into an indicator — you see the problem before you click it.</p>
+        <div class="say"><code data-prompt="Inline tabs splitting the list into views (All / Mine / Overdue), each with a record count next to the label, the active one underlined.">Tabs with record counts next to the label, active one underlined.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="nav breadcrumbs path hierarchy">
+      <div class="stage">
+        <div style="display:flex;gap:7px;align-items:center;font-size:12.5px;color:var(--muted)">
+          <span>Reports</span><span data-l="chevron-right" style="opacity:.5"></span><span>Q3 2026</span><span data-l="chevron-right" style="opacity:.5"></span><span style="color:var(--text)">Germany</span>
+        </div>
+      </div>
+      <div class="body">
+        <h3>Breadcrumbs</h3>
+        <p>The "where am I and how do I get back" trail. Only worth it past two levels of nesting — below that it's furniture.</p>
+        <div class="say"><code data-prompt="Breadcrumbs above the page title showing the nesting path, every level clickable except the last.">Breadcrumbs above the title, every level clickable except the last.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="nav command palette shortcut keyboard">
+      <div class="stage">
+        <div style="width:100%;max-width:300px;background:#12161D;border:1px solid var(--line-2);border-radius:11px;box-shadow:0 18px 40px rgba(0,0,0,.55);overflow:hidden">
+          <div style="padding:10px 12px;border-bottom:1px solid var(--line);display:flex;gap:9px;align-items:center"><span data-l="search" style="color:var(--dim)"></span><span style="font-size:13px;color:var(--muted)">germ…</span><kbd style="margin-left:auto;font-size:10px;color:var(--dim);border:1px solid var(--line-2);border-radius:4px;padding:1px 5px">Ctrl K</kbd></div>
+          <div style="padding:6px">
+            <div style="padding:7px 9px;border-radius:6px;background:rgba(217,164,65,.12);color:var(--amber);font-size:12.5px">Filter: country = Germany</div>
+            <div style="padding:7px 9px;font-size:12.5px;color:var(--muted)">Report: Germany Q3</div>
+          </div>
+        </div>
+      </div>
+      <div class="body">
+        <h3>Command palette</h3>
+        <p>Ctrl+K opens one box that searches everything: actions, filters, records. For people who live in the tool daily, it's the single biggest speed gain available.</p>
+        <div class="say"><code data-prompt="Command palette on Ctrl+K: one input searching actions, filters and records at once, arrow-key navigation, Enter to run, Escape to close.">Command palette on Ctrl+K — actions, filters and records in one input, keyboard driven.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="nav mobile dock bottom bar thumb">
+      <div class="stage">
+        <div style="display:flex;gap:4px;background:#12161D;border:1px solid var(--line-2);border-radius:99px;padding:6px 8px">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 12px;border-radius:99px;background:rgba(217,164,65,.14);color:var(--amber)"><span data-l="home"></span><span style="font-size:9.5px">Home</span></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 12px;color:var(--dim)"><span data-l="list"></span><span style="font-size:9.5px">List</span></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 12px;color:var(--dim)"><span data-l="user"></span><span style="font-size:9.5px">Me</span></div>
+        </div>
+      </div>
+      <div class="body">
+        <h3>Bottom dock (mobile)</h3>
+        <p>A floating bar near the bottom edge — within thumb reach. If the tool will be used on a phone, this is the right pattern, not a hamburger menu.</p>
+        <div class="say"><code data-prompt="On mobile, navigation as a floating bottom dock with 3–5 icons and labels instead of a hamburger menu.">On mobile use a bottom dock with 3–5 labelled icons instead of a hamburger.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- ============ STYLES ============ -->
+<section class="view" id="v-style">
+  <p class="lede"><strong>The same component, ten identities.</strong> Style is one word in a prompt that changes everything. Each one below is live, with a note on when it works — and a <em>where not to use it</em> line, which is often the more useful half.</p>
+
+<style>
+.sty .stage{min-height:200px;padding:30px 22px}
+.g-glass{background:linear-gradient(135deg,#5B6BFF 0%,#A24BFF 50%,#FF6FB1 100%)}
+.glass-card{background:rgba(255,255,255,.16);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.3);border-radius:16px;padding:16px 18px;color:#fff;box-shadow:0 8px 30px rgba(0,0,0,.2);min-width:190px}
+.glass-card .l{font-size:11.5px;opacity:.85}
+.glass-card .v{font-family:var(--disp);font-size:28px;font-weight:700;line-height:1.1}
+.g-liquid{background:radial-gradient(120% 120% at 20% 0%,#1B2A4A 0%,#0A1020 60%)}
+.liquid{position:relative;border-radius:22px;padding:16px 20px;min-width:200px;color:#EAF2FF;background:linear-gradient(140deg,rgba(255,255,255,.22),rgba(255,255,255,.05));backdrop-filter:blur(18px) saturate(180%);-webkit-backdrop-filter:blur(18px) saturate(180%);border:1px solid rgba(255,255,255,.28);box-shadow:inset 0 1px 1px rgba(255,255,255,.7),inset 0 -12px 24px rgba(255,255,255,.07),0 18px 40px rgba(0,0,0,.45)}
+.liquid::after{content:'';position:absolute;inset:1px;border-radius:21px;background:linear-gradient(160deg,rgba(255,255,255,.45),transparent 42%);pointer-events:none;mix-blend-mode:overlay}
+.liquid .v{font-family:var(--disp);font-size:28px;font-weight:700}
+.liquid .l{font-size:11.5px;opacity:.8}
+.g-neon{background:#07060F}
+.neon{border:1px solid #FF2FD0;border-radius:12px;padding:16px 20px;min-width:190px;background:rgba(255,47,208,.06);box-shadow:0 0 12px rgba(255,47,208,.55),inset 0 0 14px rgba(255,47,208,.22);color:#FFD9F6}
+.neon .v{font-family:var(--disp);font-size:28px;font-weight:700;color:#fff;text-shadow:0 0 8px #FF2FD0,0 0 22px rgba(255,47,208,.7)}
+.neon .l{font-size:11.5px;color:#7CF5FF;text-shadow:0 0 8px rgba(124,245,255,.8)}
+.g-neu{background:#E6E7EE}
+.neu{background:#E6E7EE;border-radius:18px;padding:17px 21px;min-width:190px;color:#4B5162;box-shadow:9px 9px 18px #C6C7CE,-9px -9px 18px #FFFFFF}
+.neu .v{font-family:var(--disp);font-size:28px;font-weight:700;color:#343A4B}
+.neu .l{font-size:11.5px;color:#8A90A2}
+.neu-btn{margin-top:12px;border:none;background:#E6E7EE;border-radius:11px;padding:8px 14px;font-size:12.5px;color:#5A6177;box-shadow:5px 5px 10px #C6C7CE,-5px -5px 10px #FFF}
+.neu-btn:active{box-shadow:inset 4px 4px 8px #C6C7CE,inset -4px -4px 8px #FFF}
+.g-brut{background:#FFE800}
+.brut{background:#fff;border:3px solid #000;border-radius:0;padding:14px 18px;min-width:190px;color:#000;box-shadow:7px 7px 0 #000}
+.brut .l{font-size:11.5px;font-weight:700}
+.brut .v{font-family:var(--disp);font-size:30px;font-weight:800}
+.brut-btn{margin-top:10px;background:#FF4D00;color:#000;border:3px solid #000;padding:6px 12px;font-weight:700;font-size:12px;box-shadow:4px 4px 0 #000}
+.brut-btn:active{transform:translate(4px,4px);box-shadow:none}
+.g-dark{background:#0C0E12}
+.dark-c{background:#14171D;border:1px solid #232833;border-radius:12px;padding:16px 19px;min-width:190px;color:#E6E8EC}
+.dark-c .l{font-size:11.5px;color:#7B8494}
+.dark-c .v{font-family:var(--disp);font-size:28px;font-weight:700}
+.dark-c .d{font-size:11.5px;color:#6FCF97;margin-top:5px}
+.g-grad{background:#0E1013}
+.grad{border-radius:16px;padding:1.5px;min-width:195px;background:linear-gradient(120deg,#FF8A3D,#FF4D8D,#8B5CF6,#22D3EE);background-size:300% 300%;animation:gradmove 7s ease infinite}
+@keyframes gradmove{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+.grad-in{background:#12151B;border-radius:15px;padding:15px 18px;color:#EDEFF4}
+.grad .v{font-family:var(--disp);font-size:28px;font-weight:700;background:linear-gradient(100deg,#FF8A3D,#FF4D8D,#8B5CF6);-webkit-background-clip:text;background-clip:text;color:transparent}
+.grad .l{font-size:11.5px;color:#8E96A8}
+.g-frost{background:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60"><rect width="60" height="60" fill="%23163C4A"/><circle cx="15" cy="20" r="18" fill="%232A7F8F" opacity="0.6"/><circle cx="48" cy="45" r="16" fill="%23E2B04A" opacity="0.45"/></svg>') repeat;background-size:120px}
+.frost{background:rgba(245,248,250,.55);backdrop-filter:blur(22px) saturate(140%);-webkit-backdrop-filter:blur(22px) saturate(140%);border:1px solid rgba(255,255,255,.65);border-radius:14px;padding:16px 19px;min-width:190px;color:#122029;box-shadow:0 10px 26px rgba(10,30,40,.25)}
+.frost .l{font-size:11.5px;color:#3C5766}
+.frost .v{font-family:var(--disp);font-size:28px;font-weight:700}
+.g-clay{background:#F0E7FF}
+.clay{background:#B9A2FF;border-radius:26px;padding:17px 21px;min-width:190px;color:#26124F;box-shadow:inset -6px -6px 14px rgba(255,255,255,.55),inset 6px 6px 14px rgba(80,40,160,.25),0 14px 28px rgba(120,80,220,.28)}
+.clay .l{font-size:11.5px;opacity:.75}
+.clay .v{font-family:var(--disp);font-size:28px;font-weight:800}
+.g-corp{background:#F5F6F8}
+.corp{background:#fff;border:1px solid #DFE3E8;border-left:3px solid #1B64C4;border-radius:4px;padding:14px 18px;min-width:195px;color:#1B2430}
+.corp .l{font-size:11.5px;color:#65717F}
+.corp .v{font-family:var(--disp);font-size:27px;font-weight:700}
+.corp .d{font-size:11.5px;color:#12894F;margin-top:4px}
+.dont{font-size:12px;color:#E4736B;display:flex;gap:6px;align-items:flex-start;border-top:1px dashed var(--line);padding-top:9px;margin-top:2px}
+.dont .ic{width:13px;height:13px;margin-top:2px}
+</style>
+
+  <div class="grid">
+
+    <article class="item sty" data-tags="style glassmorphism glass blur transparency">
+      <div class="stage g-glass"><div class="glass-card"><div class="l">Recovered in Q3</div><div class="v">4.2M</div><div style="font-size:11.5px;margin-top:6px;opacity:.9">+18% YoY</div></div></div>
+      <div class="body">
+        <h3>Glassmorphism</h3>
+        <p>A semi-transparent pane blurring whatever sits behind it (<code style="font-size:11.5px">backdrop-filter: blur</code>) with a thin light edge. It needs a colourful, uneven background — on flat grey it reads as nothing at all.</p>
+        <div class="say"><code data-prompt="Style: glassmorphism — semi-transparent cards with backdrop-filter blur, a thin light border and a soft shadow, placed over a colourful gradient background.">Style: glassmorphism — translucent blurred cards with a light edge over a colourful background.</code><div class="say-btns"></div></div>
+        <div class="dont"><span data-l="ban"></span> Not for dense tables or long text — legibility drops, and the blur is heavy on older laptops.</div>
+      </div>
+    </article>
+
+    <article class="item sty" data-tags="style liquid glass apple refraction">
+      <div class="stage g-liquid"><div class="liquid"><div class="l">Cases in progress</div><div class="v">238</div><div style="font-size:11.5px;opacity:.75;margin-top:5px">12 overdue</div></div></div>
+      <div class="body">
+        <h3>Liquid glass</h3>
+        <p>Glass taken further: blur plus boosted saturation, an inner highlight along the top edge and a thick lens-like rim. It looks expensive and works hard on a title screen.</p>
+        <div class="say"><code data-prompt="Style: liquid glass — backdrop-filter blur with saturate(180%), an inner highlight along the top edge (inset box-shadow), a thick soft rim and large corner radii, over a dark background with a glow.">Style: liquid glass — blur + saturate, inner top highlight, thick rim, large radii.</code><div class="say-btns"></div></div>
+        <div class="dont"><span data-l="ban"></span> Expensive to render. A handful of these per screen, never forty table rows.</div>
+      </div>
+    </article>
+
+    <article class="item sty" data-tags="style neon glow cyberpunk">
+      <div class="stage g-neon"><div class="neon"><div class="l">SYSTEM STATUS</div><div class="v">99.4%</div><div style="font-size:11.5px;margin-top:6px;color:#7CF5FF">uptime, 30 days</div></div></div>
+      <div class="body">
+        <h3>Neon glow</h3>
+        <p>Dark background, glowing edges and text (<code style="font-size:11.5px">box-shadow</code> plus <code style="font-size:11.5px">text-shadow</code> in the accent colour). Excellent for monitoring screens and status walls.</p>
+        <div class="say"><code data-prompt="Style: neon glow — very dark background, edges and figures with a glowing halo (box-shadow and text-shadow in the accent colour), magenta and cyan accents.">Style: neon glow — dark background, glowing edges and numbers, magenta/cyan accents.</code><div class="say-btns"></div></div>
+        <div class="dont"><span data-l="ban"></span> Not for anything client-facing and not for print — the glow vanishes and leaves a black smudge.</div>
+      </div>
+    </article>
+
+    <article class="item sty" data-tags="style neumorphism soft ui embossed">
+      <div class="stage g-neu"><div class="neu"><div class="l">Plan completion</div><div class="v">68%</div><button class="neu-btn">Details</button></div></div>
+      <div class="body">
+        <h3>Neumorphism (soft UI)</h3>
+        <p>Elements embossed out of the background in a single colour: light shadow on one side, dark on the other. Pressing inverts the shadows inward — try the button.</p>
+        <div class="say"><code data-prompt="Style: neumorphism (soft UI) — background and elements in the same colour, embossed with a double shadow (light top-left, dark bottom-right), pressed state as an inset shadow, large corner radii.">Style: neumorphism — double-shadow embossing, inset pressed state, large radii.</code><div class="say-btns"></div></div>
+        <div class="dont"><span data-l="ban"></span> Low contrast means accessibility problems. Never for text, never for anything a first-time user must spot.</div>
+      </div>
+    </article>
+
+    <article class="item sty" data-tags="style brutalism neobrutalism harsh contrast">
+      <div class="stage g-brut"><div class="brut"><div class="l">OVERDUE</div><div class="v">7</div><button class="brut-btn">SHOW LIST</button></div></div>
+      <div class="body">
+        <h3>Brutalism</h3>
+        <p>Thick black outlines, zero rounding, a hard shadow offset by a few pixels, loud colours. No subtlety whatsoever, which is the point — nothing gets overlooked.</p>
+        <div class="say"><code data-prompt="Style: neobrutalism — thick 3px black outlines, no corner rounding, hard unblurred offset shadows, loud high-contrast colours (yellow, orange), buttons that press into the page on click.">Style: brutalism — thick black outlines, hard unblurred shadows, loud colours.</code><div class="say-btns"></div></div>
+        <div class="dont"><span data-l="ban"></span> Not for corporate material or formal reports — it reads as play, not as a work tool.</div>
+      </div>
+    </article>
+
+    <article class="item sty" data-tags="style dark mode theme">
+      <div class="stage g-dark"><div class="dark-c"><div class="l">Open queries</div><div class="v">1,247</div><div class="d">▲ 12.4% MoM</div></div></div>
+      <div class="body">
+        <h3>Dark mode</h3>
+        <p>Not black — dark grey (#0C0E12), with text slightly below pure white. Hierarchy comes from layer brightness rather than shadows. Standard for tools people sit in all day.</p>
+        <div class="say"><code data-prompt="Style: dark mode — dark grey background (not pure black), slightly dimmed text (not #FFF), hierarchy built from layer brightness, a light/dark toggle that remembers the choice and respects the system setting.">Style: dark mode — dark grey background, dimmed text, toggle that remembers the choice.</code><div class="say-btns"></div></div>
+        <div class="dont"><span data-l="ban"></span> Don't ship dark-only if the report gets printed — add a toggle and print styles.</div>
+      </div>
+    </article>
+
+    <article class="item sty" data-tags="style gradient aurora mesh colour">
+      <div class="stage g-grad"><div class="grad"><div class="grad-in"><div class="l">Value recovered</div><div class="v">12.8M</div><div style="font-size:11.5px;color:#8E96A8;margin-top:5px">year to date</div></div></div></div>
+      <div class="body">
+        <h3>Gradient / aurora</h3>
+        <p>Colour in motion: an animated gradient border, gradient text, blurred light blobs in the background. Adds energy without changing the structure. That border really is flowing.</p>
+        <div class="say"><code data-prompt="Style: gradient/aurora — an animated gradient border around key cards, headings with gradient text (background-clip: text), blurred colour blobs behind sections.">Style: gradient/aurora — animated gradient border, gradient text, blurred colour blobs.</code><div class="say-btns"></div></div>
+        <div class="dont"><span data-l="ban"></span> One gradient per screen. When everything is a gradient, nothing is important.</div>
+      </div>
+    </article>
+
+    <article class="item sty" data-tags="style frosted glass matte">
+      <div class="stage g-frost"><div class="frost"><div class="l">Average handling time</div><div class="v">18 days</div><div style="font-size:11.5px;margin-top:5px;color:#3C5766">target: 21 days</div></div></div>
+      <div class="body">
+        <h3>Frosted glass</h3>
+        <p>Glassmorphism's lighter cousin: a milky, heavily matted pane over a photo or pattern, with dark text. Calmer, and it can actually carry content people need to read.</p>
+        <div class="say"><code data-prompt="Style: frosted glass — a light milky pane (white at 55% opacity with 22px blur) over a photo or pattern background, dark text, subtle white border.">Style: frosted glass — light milky blurred pane over a photo, dark text.</code><div class="say-btns"></div></div>
+        <div class="dont"><span data-l="ban"></span> The background underneath must be calm. Over a high-contrast photo the text disappears into the blotches.</div>
+      </div>
+    </article>
+
+    <article class="item sty" data-tags="style claymorphism clay 3d soft pastel">
+      <div class="stage g-clay"><div class="clay"><div class="l">Tasks today</div><div class="v">14</div></div></div>
+      <div class="body">
+        <h3>Claymorphism</h3>
+        <p>Plump, plasticine-like shapes: very large radii, inner light and shadow, a pastel palette. Friendly and non-technical — good for training material and onboarding.</p>
+        <div class="say"><code data-prompt="Style: claymorphism — very large corner radii (24px+), pastel palette, inner light and shadow giving a plasticine feel, soft coloured drop shadow underneath.">Style: claymorphism — plump pastel shapes, large radii, inner light and shadow.</code><div class="say-btns"></div></div>
+        <div class="dont"><span data-l="ban"></span> Looks unserious around hard numbers. Keep it for educational material.</div>
+      </div>
+    </article>
+
+    <article class="item sty" data-tags="style corporate minimal bank professional">
+      <div class="stage g-corp"><div class="corp"><div class="l">Open query value</div><div class="v">EUR 1,240,000</div><div class="d">▲ 4.1% vs prior quarter</div></div></div>
+      <div class="body">
+        <h3>Minimal corporate <span class="pill">safe choice</span></h3>
+        <p>White, thin grey rules, one navy accent, sharp corners, no effects. Boring in the best sense: it draws attention to the data instead of itself. This one survives any meeting.</p>
+        <div class="say"><code data-prompt="Style: minimal corporate — white background, thin grey rules, a single navy accent colour, small corner radii (4px), no gradients or shadows, system typography, accent used as a left card border.">Style: minimal corporate — white, thin rules, one navy accent, no shadows or gradients.</code><div class="say-btns"></div></div>
+        <div class="dont"><span data-l="ban"></span> The one risk: without strong typographic hierarchy it goes flat. Ask for a clear contrast in heading sizes.</div>
+      </div>
+    </article>
+  </div>
+
+  <div class="note" style="margin-top:24px"><b>How to combine styles:</b> pick one as the base and add at most one accent. "Minimal corporate, but the KPI cards in liquid glass" is a good prompt. "Neon plus neumorphism plus brutalism" is a request for chaos.</div>
+</section>
+<!-- ============ MOTION ============ -->
+<section class="view" id="v-motion">
+  <p class="lede"><strong>Motion has to mean something.</strong> Good animation shows what just changed and lasts 150–300 ms. Bad animation is decoration that costs the user time on every click. Hover and click the examples.</p>
+<style>
+.skel{background:linear-gradient(90deg,#252B37 25%,#333B4B 50%,#252B37 75%);background-size:200% 100%;animation:shim 1.4s infinite;border-radius:5px}
+@keyframes shim{to{background-position:-200% 0}}
+.m-lift{transition:transform .22s cubic-bezier(.2,.7,.3,1),box-shadow .22s;cursor:pointer}
+.m-lift:hover{transform:translateY(-6px);box-shadow:0 14px 30px rgba(0,0,0,.45)}
+.m-glowb{position:relative;overflow:hidden}
+.m-glowb::after{content:'';position:absolute;top:0;left:-70%;width:45%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.28),transparent);transform:skewX(-20deg);transition:left .55s}
+.m-glowb:hover::after{left:130%}
+.m-ripple{position:relative;overflow:hidden}
+.rip{position:absolute;border-radius:50%;background:rgba(255,255,255,.45);transform:scale(0);animation:rip .55s ease-out;pointer-events:none}
+@keyframes rip{to{transform:scale(4);opacity:0}}
+.m-pulse{animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(228,115,107,.55)}70%{box-shadow:0 0 0 12px rgba(228,115,107,0)}}
+.m-float{animation:float 3.2s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.reveal{opacity:0;transform:translateY(16px);transition:opacity .5s,transform .5s}
+.reveal.in{opacity:1;transform:none}
+.marq{overflow:hidden;width:100%;mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
+.marq-in{display:flex;gap:26px;width:max-content;animation:marq 14s linear infinite}
+@keyframes marq{to{transform:translateX(-50%)}}
+.marq:hover .marq-in{animation-play-state:paused}
+.typ{border-right:2px solid var(--amber);white-space:nowrap;overflow:hidden;font-family:var(--mono);font-size:13px}
+.flip{perspective:700px;width:170px;height:96px;cursor:pointer}
+.flip-in{position:relative;width:100%;height:100%;transition:transform .6s cubic-bezier(.4,.2,.2,1);transform-style:preserve-3d}
+.flip.on .flip-in{transform:rotateY(180deg)}
+.flip-f,.flip-b{position:absolute;inset:0;backface-visibility:hidden;border-radius:11px;display:grid;place-items:center;border:1px solid var(--line-2)}
+.flip-f{background:#1A1E27}
+.flip-b{background:var(--amber);color:#14161a;transform:rotateY(180deg);font-weight:700}
+</style>
+  <div class="grid">
+
+    <article class="item" data-tags="motion hover lift card elevation">
+      <div class="stage"><div class="d-card m-lift" style="min-width:170px"><div class="d-lab">Hover over me</div><div class="d-val">418</div></div></div>
+      <div class="body">
+        <h3>Hover lift</h3>
+        <p>The card rises and gains a deeper shadow. It says "this is clickable" before anyone clicks. The cheapest way to make something feel finished.</p>
+        <div class="say"><code data-prompt="Interaction: cards lift on hover (translateY -6px) with a deeper shadow, 200 ms transition with a gentle easing curve.">Cards lift on hover with a deeper shadow, ~200 ms transition.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="motion count up counter numbers">
+      <div class="stage"><div style="text-align:center"><div class="d-val" style="font-size:42px" data-count="1247">0</div><button class="mini" id="recount" style="margin-top:10px"><span data-l="rotate-ccw"></span> Replay</button></div></div>
+      <div class="body">
+        <h3>Count-up</h3>
+        <p>The number climbs to its target instead of simply being there. It should fire once, when it first enters the screen — not on every scroll.</p>
+        <div class="say"><code data-prompt="KPI numbers animate count-up from zero to the target value the first time they appear on screen (IntersectionObserver), formatted with thousands separators.">KPI numbers count up on first appearance, with thousands separators.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="motion reveal scroll fade in stagger">
+      <div class="stage flow" style="padding:18px">
+        <div id="revealBox" style="display:flex;flex-direction:column;gap:8px">
+          <div class="reveal d-card" style="padding:9px 12px;min-width:0"><span style="font-size:12.5px">I appear first</span></div>
+          <div class="reveal d-card" style="padding:9px 12px;min-width:0"><span style="font-size:12.5px">I follow, slightly later</span></div>
+          <div class="reveal d-card" style="padding:9px 12px;min-width:0"><span style="font-size:12.5px">And I'm last</span></div>
+        </div>
+      </div>
+      <div class="body">
+        <h3>Reveal on scroll + stagger</h3>
+        <p>Elements slide in as you scroll, each one slightly after the last — that delay is the "stagger". Use it on sections, never on every table row.</p>
+        <div class="say"><code data-prompt="Sections animate in on scroll (fade + slide up via IntersectionObserver), items within a group staggered by 60 ms; the animation runs once and respects prefers-reduced-motion.">Sections fade and slide in on scroll with a 60 ms stagger, once, respecting reduced-motion.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="motion ripple click feedback">
+      <div class="stage"><button class="d-btn m-ripple" id="ripBtn" style="padding:12px 22px">Click me</button></div>
+      <div class="body">
+        <h3>Ripple</h3>
+        <p>A wave spreading from the point of the click. It confirms the button registered the press — useful whenever the action takes a moment.</p>
+        <div class="say"><code data-prompt="Buttons with a ripple effect: a wave spreading from the click point, 550 ms.">Buttons with a ripple spreading from the click point.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="motion shimmer shine sweep highlight">
+      <div class="stage"><button class="d-btn m-glowb" style="padding:12px 22px">Hover — watch the shine</button></div>
+      <div class="body">
+        <h3>Shine sweep</h3>
+        <p>A band of light crossing the element on hover. For the single main button on a screen. On every button at once it looks cheap.</p>
+        <div class="say"><code data-prompt="The primary CTA button has a shine sweep effect: an angled band of light crossing it on hover.">Primary button with a shine sweep on hover.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="motion pulse attention alert float">
+      <div class="stage"><div class="row"><span class="m-pulse" style="background:rgba(228,115,107,.15);color:#E4736B;border:1px solid rgba(228,115,107,.4);padding:6px 13px;border-radius:99px;font-size:12.5px;font-weight:600">7 overdue</span><span class="m-float" data-l="bell" style="color:var(--amber)"></span></div></div>
+      <div class="body">
+        <h3>Pulse and float</h3>
+        <p>A gentle pulse pulls the eye to the one thing that needs a response. The rule: one pulsing element per screen, or it's just noise.</p>
+        <div class="say"><code data-prompt="The overdue-count badge pulses gently (an expanding halo) — and it is the only animated attention element on the screen.">One alert badge pulses with an expanding halo — the only one on screen.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="motion flip card 3d rotate">
+      <div class="stage"><div class="flip" id="flipDemo"><div class="flip-in"><div class="flip-f"><span style="font-size:12.5px;color:var(--muted)">Click to flip</span></div><div class="flip-b">Details on the back</div></div></div></div>
+      <div class="body">
+        <h3>Flip card</h3>
+        <p>The card rotates in 3D to reveal its other side. A nice trick for training material (question/answer), less so for working tools.</p>
+        <div class="say"><code data-prompt="Flip cards: clicking rotates the card in 3D (rotateY 180°, transform-style: preserve-3d) to reveal details on the reverse.">Flip card — click rotates it in 3D to reveal the details on the back.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="motion marquee ticker scrolling strip">
+      <div class="stage">
+        <div class="marq"><div class="marq-in" id="marq">
+          <span style="font-size:12.5px;color:var(--muted)">Germany · 412 cases</span><span style="font-size:12.5px;color:var(--muted)">France · 238</span><span style="font-size:12.5px;color:var(--muted)">Switzerland · 119</span><span style="font-size:12.5px;color:var(--muted)">Italy · 96</span>
+          <span style="font-size:12.5px;color:var(--muted)">Germany · 412 cases</span><span style="font-size:12.5px;color:var(--muted)">France · 238</span><span style="font-size:12.5px;color:var(--muted)">Switzerland · 119</span><span style="font-size:12.5px;color:var(--muted)">Italy · 96</span>
+        </div></div>
+      </div>
+      <div class="body">
+        <h3>Ticker / marquee</h3>
+        <p>An endlessly scrolling strip that pauses on hover. For information screens on a wall, not for tools people work inside.</p>
+        <div class="say"><code data-prompt="A ticker strip scrolling in a loop across the top, pausing on hover, with faded edges (mask gradient).">Looping ticker strip, pauses on hover, faded edges.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="motion typewriter typing text">
+      <div class="stage"><div class="typ" id="typ"></div></div>
+      <div class="body">
+        <h3>Typewriter</h3>
+        <p>Text typed out character by character. One line, once, on a title screen. Inside a working tool it just delays access to information.</p>
+        <div class="say"><code data-prompt="The title-screen heading types itself out (character by character with a blinking cursor), once on load.">Title heading typed out with a blinking cursor, once on load.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="motion gsap scrolltrigger lenis libraries">
+      <div class="stage">
+        <div class="col" style="max-width:280px;gap:7px">
+          <div style="display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);border-bottom:1px solid var(--line);padding-bottom:6px"><b style="color:var(--text)">GSAP</b><span>sequences, timelines</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);border-bottom:1px solid var(--line);padding-bottom:6px"><b style="color:var(--text)">ScrollTrigger</b><span>scroll-driven animation</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted)"><b style="color:var(--text)">Lenis</b><span>smooth scrolling</span></div>
+        </div>
+      </div>
+      <div class="body">
+        <h3>What powers it</h3>
+        <p>Plain CSS covers the simple cases. For sequences and scroll-driven motion ask explicitly for GSAP with ScrollTrigger, and for Lenis when scrolling itself should feel like butter.</p>
+        <div class="say"><code data-prompt="Base animations on GSAP with ScrollTrigger (loaded from CDN) and add Lenis for smooth scrolling; keep simple hover effects in plain CSS.">Animations on GSAP + ScrollTrigger from CDN, Lenis for smooth scroll, hovers in plain CSS.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+  </div>
+  <div class="note" style="margin-top:22px"><b>The test for any animation:</b> if the user still understands what happened once you switch the effect off, it was decoration. If they stop understanding, it was information. Keep the second kind.</div>
+</section>
+
+<!-- ============ CAROUSELS ============ -->
+<section class="view" id="v-karuzela">
+  <p class="lede"><strong>A carousel shows many things in one spot.</strong> Four variants, each for something different. One warning: carousels hide content — if something matters, don't bury it on slide three.</p>
+<style>
+.car{position:relative;width:100%;overflow:hidden;border-radius:11px}
+.car-tr{display:flex;transition:transform .45s cubic-bezier(.3,.7,.3,1)}
+.car-sl{min-width:100%;padding:20px;background:#1A1E27;border:1px solid var(--line);border-radius:11px}
+.car-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(10,12,16,.75);border:1px solid var(--line-2);color:var(--text);width:30px;height:30px;border-radius:50%;display:grid;place-items:center}
+.car-dots{display:flex;gap:6px;justify-content:center;margin-top:10px}
+.car-dot{width:7px;height:7px;border-radius:50%;background:var(--line-2);border:none;padding:0;transition:.2s}
+.car-dot.on{background:var(--amber);width:20px;border-radius:99px}
+.snap{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:8px;scrollbar-width:thin}
+.snap>div{scroll-snap-align:start;min-width:150px;background:#1A1E27;border:1px solid var(--line);border-radius:11px;padding:14px}
+.stack{position:relative;height:130px;width:200px}
+.stack>div{position:absolute;inset:0;background:#1A1E27;border:1px solid var(--line-2);border-radius:12px;display:grid;place-items:center;transition:.45s cubic-bezier(.3,.7,.3,1);font-family:var(--disp);font-weight:700}
+</style>
+  <div class="grid wide">
+
+    <article class="item" data-tags="carousel slider slides arrows dots">
+      <div class="stage flow" style="padding:16px">
+        <div class="car" id="car1">
+          <div class="car-tr">
+            <div class="car-sl"><div class="d-lab">Slide 1 — Germany</div><div class="d-val">412</div><p style="font-size:12.5px;color:var(--muted);margin:6px 0 0">Highest volume, 14 days average handling time.</p></div>
+            <div class="car-sl"><div class="d-lab">Slide 2 — France</div><div class="d-val">238</div><p style="font-size:12.5px;color:var(--muted);margin:6px 0 0">Steady, no deadline breaches this quarter.</p></div>
+            <div class="car-sl"><div class="d-lab">Slide 3 — Switzerland</div><div class="d-val">119</div><p style="font-size:12.5px;color:var(--muted);margin:6px 0 0">Highest value per individual case.</p></div>
+          </div>
+          <button class="car-nav" data-dir="-1" style="left:8px"><span data-l="chevron-left"></span></button>
+          <button class="car-nav" data-dir="1" style="right:8px"><span data-l="chevron-right"></span></button>
+        </div>
+        <div class="car-dots" id="car1dots"></div>
+      </div>
+      <div class="body">
+        <h3>Classic carousel</h3>
+        <p>One slide at a time, arrows and dots. The active dot stretches — a small detail that instantly tells you where you are. It can auto-advance, but then it must pause on hover.</p>
+        <div class="say"><code data-prompt="Carousel: one slide at a time, arrows on the sides, dot navigation (active dot elongated), swipe support on touch and arrow-key support, autoplay pausing on hover.">Carousel: arrows + dots, swipe, keyboard, autoplay pausing on hover.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="carousel scroll snap horizontal cards mobile">
+      <div class="stage flow" style="padding:16px">
+        <div class="snap">
+          <div><div class="d-lab">Germany</div><div class="d-val" style="font-size:22px">412</div></div>
+          <div><div class="d-lab">France</div><div class="d-val" style="font-size:22px">238</div></div>
+          <div><div class="d-lab">Switzerland</div><div class="d-val" style="font-size:22px">119</div></div>
+          <div><div class="d-lab">Italy</div><div class="d-val" style="font-size:22px">96</div></div>
+          <div><div class="d-lab">Spain</div><div class="d-val" style="font-size:22px">74</div></div>
+        </div>
+      </div>
+      <div class="body">
+        <h3>Scroll-snap (horizontal scroller)</h3>
+        <p>Cards you swipe or drag that settle neatly at the edge. Simpler and more natural than a carousel — this is the default choice on a phone. Drag it to the right.</p>
+        <div class="say"><code data-prompt="A horizontal card strip using CSS scroll-snap (scroll-snap-type: x mandatory), with the next card peeking past the edge so it's obvious it scrolls.">Horizontal card strip with scroll-snap, next card peeking past the edge.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="carousel stack cards deck">
+      <div class="stage"><div class="stack" id="stack"><div data-i="0">Card A</div><div data-i="1">Card B</div><div data-i="2">Card C</div></div></div>
+      <div class="body">
+        <h3>Card stack <span class="pill">click the stack</span></h3>
+        <p>Cards piled on each other; the top one moves to the back. Nice for flicking through individual records and for quizzes. Slightly more code than the rest.</p>
+        <div class="say"><code data-prompt="Card-stack carousel: cards piled with a small offset and scale difference, click or swipe sends the top card to the back of the stack.">Card stack — cards piled up, click sends the top one to the back.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="carousel before after comparison slider">
+      <div class="stage">
+        <div id="ba" style="position:relative;width:250px;height:130px;border-radius:11px;overflow:hidden;border:1px solid var(--line-2);cursor:ew-resize">
+          <div style="position:absolute;inset:0;background:#E6E7EE;display:grid;place-items:center;color:#4B5162;font-family:var(--disp);font-weight:700">Before: Excel</div>
+          <div id="baTop" style="position:absolute;inset:0;width:50%;overflow:hidden;background:#14171D;display:grid;place-items:center"><span style="width:250px;text-align:center;font-family:var(--disp);font-weight:700;color:var(--amber)">After: Dashboard</span></div>
+          <div id="baLine" style="position:absolute;top:0;bottom:0;left:50%;width:2px;background:var(--amber)"></div>
+        </div>
+      </div>
+      <div class="body">
+        <h3>Before / after slider</h3>
+        <p>A handle that wipes one view over another. Perfect for the "here's the old report, here's the new one" slide. Drag your mouse across the preview.</p>
+        <div class="say"><code data-prompt="Before/after comparison: two stacked views with a vertical wipe handle, working with both mouse and touch.">Before/after wipe slider over two stacked views, mouse and touch.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- ============ CHARTS ============ -->
+<section class="view" id="v-wykresy">
+  <p class="lede"><strong>A chart is an answer, not decoration.</strong> Decide the question first ("which country is growing fastest?"), then pick the chart type. Below: what to use when, and what to draw it with.</p>
+  <div class="grid">
+
+    <article class="item" data-tags="chart bar column comparison">
+      <div class="stage">
+        <svg width="250" height="130" viewBox="0 0 250 130">
+          <g fill="#D9A441">
+            <rect x="14" y="30" width="34" height="80" rx="4"><animate attributeName="height" from="0" to="80" dur=".7s" fill="freeze"/><animate attributeName="y" from="110" to="30" dur=".7s" fill="freeze"/></rect>
+            <rect x="62" y="56" width="34" height="54" rx="4" opacity=".8"/><rect x="110" y="72" width="34" height="38" rx="4" opacity=".65"/><rect x="158" y="84" width="34" height="26" rx="4" opacity=".5"/><rect x="206" y="94" width="34" height="16" rx="4" opacity=".4"/>
+          </g>
+          <line x1="8" y1="110" x2="244" y2="110" stroke="#3A4150"/>
+          <g fill="#6B7280" font-size="9" text-anchor="middle" font-family="system-ui"><text x="31" y="124">DE</text><text x="79" y="124">FR</text><text x="127" y="124">CH</text><text x="175" y="124">IT</text><text x="223" y="124">ES</text></g>
+        </svg>
+      </div>
+      <div class="body">
+        <h3>Bar chart</h3>
+        <p>Comparing sizes across categories. The default and safest choice. Sort the bars descending — an unsorted bar chart wastes its own advantage.</p>
+        <div class="say"><code data-prompt="Bar chart comparing categories, sorted descending, values labelled above the bars, no unnecessary gridlines, animated on load.">Bar chart sorted descending, values above the bars, no gridlines.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="chart line area trend time series">
+      <div class="stage">
+        <svg width="250" height="130" viewBox="0 0 250 130">
+          <defs><linearGradient id="lg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7FA8C9" stop-opacity=".45"/><stop offset="1" stop-color="#7FA8C9" stop-opacity="0"/></linearGradient></defs>
+          <path d="M10,96 L50,80 L90,86 L130,54 L170,62 L210,32 L240,22 L240,110 L10,110 Z" fill="url(#lg)"/>
+          <polyline points="10,96 50,80 90,86 130,54 170,62 210,32 240,22" fill="none" stroke="#7FA8C9" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="240" cy="22" r="4" fill="#7FA8C9"/><line x1="10" y1="110" x2="240" y2="110" stroke="#3A4150"/>
+        </svg>
+      </div>
+      <div class="body">
+        <h3>Line / area chart</h3>
+        <p>Change over time. Filling below the line (area) emphasises volume. Don't put more than four lines on one chart — the fifth turns it into spaghetti.</p>
+        <div class="say"><code data-prompt="Line chart of a trend over time with a subtle gradient fill under the line, at most 4 series, tooltip with the value on point hover.">Line chart with gradient fill, max 4 series, tooltips on points.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="chart donut pie share composition">
+      <div class="stage">
+        <svg width="132" height="132" viewBox="0 0 132 132">
+          <circle cx="66" cy="66" r="48" fill="none" stroke="#2B313D" stroke-width="18"/>
+          <circle cx="66" cy="66" r="48" fill="none" stroke="#D9A441" stroke-width="18" stroke-dasharray="301" stroke-dashoffset="90" transform="rotate(-90 66 66)"/>
+          <circle cx="66" cy="66" r="48" fill="none" stroke="#7FA8C9" stroke-width="18" stroke-dasharray="301" stroke-dashoffset="228" transform="rotate(64 66 66)"/>
+          <text x="66" y="63" text-anchor="middle" fill="#E8E6E1" font-size="22" font-weight="700" font-family="system-ui">70%</text>
+          <text x="66" y="79" text-anchor="middle" fill="#6B7280" font-size="9.5" font-family="system-ui">on time</text>
+        </svg>
+      </div>
+      <div class="body">
+        <h3>Donut</h3>
+        <p>Parts of a whole, and nothing else. Four or five slices maximum, with the headline figure in the middle. At seven categories a bar chart always wins.</p>
+        <div class="say"><code data-prompt="Donut chart with at most 5 segments, the headline percentage in the centre and a legend with values beside it, segments animating as they draw.">Donut with max 5 segments, value in the centre, legend with numbers.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="chart heatmap calendar density">
+      <div class="stage"><div id="heat" style="display:grid;grid-template-columns:repeat(14,1fr);gap:3px;width:230px"></div></div>
+      <div class="body">
+        <h3>Heatmap</h3>
+        <p>Intensity across a grid: days by weeks, country by status. It shows clusters brilliantly — where things pile up, and when. Hover a square.</p>
+        <div class="say"><code data-prompt="Calendar-style heatmap (days × weeks), colour intensity representing volume, tooltip with the date and count on hover, plus a colour scale legend.">Calendar heatmap, colour intensity = volume, tooltip with date and count.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="chart gauge target threshold">
+      <div class="stage">
+        <svg width="180" height="110" viewBox="0 0 180 110">
+          <path d="M20,95 A70,70 0 0,1 160,95" fill="none" stroke="#2B313D" stroke-width="15" stroke-linecap="round"/>
+          <path d="M20,95 A70,70 0 0,1 160,95" fill="none" stroke="#6FCF97" stroke-width="15" stroke-linecap="round" stroke-dasharray="220" stroke-dashoffset="66"/>
+          <text x="90" y="88" text-anchor="middle" fill="#E8E6E1" font-size="27" font-weight="700" font-family="system-ui">70%</text>
+          <text x="90" y="104" text-anchor="middle" fill="#6B7280" font-size="10" font-family="system-ui">quarterly target: 65%</text>
+        </svg>
+      </div>
+      <div class="body">
+        <h3>Gauge</h3>
+        <p>One value against a target or threshold. Always print the target next to the figure — without it, "70%" means nothing.</p>
+        <div class="say"><code data-prompt="Semi-circular gauge: performance against target, both the value and the target labelled, colour changing once the threshold is crossed.">Semi-circular gauge with value and target, colour changes past the threshold.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="chart libraries chartjs echarts apexcharts svg">
+      <div class="stage">
+        <div class="col" style="max-width:290px;gap:8px">
+          <div style="display:flex;gap:10px;font-size:12.5px"><b style="color:var(--text);min-width:86px">Chart.js</b><span style="color:var(--muted)">the default; fast, covers 90% of reports</span></div>
+          <div style="display:flex;gap:10px;font-size:12.5px"><b style="color:var(--text);min-width:86px">ApexCharts</b><span style="color:var(--muted)">prettier out of the box, zoom and image export</span></div>
+          <div style="display:flex;gap:10px;font-size:12.5px"><b style="color:var(--text);min-width:86px">ECharts</b><span style="color:var(--muted)">big datasets, maps, complex chart types</span></div>
+          <div style="display:flex;gap:10px;font-size:12.5px"><b style="color:var(--text);min-width:86px">plain SVG</b><span style="color:var(--muted)">sparklines and simple shapes, zero dependencies</span></div>
+        </div>
+      </div>
+      <div class="body">
+        <h3>What to draw them with</h3>
+        <p>If you don't name a library, the model picks for you — usually Chart.js. Name it deliberately, especially when the file must work without internet access.</p>
+        <div class="say"><code data-prompt="Build the charts with Chart.js loaded from CDN; if the file must work offline, use plain inline SVG with no external libraries.">Charts with Chart.js from CDN; if it must work offline, plain SVG with no libraries.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+  </div>
+</section>
+<!-- ============ SNIPPETS ============ -->
+<section class="view" id="v-snip">
+  <p class="lede"><strong>Ready-made pieces of code.</strong> You don't have to understand them — you can paste one to your AI and say "use this pattern". It shortens the path and stops the model inventing its own solution where a proven one exists.</p>
+  <div class="grid wide">
+
+    <article class="item" data-tags="snippet skeleton boilerplate single file">
+      <div class="body" style="padding-bottom:0">
+        <h3>Single-file tool skeleton</h3>
+        <p>Everything in one .html: structure, styles, logic. Opens on a double click, runs from a network drive, installs nothing.</p>
+      </div>
+      <div class="stage flow" style="background:var(--panel);border:none;padding:16px">
+<pre><code><span class="c">&lt;!-- one file: HTML + CSS + JS, nothing to install --&gt;</span>
+<span class="k">&lt;!DOCTYPE html&gt;</span>
+<span class="k">&lt;html</span> <span class="f">lang</span>=<span class="s">"en"</span><span class="k">&gt;</span>
+<span class="k">&lt;head&gt;</span>
+  <span class="k">&lt;meta</span> <span class="f">charset</span>=<span class="s">"UTF-8"</span><span class="k">&gt;</span>
+  <span class="k">&lt;meta</span> <span class="f">name</span>=<span class="s">"viewport"</span> <span class="f">content</span>=<span class="s">"width=device-width, initial-scale=1"</span><span class="k">&gt;</span>
+  <span class="k">&lt;title&gt;</span>Tracker<span class="k">&lt;/title&gt;</span>
+  <span class="k">&lt;style&gt;</span> <span class="c">/* all styles live here */</span> <span class="k">&lt;/style&gt;</span>
+<span class="k">&lt;/head&gt;</span>
+<span class="k">&lt;body&gt;</span>
+  <span class="k">&lt;header&gt;</span>…<span class="k">&lt;/header&gt;</span>
+  <span class="k">&lt;main</span> <span class="f">id</span>=<span class="s">"app"</span><span class="k">&gt;&lt;/main&gt;</span>
+  <span class="k">&lt;script&gt;</span> <span class="c">/* all logic lives here */</span> <span class="k">&lt;/script&gt;</span>
+<span class="k">&lt;/body&gt;</span>
+<span class="k">&lt;/html&gt;</span></code></pre>
+      </div>
+      <div class="body">
+        <div class="say"><code data-prompt="Deliver this as one self-contained .html file — styles and scripts inline, no build step and no companion files; it must run from a double click on disk.">One self-contained .html file, styles and scripts inline, runs on a double click.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="snippet excel sheetjs import xlsx parse">
+      <div class="body" style="padding-bottom:0">
+        <h3>Reading an Excel file (SheetJS)</h3>
+        <p>The file is parsed in the browser; nothing reaches a server. That is usually the argument that settles the data-security conversation.</p>
+      </div>
+      <div class="stage flow" style="background:var(--panel);border:none;padding:16px">
+<pre><code><span class="k">&lt;script</span> <span class="f">src</span>=<span class="s">"https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"</span><span class="k">&gt;&lt;/script&gt;</span>
+
+<span class="k">const</span> input = document.<span class="f">getElementById</span>(<span class="s">'file'</span>);
+
+input.<span class="f">addEventListener</span>(<span class="s">'change'</span>, <span class="k">async</span> (e) =&gt; {
+  <span class="k">const</span> file = e.target.files[<span class="t">0</span>];
+  <span class="k">const</span> buf  = <span class="k">await</span> file.<span class="f">arrayBuffer</span>();
+  <span class="k">const</span> wb   = XLSX.<span class="f">read</span>(buf);
+  <span class="k">const</span> ws   = wb.Sheets[wb.SheetNames[<span class="t">0</span>]];
+
+  <span class="c">// array of objects: key = column header</span>
+  <span class="k">const</span> rows = XLSX.utils.<span class="f">sheet_to_json</span>(ws, { defval: <span class="s">''</span> });
+
+  <span class="k">if</span> (!rows.length) <span class="k">return</span> <span class="f">showError</span>(<span class="s">'The sheet is empty'</span>);
+  <span class="f">renderTable</span>(rows);
+});</code></pre>
+      </div>
+      <div class="body">
+        <div class="say"><code data-prompt="Data loading: a file input plus SheetJS (xlsx.full.min.js from CDN), XLSX.utils.sheet_to_json on the first sheet, validation of required columns and a readable error when one is missing. Data never leaves the browser.">Data loading via SheetJS: sheet_to_json on the first sheet, column validation, data stays local.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="snippet export csv download filtered">
+      <div class="body" style="padding-bottom:0">
+        <h3>Exporting the visible rows to CSV</h3>
+        <p>The detail that matters: we export <code style="font-size:11.5px">visibleRows</code>, the data after filtering — what the user is actually looking at.</p>
+      </div>
+      <div class="stage flow" style="background:var(--panel);border:none;padding:16px">
+<pre><code><span class="k">function</span> <span class="f">exportCSV</span>(visibleRows, name = <span class="s">'export'</span>) {
+  <span class="k">const</span> cols = Object.<span class="f">keys</span>(visibleRows[<span class="t">0</span>]);
+  <span class="k">const</span> esc = v =&gt; <span class="s">'"'</span> + <span class="f">String</span>(v ?? <span class="s">''</span>).<span class="f">replace</span>(/"/g, <span class="s">'""'</span>) + <span class="s">'"'</span>;
+
+  <span class="k">const</span> csv = [
+    cols.<span class="f">join</span>(<span class="s">';'</span>),
+    ...visibleRows.<span class="f">map</span>(r =&gt; cols.<span class="f">map</span>(c =&gt; <span class="f">esc</span>(r[c])).<span class="f">join</span>(<span class="s">';'</span>))
+  ].<span class="f">join</span>(<span class="s">'\n'</span>);
+
+  <span class="c">// BOM so Excel renders accented characters correctly</span>
+  <span class="k">const</span> blob = <span class="k">new</span> <span class="f">Blob</span>([<span class="s">'\uFEFF'</span> + csv], { type: <span class="s">'text/csv;charset=utf-8'</span> });
+  <span class="k">const</span> a = Object.<span class="f">assign</span>(document.<span class="f">createElement</span>(<span class="s">'a'</span>), {
+    href: URL.<span class="f">createObjectURL</span>(blob),
+    download: name + <span class="s">'_'</span> + <span class="k">new</span> <span class="f">Date</span>().<span class="f">toISOString</span>().<span class="f">slice</span>(<span class="t">0</span>,<span class="t">10</span>) + <span class="s">'.csv'</span>
+  });
+  a.<span class="f">click</span>();
+}</code></pre>
+      </div>
+      <div class="body">
+        <div class="say"><code data-prompt="CSV export: semicolon separator (European Excel), UTF-8 BOM for accented characters, quotes escaped, the date in the filename, and only the rows visible after filtering.">CSV export with semicolons and UTF-8 BOM, date in the filename, filtered rows only.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="snippet localstorage state persistence">
+      <div class="body" style="padding-bottom:0">
+        <h3>Remembering state (localStorage)</h3>
+        <p>Filters, dark mode and column widths survive closing the tab. A small thing that stops the tool being irritating.</p>
+      </div>
+      <div class="stage flow" style="background:var(--panel);border:none;padding:16px">
+<pre><code><span class="k">const</span> KEY = <span class="s">'tracker.settings'</span>;
+
+<span class="k">const</span> <span class="f">save</span> = (state) =&gt;
+  localStorage.<span class="f">setItem</span>(KEY, <span class="f">JSON</span>.stringify(state));
+
+<span class="k">const</span> <span class="f">load</span> = () =&gt; {
+  <span class="k">try</span> { <span class="k">return</span> <span class="f">JSON</span>.parse(localStorage.<span class="f">getItem</span>(KEY)) ?? {}; }
+  <span class="k">catch</span> { <span class="k">return</span> {}; }   <span class="c">// a corrupted entry must not break the app</span>
+};
+
+<span class="k">const</span> state = { country: <span class="s">'all'</span>, mineOnly: <span class="k">false</span>, theme: <span class="s">'dark'</span>, ...<span class="f">load</span>() };</code></pre>
+      </div>
+      <div class="body">
+        <div class="say"><code data-prompt="Persist application state (filters, sorting, chosen theme) in localStorage under a single key and restore it at start-up; wrap the read in try/catch so a corrupted entry never blocks the tool.">Persist state (filters, sorting, theme) in localStorage under one key, read in try/catch.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="snippet filtering sorting architecture state">
+      <div class="body" style="padding-bottom:0">
+        <h3>Filtering and sorting in one place</h3>
+        <p>The pattern: one source of data, one function computing the view, one function redrawing. Without it, a tool starts drifting apart around the third feature.</p>
+      </div>
+      <div class="stage flow" style="background:var(--panel);border:none;padding:16px">
+<pre><code><span class="k">let</span> data = [];                  <span class="c">// source of truth — never mutated</span>
+<span class="k">let</span> view = { search:<span class="s">''</span>, country:<span class="s">'all'</span>, sort:<span class="s">'deadline'</span>, dir:<span class="t">1</span> };
+
+<span class="k">function</span> <span class="f">computeView</span>() {
+  <span class="k">const</span> s = view.search.<span class="f">toLowerCase</span>();
+  <span class="k">return</span> data
+    .<span class="f">filter</span>(r =&gt; view.country === <span class="s">'all'</span> || r.country === view.country)
+    .<span class="f">filter</span>(r =&gt; !s || Object.<span class="f">values</span>(r).<span class="f">some</span>(v =&gt;
+        <span class="f">String</span>(v).<span class="f">toLowerCase</span>().<span class="f">includes</span>(s)))
+    .<span class="f">sort</span>((a,b) =&gt;
+        <span class="f">String</span>(a[view.sort]).<span class="f">localeCompare</span>(<span class="f">String</span>(b[view.sort]),
+          <span class="k">undefined</span>, { numeric: <span class="k">true</span> }) * view.dir);
+}
+
+<span class="k">function</span> <span class="f">refresh</span>() {         <span class="c">// called after EVERY filter change</span>
+  <span class="k">const</span> v = <span class="f">computeView</span>();
+  <span class="f">renderTable</span>(v); <span class="f">renderKPI</span>(v); <span class="f">renderCharts</span>(v);
+}</code></pre>
+      </div>
+      <div class="body">
+        <div class="say"><code data-prompt="Architecture: one data array as the source of truth, one computeView() applying all filters and sorting, one refresh() redrawing the table, KPI cards and charts — so every element always reflects the same filtered set.">Architecture: one data source, one computeView(), one refresh() redrawing table, KPIs and charts.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="snippet print pdf css media">
+      <div class="body" style="padding-bottom:0">
+        <h3>Print and PDF styles</h3>
+        <p>Without this, the printout includes buttons, menus and a dark background eating toner. Three lines turn a tool into a document.</p>
+      </div>
+      <div class="stage flow" style="background:var(--panel);border:none;padding:16px">
+<pre><code><span class="f">@media</span> print {
+  .sidebar, .filters, button, .no-print { display: none !important; }
+  body  { background: #fff; color: #000; font-size: 11pt; }
+  .card { break-inside: avoid; border: 1px solid #999; }
+  table { page-break-inside: auto; }
+  tr    { page-break-inside: avoid; }
+  thead { display: table-header-group; }  <span class="c">/* header on every page */</span>
+  <span class="f">@page</span> { margin: 14mm; size: A4 portrait; }
+}</code></pre>
+      </div>
+      <div class="body">
+        <div class="say"><code data-prompt="Add @media print rules: hide navigation, filters and buttons, switch to a white background, repeat the table header on every page (thead display: table-header-group), avoid breaking cards and rows across pages, @page A4 with a 14 mm margin.">Add @media print: hide buttons, white background, repeating table header, A4 margins.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- ============ PROMPTS ============ -->
+<section class="view" id="v-prompty">
+  <p class="lede"><strong>Complete requests, ready to copy.</strong> Each is built only from names you've met in the previous tabs. Swap in your own data and send.</p>
+
+  <div class="secthead"><h2>Complete tools</h2><p>copy, swap the data, send</p></div>
+  <div class="grid wide">
+
+    <article class="item" data-tags="prompt tracker complete case management">
+      <div class="body">
+        <h3>Case tracker with Excel import</h3>
+        <p>The most common case: you have a spreadsheet and you want a living tool your team uses daily.</p>
+        <div class="say"><code data-prompt="Build a single-file HTML tool for tracking team cases. Data loaded from an .xlsx file via SheetJS, entirely in the browser. Columns: ID, country, client, status, deadline, owner, amount. App shell layout: left sidebar collapsible to icons, top bar with the title and export buttons. Four KPI cards with count-up at the top (open cases, overdue, average handling time, value). Below them a filter bar: country chips with counts, live search, date range with shortcuts, a 'mine only' toggle. The main area is a sortable table with a sticky header, statuses as coloured badges, a progress bar and pagination at 25/50/100. Clicking a row opens a drawer with the record details. Export to CSV and XLSX covering only the visible rows, plus @media print styles. Filter state saved to localStorage. Minimal corporate style with a dark-mode toggle. Empty state with a clear-filters button. Fully responsive: the table becomes cards on mobile.">Full prompt: case tracker — SheetJS, app shell, 4 KPIs, filters, sortable table, drawer, export, localStorage, minimal corporate + dark mode.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="prompt dashboard report excel">
+      <div class="body">
+        <h3>Excel report → dashboard</h3>
+        <p>When the point is showing results rather than daily work: fewer filters, more charts and conclusions.</p>
+        <div class="say"><code data-prompt="Turn an Excel sheet into a single-file HTML dashboard. Drag & drop file loading via SheetJS, automatic detection of numeric and date columns. Bento grid layout: the largest tile is a monthly trend line chart, beside it three KPI cards with sparklines, below a descending bar chart and a composition donut, and a detail table at the bottom. Charts built with Chart.js from CDN, one shared colour palette, tooltips with values. A segmented control switching the range (month / quarter / year) refreshes every tile at once. Above the charts, one line of automatically generated summary (largest increase, largest decrease). Dark mode style with a single accent colour, KPI cards in liquid glass. A 'Print / PDF' button with an A4 layout.">Full prompt: Excel → dashboard — bento grid, Chart.js, KPI sparklines, range control, auto-summary, dark + liquid glass.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="prompt presentation scrollytelling deck">
+      <div class="body">
+        <h3>Scrolling presentation</h3>
+        <p>Instead of PowerPoint slides — a page you send as a link or a file that tells the story itself.</p>
+        <div class="say"><code data-prompt="Build a single-file HTML presentation as a scrollytelling page. Full-screen stacked sections, smooth scrolling with Lenis, section entrance animations with GSAP + ScrollTrigger using a stagger, a reading progress bar at the top and a side contents list highlighting the current section (scrollspy). Use a real icon set, no emoji. One title screen with a gradient border and headline, then sections: problem, data (bar chart), solution (three cards), timeline (horizontal), summary. Dark style with a single accent colour, typography with a clear size contrast. Must run from a double click on disk and respect prefers-reduced-motion.">Full prompt: scrollytelling presentation — Lenis, GSAP ScrollTrigger, scrollspy, progress bar, real icons, dark style.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+
+    <article class="item" data-tags="prompt form signup booking">
+      <div class="body">
+        <h3>Form / sign-up sheet</h3>
+        <p>Collecting submissions without a system: the form produces a ready-to-send email or a data file.</p>
+        <div class="say"><code data-prompt="Build a single-file HTML sign-up form. Fields: full name, department, choice of slot from a list of available times with a remaining-seats counter, and notes. Live validation with messages next to the fields (not alerts), submit button disabled until the required fields are filled. On submit: a summary of the choice and a button generating a pre-filled email (mailto) with subject and body. A stepper at the top showing the stage. Toasts confirming actions. Minimal corporate style, fully responsive, fully keyboard accessible.">Full prompt: sign-up form — slots with seat counters, inline validation, stepper, pre-filled mailto.</code><div class="say-btns"></div></div>
+      </div>
+    </article>
+  </div>
+
+  <div class="secthead"><h2>Lines that improve any result</h2><p>append these to any request</p></div>
+  <div class="grid">
+    <article class="item" data-tags="prompt add-on quality craft"><div class="body"><h3>Craft quality</h3><div class="say"><code data-prompt="Use a real icon set (Lucide from CDN or inline SVG), not emoji. Keep a consistent type scale, visible keyboard focus, WCAG AA contrast and support for prefers-reduced-motion.">Real icons instead of emoji, consistent type scale, visible focus, WCAG AA, reduced-motion.</code><div class="say-btns"></div></div></div></article>
+    <article class="item" data-tags="prompt add-on data security"><div class="body"><h3>Data and security</h3><div class="say"><code data-prompt="Process all data strictly in the browser — no network calls carrying data, no file uploads anywhere. List at the end which libraries you load from CDN.">All data processed in-browser, no network calls with data; list any CDN libraries used.</code><div class="say-btns"></div></div></div></article>
+    <article class="item" data-tags="prompt add-on demo data"><div class="body"><h3>Demo data</h3><div class="say"><code data-prompt="Include 30 realistic demo rows so the tool is fully clickable the moment it opens, and clearly mark them as sample data to be replaced.">Include 30 realistic demo rows, clearly marked as sample data to replace.</code><div class="say-btns"></div></div></div></article>
+    <article class="item" data-tags="prompt add-on iteration refine"><div class="body"><h3>Refining afterwards</h3><div class="say"><code data-prompt="Change only the part I named and leave the rest of the file untouched. Then list briefly what you changed.">Change only the part I named, leave the rest untouched, and list what changed.</code><div class="say-btns"></div></div></div></article>
+    <article class="item" data-tags="prompt add-on environment browser"><div class="body"><h3>Environment</h3><div class="say"><code data-prompt="It must run in Microsoft Edge, opened from a file on a network drive, without installing anything and without admin rights.">Must run in Edge from a network-drive file, no installs, no admin rights.</code><div class="say-btns"></div></div></div></article>
+    <article class="item" data-tags="prompt add-on maintainability comments"><div class="body"><h3>So you can maintain it</h3><div class="say"><code data-prompt="Add a comment block at the top of the file explaining where to swap the data, where to change the colours and how to add a new column.">Add a comment block at the top: where to swap data, change colours, add a column.</code><div class="say-btns"></div></div></div></article>
+  </div>
+
+  <div class="note" style="margin-top:24px"><b>The important part:</b> the first result is never the final one. Treat it as a draft and refine it with single sentences from this encyclopedia — "replace the dropdown with chips", "add an empty state", "move the KPIs into a bento grid". Three rounds of that beat an hour spent writing the perfect opening prompt.</div>
+</section>
+
+<!-- ============ WORKSHOP ============ -->
+<section class="view" id="v-warsztat">
+  <p class="lede"><strong>Build one tool in three rounds.</strong> Round one gets something on screen, rounds two and three make it yours. Pick a brief, run the timer, and use the prompt basket to assemble your request.</p>
+
+  <div class="secthead"><h2>Session timer</h2><p>press start when the round begins</p></div>
+  <div class="item" style="max-width:520px">
+    <div class="stage" style="min-height:0;padding:22px">
+      <div style="text-align:center">
+        <div id="clock" style="font-family:var(--disp);font-size:54px;font-weight:700;letter-spacing:-.03em;line-height:1">08:00</div>
+        <div id="roundLabel" style="font-size:12.5px;color:var(--dim);margin-top:2px">Round 1 — first draft</div>
+        <div class="row" style="margin-top:14px">
+          <button class="d-btn" id="tStart">Start</button>
+          <button class="d-btn ghost" id="tReset">Reset</button>
+          <div class="seg" id="tPick"><button class="on" data-min="8">8 min</button><button data-min="5">5 min</button><button data-min="3">3 min</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="secthead"><h2>The three rounds</h2><p>same tool, three passes</p></div>
+  <div class="grid">
+    <article class="item" data-tags="workshop round draft"><div class="body">
+      <h3><span class="pill">Round 1</span> Get it on screen</h3>
+      <p>Open the prompt basket, add a layout, four or five components and one style. Add one sentence about your data, then send. Don't polish anything yet — the goal is something that exists.</p>
+      <div class="say"><code data-prompt="Build this as a single-file HTML tool with realistic demo data so it is fully clickable immediately. Keep it simple for now — I will refine it in the next messages.">Round 1: single file, demo data, fully clickable, simple — refinement comes next.</code><div class="say-btns"></div></div>
+    </div></article>
+    <article class="item" data-tags="workshop round fix"><div class="body">
+      <h3><span class="pill">Round 2</span> Fix what annoys you</h3>
+      <p>Open it, use it for a minute, write down the three things that irritate you. Send them as three separate named changes — that's what the vocabulary is for.</p>
+      <div class="say"><code data-prompt="Three changes, and leave everything else untouched: 1) …, 2) …, 3) … . After each change tell me in one line what you altered.">Round 2: three named changes, nothing else touched, one line of explanation each.</code><div class="say-btns"></div></div>
+    </div></article>
+    <article class="item" data-tags="workshop round finish"><div class="body">
+      <h3><span class="pill">Round 3</span> Make it survive Monday</h3>
+      <p>The unglamorous layer: empty state, error message when the file is wrong, print styles, saved filters, mobile. This is what separates a demo from a tool people keep using.</p>
+      <div class="say"><code data-prompt="Now harden it: add an empty state, a clear error message when the uploaded file lacks a required column, @media print styles, filter state saved to localStorage, and make it work on a phone.">Round 3: empty state, file error message, print styles, saved filters, mobile.</code><div class="say-btns"></div></div>
+    </div></article>
+  </div>
+
+  <div class="secthead"><h2>Pick a brief</h2><p>or bring your own spreadsheet</p></div>
+  <div class="grid">
+    <article class="item" data-tags="workshop brief deadline tracker"><div class="body">
+      <h3>Brief A — Deadline board</h3>
+      <p>A team list of cases with due dates. Must answer one question in under three seconds: what is at risk this week? Suggested parts: KPI cards, status badges, filter chips, sortable table, overdue alert.</p>
+    </div></article>
+    <article class="item" data-tags="workshop brief volume dashboard"><div class="body">
+      <h3>Brief B — Monthly volumes</h3>
+      <p>A recurring report someone currently rebuilds by hand each month. Suggested parts: Excel import, bento grid, bar and line charts, range segmented control, print layout.</p>
+    </div></article>
+    <article class="item" data-tags="workshop brief onboarding guide"><div class="body">
+      <h3>Brief C — Team handbook</h3>
+      <p>Procedures nobody reads because they live in a 40-page document. Suggested parts: scrollytelling or sticky contents, accordion, stepper, search, tooltips for definitions.</p>
+    </div></article>
+  </div>
+
+  <div class="secthead"><h2>Before you show it to anyone</h2><p>a 60-second check</p></div>
+  <div class="item">
+    <div class="body">
+      <table class="cheat">
+        <tr><td>Empty</td><td>Clear all filters — does it explain what happened, or just go blank?</td></tr>
+        <tr><td>Wrong file</td><td>Load a file with a missing column — does it say which one?</td></tr>
+        <tr><td>Phone</td><td>Narrow the window to a phone width — does anything fall off the screen?</td></tr>
+        <tr><td>Keyboard</td><td>Tab through it — can you see where the focus is?</td></tr>
+        <tr><td>Print</td><td>Ctrl+P — is it a document, or a screenshot of a dark app?</td></tr>
+        <tr><td>Export</td><td>Filter, then export — does the file contain the filtered rows only?</td></tr>
+        <tr><td>Reload</td><td>Refresh the page — are your filters and theme still there?</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="note" style="margin-top:22px"><b>One rule for the session:</b> if you find yourself describing something with your hands, it has a name in this encyclopedia. Find the name, use the name.</div>
+</section>
+
+</main>
+
+<button class="basket-fab" id="fab"><span data-l="clipboard-list"></span> Prompt basket <b id="cnt">0</b></button>
+
+<div class="drawer" id="drawer">
+  <div class="drawer-bg" data-close></div>
+  <div class="drawer-in">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <h3>Your prompt</h3>
+      <button class="mini" data-close><span data-l="x"></span> Close</button>
+    </div>
+    <p style="margin:0;font-size:13px;color:var(--muted)">Add one line at the top saying what the tool is for and where the data comes from. Everything else is already named for you.</p>
+    <textarea id="basketText" spellcheck="false"></textarea>
+    <div class="row" style="justify-content:flex-start">
+      <button class="d-btn" id="copyBasket">Copy full prompt</button>
+      <button class="d-btn ghost" id="clearBasket">Clear basket</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<style>
+.tipwrap:hover .tip,.tipwrap:focus-within .tip{opacity:1}
+.dd-i:hover{background:#1E232C;color:var(--text)!important}
+#dz.over{border-color:var(--amber);background:rgba(217,164,65,.07)}
+.toc{position:fixed;inset:0;z-index:95;background:rgba(6,8,11,.8);backdrop-filter:blur(4px);display:none;padding:40px 20px;overflow:auto}
+.toc.on{display:block}
+.toc-in{max-width:900px;margin:0 auto;background:var(--shell);border:1px solid var(--line);border-radius:16px;padding:26px}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:18px;margin-top:18px}
+.toc-grid h4{font-size:13.5px;color:var(--amber);margin-bottom:7px}
+.toc-grid a{display:block;font-size:12.5px;color:var(--muted);text-decoration:none;padding:2px 0}
+.toc-grid a:hover{color:var(--text)}
+
+/* ---------- printable one-page cheat sheet ---------- */
+#cheatsheet{display:none}
+@media print{
+  .top,main,.basket-fab,.drawer,.toc,.toast{display:none!important}
+  html,body{background:#fff!important;color:#000!important}
+  #cheatsheet{display:block;font-size:8.2pt;line-height:1.35;color:#000}
+  #cheatsheet h1{font-size:15pt;margin:0 0 1mm;letter-spacing:-.02em}
+  #cheatsheet .sub{font-size:8.5pt;color:#444;margin:0 0 3mm;border-bottom:1.2pt solid #000;padding-bottom:2mm}
+  #cheatsheet .cs-cols{column-count:3;column-gap:6mm}
+  #cheatsheet .cs-grp{break-inside:avoid;margin-bottom:3mm}
+  #cheatsheet .cs-grp h2{font-size:8.6pt;margin:0 0 1mm;text-transform:none;border-bottom:.6pt solid #999;padding-bottom:.6mm}
+  #cheatsheet .cs-grp span{display:block;color:#222}
+  #cheatsheet .cs-foot{margin-top:3mm;border-top:1.2pt solid #000;padding-top:2mm;font-size:8pt;break-inside:avoid}
+  #cheatsheet .cs-foot b{display:inline-block;min-width:22mm}
+  @page{size:A4 portrait;margin:11mm}
+}
+</style>
+
+<div class="toc" id="toc"><div class="toc-in">
+  <div style="display:flex;justify-content:space-between;align-items:center"><h3 style="font-size:19px">Contents</h3><button class="mini" id="tocClose"><span data-l="x"></span> Close</button></div>
+  <div class="toc-grid" id="tocGrid"></div>
+</div></div>
+
+<div id="cheatsheet">
+  <h1>The UI Encyclopedia — one-page cheat sheet</h1>
+  <p class="sub">Name the part, and the AI builds the part. Five ingredients of a request: <b>what it is</b> · <b>what data</b> · <b>which parts</b> · <b>which style</b> · <b>how it's used</b>.</p>
+  <div class="cs-cols" id="csCols"></div>
+  <div class="cs-foot">
+    <div><b>Always add:</b> single self-contained .html file · real icons, no emoji · fully responsive · empty state · clear error messages · @media print · state in localStorage · 30 rows of demo data.</div>
+    <div style="margin-top:1.5mm"><b>Refining:</b> "Change only the part I named and leave the rest of the file untouched, then list what you changed."</div>
+  </div>
+</div>
+
+<script>
+/* ---------- icons ---------- */
+(function(){
+  document.querySelectorAll('[data-l]').forEach(el=>{
+    if(el.querySelector('svg')) return;
+    const s=document.createElementNS('http://www.w3.org/2000/svg','svg');
+    s.setAttribute('class','ic'); s.setAttribute('viewBox','0 0 24 24');
+    const u=document.createElementNS('http://www.w3.org/2000/svg','use');
+    u.setAttribute('href','#i-'+el.dataset.l);
+    s.appendChild(u); el.appendChild(s);
+  });
+})();
+const icons=()=>{document.querySelectorAll('[data-l]').forEach(el=>{
+  if(el.querySelector('svg'))return;
+  const s=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  s.setAttribute('class','ic');s.setAttribute('viewBox','0 0 24 24');
+  const u=document.createElementNS('http://www.w3.org/2000/svg','use');
+  u.setAttribute('href','#i-'+el.dataset.l);s.appendChild(u);el.appendChild(s);})};
+
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const toast=(t)=>{const el=$('#toast');el.textContent=t;el.classList.add('on');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('on'),1900)};
+const icon=(n)=>'<svg class="ic" viewBox="0 0 24 24"><use href="#i-'+n+'"/></svg>';
+
+/* ---------- tabs ---------- */
+function show(v){
+  $$('.tab').forEach(t=>t.classList.toggle('on',t.dataset.v===v));
+  $$('.view').forEach(s=>s.classList.toggle('on',s.id==='v-'+v));
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+$$('.tab').forEach(t=>t.onclick=()=>show(t.dataset.v));
+$$('[data-goto]').forEach(b=>b.onclick=()=>show(b.dataset.goto));
+
+/* ---------- copy / basket buttons ---------- */
+let basket=[];
+$$('.say').forEach(say=>{
+  const code=$('code',say), box=$('.say-btns',say);
+  if(!box||!code) return;
+  const txt=code.dataset.prompt||code.textContent.trim();
+  const name=say.closest('.item')?.querySelector('h3')?.textContent.replace(/\s+/g,' ').trim()||'item';
+  const b1=document.createElement('button'); b1.className='mini'; b1.innerHTML=icon('copy'); b1.title='Copy this description';
+  b1.onclick=()=>{navigator.clipboard.writeText(txt);toast('Copied: '+name)};
+  const b2=document.createElement('button'); b2.className='mini'; b2.innerHTML=icon('plus'); b2.title='Add to prompt basket';
+  b2.onclick=()=>{
+    if(basket.some(x=>x.t===txt)){basket=basket.filter(x=>x.t!==txt);b2.classList.remove('done');b2.innerHTML=icon('plus')}
+    else{basket.push({n:name,t:txt});b2.classList.add('done');b2.innerHTML=icon('check');toast('Added: '+name)}
+    renderBasket();
+  };
+  box.append(b1,b2);
+});
+
+function renderBasket(){
+  $('#cnt').textContent=basket.length;
+  const head='Build a single-file HTML tool. [DESCRIBE HERE: what it is for, where the data comes from, who uses it].\n\nIt should include:\n';
+  $('#basketText').value = basket.length
+    ? head + basket.map(x=>'- '+x.t).join('\n') + '\n\nDeliver it as one self-contained .html file that runs from a double click on disk.'
+    : 'The basket is empty. Add items with the "+" button on any card.';
+}
+renderBasket();
+$('#fab').onclick=()=>$('#drawer').classList.add('on');
+$$('[data-close]').forEach(b=>b.onclick=()=>$('#drawer').classList.remove('on'));
+$('#copyBasket').onclick=()=>{navigator.clipboard.writeText($('#basketText').value);toast('Prompt copied')};
+$('#clearBasket').onclick=()=>{basket=[];$$('.mini.done').forEach(b=>{b.classList.remove('done');b.innerHTML=icon('plus')});renderBasket();toast('Basket cleared')};
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){$('#drawer').classList.remove('on');$('#toc').classList.remove('on')}});
+
+/* ---------- search ---------- */
+$('#q').addEventListener('input',e=>{
+  const s=e.target.value.toLowerCase().trim();
+  if(!s){$$('.item').forEach(i=>i.classList.remove('hide'));return}
+  let first=null;
+  $$('.view').forEach(v=>{$$('.item',v).forEach(i=>{
+    const hit=(i.dataset.tags||'').includes(s)||i.textContent.toLowerCase().includes(s);
+    i.classList.toggle('hide',!hit);
+    if(hit&&!first) first=v.id.replace('v-','');
+  })});
+  if(first) show(first);
+});
+
+/* ---------- contents + printable cheat sheet ---------- */
+const labels={start:'Start',layout:'Layouts',komp:'Components',nav:'Navigation',style:'Styles',motion:'Motion',karuzela:'Carousels',wykresy:'Charts',snip:'Snippets',prompty:'Prompts',warsztat:'Workshop'};
+const nameOf=h=>h.textContent.replace(/\s+/g,' ').replace(/\s*(must have|default|key piece|safe choice|click.*|klik.*)\s*$/i,'').trim();
+$('#tocGrid').innerHTML=Object.entries(labels).map(([k,v])=>{
+  const items=$$('#v-'+k+' .item h3').map(h=>'<a href="#" data-tv="'+k+'">'+nameOf(h)+'</a>').join('');
+  return '<div><h4>'+v+'</h4>'+items+'</div>';
+}).join('');
+$('#csCols').innerHTML=Object.entries(labels).filter(([k])=>!['start','warsztat'].includes(k)).map(([k,v])=>{
+  const items=$$('#v-'+k+' .item[data-tags] h3').map(h=>'<span>'+nameOf(h)+'</span>').join('');
+  return '<div class="cs-grp"><h2>'+v+'</h2>'+items+'</div>';
+}).join('');
+$('#expandAll').onclick=()=>$('#toc').classList.add('on');
+$('#tocClose').onclick=()=>$('#toc').classList.remove('on');
+$$('#tocGrid a').forEach(a=>a.onclick=e=>{e.preventDefault();$('#toc').classList.remove('on');show(a.dataset.tv)});
+$('#printBtn').onclick=()=>window.print();
+$('#cnt-items').childNodes[0].nodeValue=$$('.item[data-tags]').length;
+
+/* ---------- hero style switcher ---------- */
+const styles=[
+ ['Glassmorphism','g-glass','<div class="glass-card"><div class="l">Recovered in Q3</div><div class="v">4.2M</div></div>'],
+ ['Liquid glass','g-liquid','<div class="liquid"><div class="l">Recovered in Q3</div><div class="v">4.2M</div></div>'],
+ ['Neon','g-neon','<div class="neon"><div class="l">RECOVERED IN Q3</div><div class="v">4.2M</div></div>'],
+ ['Neumorphism','g-neu','<div class="neu"><div class="l">Recovered in Q3</div><div class="v">4.2M</div></div>'],
+ ['Brutalism','g-brut','<div class="brut"><div class="l">RECOVERED IN Q3</div><div class="v">4.2M</div></div>'],
+ ['Dark mode','g-dark','<div class="dark-c"><div class="l">Recovered in Q3</div><div class="v">4.2M</div><div class="d">▲ 18% YoY</div></div>'],
+ ['Gradient','g-grad','<div class="grad"><div class="grad-in"><div class="l">Recovered in Q3</div><div class="v">4.2M</div></div></div>'],
+ ['Frosted','g-frost','<div class="frost"><div class="l">Recovered in Q3</div><div class="v">4.2M</div></div>'],
+ ['Claymorphism','g-clay','<div class="clay"><div class="l">Recovered in Q3</div><div class="v">4.2M</div></div>'],
+ ['Minimal corporate','g-corp','<div class="corp"><div class="l">Recovered in Q3</div><div class="v">EUR 4,200,000</div><div class="d">▲ 18% YoY</div></div>']
+];
+const stage=$('#swStage'), pick=$('#swPick');
+styles.forEach(([n,c,h],idx)=>{
+  const b=document.createElement('button'); b.textContent=n;
+  b.onclick=()=>{$$('button',pick).forEach(x=>x.classList.remove('on'));b.classList.add('on');stage.className='swatch-stage '+c;stage.innerHTML=h};
+  pick.appendChild(b); if(idx===1) setTimeout(()=>b.click(),120);
+});
+
+/* ---------- demo interactions ---------- */
+$$('[data-sw]').forEach(s=>s.onclick=()=>s.classList.toggle('on'));
+$$('[data-seg]').forEach(g=>$$('button',g).forEach(b=>b.onclick=()=>{$$('button',g).forEach(x=>x.classList.remove('on'));b.classList.add('on')}));
+$$('[data-chip]').forEach(c=>c.onclick=()=>c.classList.toggle('on'));
+const dd=$('#ddBtn'); if(dd) dd.onclick=()=>{const m=$('#ddMenu');m.style.display=m.style.display==='block'?'none':'block'};
+$$('.dd-i').forEach(i=>i.onclick=()=>{$('#ddBtn').childNodes[0].nodeValue='Owner: '+i.textContent+' ';$('#ddMenu').style.display='none'});
+const rng=$('#rng'); if(rng) rng.oninput=()=>$('#rngV').textContent=rng.value;
+const mo=$('#modalOpen'); if(mo){mo.onclick=()=>$('#modalDemo').style.display='grid';$$('[data-modal-close]').forEach(b=>b.onclick=()=>$('#modalDemo').style.display='none')}
+$$('.acc-h').forEach(h=>h.onclick=()=>{const b=h.nextElementSibling;const o=b.style.display==='block';b.style.display=o?'none':'block';h.lastElementChild.textContent=o?'+':'−'});
+const flip=$('#flipDemo'); if(flip) flip.onclick=()=>flip.classList.toggle('on');
+const rail=$('#railBtn');
+if(rail) rail.onclick=()=>{const r=$('#navRail');const c=r.style.width==='58px';r.style.width=c?'150px':'58px';$$('.rail-t',r).forEach(t=>t.style.display=c?'inline':'none')};
+
+const countries=['Germany','France','Switzerland','Italy','Spain','Netherlands'];
+const dsOut=$('#demoSearchOut'), ds=$('#demoSearch');
+function renderDs(){const s=(ds.value||'').toLowerCase();const r=countries.filter(k=>k.toLowerCase().includes(s));
+  dsOut.innerHTML=r.length?r.map(k=>'<div>'+(s?k.replace(new RegExp('('+s+')','i'),'<b style="color:#D9A441">$1</b>'):k)+'</div>').join(''):'<div style="color:#6B7280">No results</div>'}
+if(ds){ds.oninput=renderDs;renderDs()}
+
+const tb=$('#demoTable');
+if(tb) $$('[data-sort]',tb).forEach(th=>{let dir=1;th.onclick=()=>{
+  const i=+th.dataset.sort, body=$('tbody',tb);
+  [...body.rows].sort((a,b)=>{const x=a.cells[i].textContent.replace(/\s/g,''),y=b.cells[i].textContent.replace(/\s/g,'');
+    const nx=parseFloat(x),ny=parseFloat(y);return (isNaN(nx)?x.localeCompare(y):nx-ny)*dir}).forEach(r=>body.appendChild(r));
+  dir*=-1}});
+
+const dz=$('#dz');
+if(dz){['dragover','dragenter'].forEach(e=>dz.addEventListener(e,ev=>{ev.preventDefault();dz.classList.add('over')}));
+['dragleave','drop'].forEach(e=>dz.addEventListener(e,ev=>{ev.preventDefault();dz.classList.remove('over')}));
+dz.addEventListener('drop',()=>toast('In a real tool, SheetJS would parse this file here'));}
+
+function countUp(el){const t=+el.dataset.count;let s=null;
+  const step=ts=>{if(!s)s=ts;const p=Math.min((ts-s)/1100,1);
+    el.textContent=Math.floor(t*(1-Math.pow(1-p,3))).toLocaleString('en-US');
+    if(p<1)requestAnimationFrame(step)};requestAnimationFrame(step)}
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){
+  if(e.target.dataset.count){countUp(e.target);io.unobserve(e.target)}
+  if(e.target.classList.contains('reveal')){e.target.classList.add('in')}}}),{threshold:.4});
+$$('[data-count],.reveal').forEach(el=>io.observe(el));
+$$('.reveal').forEach((el,i)=>el.style.transitionDelay=(i*90)+'ms');
+const rc=$('#recount'); if(rc) rc.onclick=()=>$$('[data-count]').forEach(countUp);
+
+const rb=$('#ripBtn');
+if(rb) rb.onclick=e=>{const r=document.createElement('span');r.className='rip';
+  const d=Math.max(rb.offsetWidth,rb.offsetHeight);r.style.width=r.style.height=d+'px';
+  r.style.left=(e.offsetX-d/2)+'px';r.style.top=(e.offsetY-d/2)+'px';rb.appendChild(r);setTimeout(()=>r.remove(),600)};
+
+const ty=$('#typ');
+if(ty){const t='KPI card + filter chips + sortable table…';let i=0;
+  setInterval(()=>{ty.textContent=t.slice(0,i);i=(i+1)%(t.length+14)},95)}
+
+const c1=$('#car1');
+if(c1){const tr=$('.car-tr',c1),n=$$('.car-sl',c1).length,dots=$('#car1dots');let idx=0;
+  for(let i=0;i<n;i++){const d=document.createElement('button');d.className='car-dot'+(i?'':' on');d.onclick=()=>go(i);dots.appendChild(d)}
+  function go(i){idx=(i+n)%n;tr.style.transform='translateX('+(-idx*100)+'%)';$$('.car-dot',dots).forEach((d,j)=>d.classList.toggle('on',j===idx))}
+  $$('[data-dir]',c1).forEach(b=>b.onclick=()=>go(idx+ +b.dataset.dir));}
+
+const st=$('#stack');
+if(st){let order=[0,1,2];
+  const draw=()=>$$('div',st).forEach(el=>{const p=order.indexOf(+el.dataset.i);
+    el.style.transform='translateY('+(p*10)+'px) scale('+(1-p*.06)+')';el.style.zIndex=9-p});
+  st.onclick=()=>{order.push(order.shift());draw()};draw()}
+
+const ba=$('#ba');
+if(ba){const mv=e=>{const r=ba.getBoundingClientRect();
+  const x=Math.max(0,Math.min(1,((e.touches?e.touches[0].clientX:e.clientX)-r.left)/r.width));
+  $('#baTop').style.width=(x*100)+'%';$('#baLine').style.left=(x*100)+'%'};
+  ba.addEventListener('mousemove',mv);ba.addEventListener('touchmove',mv)}
+
+const heat=$('#heat');
+if(heat){for(let i=0;i<70;i++){const v=Math.random();const d=document.createElement('div');
+  d.style.cssText='aspect-ratio:1;border-radius:2px;background:rgba(217,164,65,'+(0.08+v*0.9)+')';
+  d.title='day '+(i+1)+': '+Math.round(v*40)+' cases';heat.appendChild(d)}}
+
+/* ---------- workshop timer ---------- */
+(function(){
+  const clock=$('#clock'); if(!clock) return;
+  let total=8*60, left=total, t=null, round=1;
+  const labelsR=['Round 1 — first draft','Round 2 — fix what annoys you','Round 3 — make it survive Monday'];
+  const paint=()=>clock.textContent=String(Math.floor(left/60)).padStart(2,'0')+':'+String(left%60).padStart(2,'0');
+  const stop=()=>{clearInterval(t);t=null;$('#tStart').textContent='Start'};
+  $('#tStart').onclick=()=>{
+    if(t){stop();return}
+    $('#tStart').textContent='Pause';
+    t=setInterval(()=>{left--;paint();
+      if(left<=0){stop();left=total;toast('Time — next round');
+        round=round%3+1;$('#roundLabel').textContent=labelsR[round-1];paint()}},1000);
+  };
+  $('#tReset').onclick=()=>{stop();left=total;paint()};
+  $$('#tPick button').forEach(b=>b.onclick=()=>{$$('#tPick button').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+    total=+b.dataset.min*60;stop();left=total;paint()});
+  paint();
+})();
+
+icons();
+</script>
+
+</body>
+</html>

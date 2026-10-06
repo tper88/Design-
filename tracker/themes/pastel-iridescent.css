@@ -1,0 +1,160 @@
+/* Pastel Iridescent — motyw trackera.
+   WYGENEROWANY z sources/02-pastel-iridescent.html przez build-themes.py. Nie edytuj ręcznie.
+   Layout shella jest w tracker.css; tutaj tokeny, komponenty i skóra shella. */
+
+:root {
+  
+  --font-head: 'Poppins', system-ui, sans-serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  
+  --wl-frame: #1C1C1E;                 
+  --wl-bg: #EFEFF2;                    
+  --wl-canvas: #F7F7F9;                
+  --wl-surface: #FFFFFF;               
+  --wl-surface-2: #F2F2F5;             
+  --wl-border: #ECECF0;                
+
+  
+  --wl-ink: #0E0E10;                   
+  --wl-text: #16161A;                  
+  --wl-text-2: #4A4B52;                
+  --wl-muted: #9A9BA3;                 
+
+  
+  --wl-crimson: #A3122A;               
+  --wl-salmon: #F4A38A;                
+  --wl-periwinkle: #A9BEE8;            
+  --wl-lilac: #B7A4F4;                 
+  --wl-pink: #F28DB2;                  
+  --wl-peach: #FFB38E;                 
+  --wl-sky: #8EC5F7;                   
+  --wl-blue: #5B8DEF;                  
+
+  
+  --wl-badge: #E5383B;                 
+  --wl-positive: #2FA36B;              
+  --wl-rose-soft: #FBE7EE;             
+  --wl-lilac-soft: #EFEAFE;            
+
+  
+  --c1: var(--wl-crimson);
+  --c2: var(--wl-salmon);
+  --c3: var(--wl-periwinkle);
+  --c4: var(--wl-lilac);
+  --c5: var(--wl-pink);
+
+  
+  --wl-grad-card: linear-gradient(125deg, #F9A8C0 0%, #F3B0D6 28%, #C7B6F6 62%, #E3D6FC 100%); 
+  --wl-grad-iri: conic-gradient(from 210deg at 50% 50%, #F9A8C0, #C7B6F6, #8EC5F7, #FFD4B8, #F28DB2, #F9A8C0); 
+  --wl-grad-progress: linear-gradient(90deg, #B7A4F4 0%, #F28DB2 55%, #F2667F 100%); 
+  --wl-grad-blue: linear-gradient(90deg, #8EC5F7 0%, #5B8DEF 100%); 
+  --wl-grad-glow: radial-gradient(60% 60% at 50% 40%, rgba(247,168,196,.55), rgba(183,164,244,.25) 55%, transparent 75%); 
+
+  
+  --wl-r-device: 36px; 
+  --wl-r-card: 22px; 
+  --wl-r-inner: 14px; 
+  --wl-r-pill: 999px; 
+
+  
+  --wl-shadow: 0 2px 6px rgba(17,17,19,.03), 0 14px 34px rgba(17,17,19,.05); 
+  --wl-shadow-card: 0 20px 40px rgba(183,164,244,.45); 
+  --wl-shadow-device: 0 40px 80px rgba(0,0,0,.18); 
+
+  
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+
+  
+  --page-bg: var(--wl-bg);
+  --surface: var(--wl-surface);
+  --surface-2: var(--wl-surface-2);
+  --border: var(--wl-border);
+  --divider: var(--wl-surface-2);
+  --text: var(--wl-text);
+  --text-2: var(--wl-text-2);
+  --muted: var(--wl-muted);
+  --accent: var(--wl-ink);
+  --hover: #F2F2F5;
+  --toc-bg: rgba(255,255,255,.85);
+  --code-bg: #16161A;
+  --code-text: #EDEBF7;
+  --r-card: var(--wl-r-card);
+  --r-inner: var(--wl-r-inner);
+  --r-pill: var(--wl-r-pill);
+  --shadow: var(--wl-shadow);
+  --up: var(--wl-positive);
+  --down: var(--wl-crimson);
+}
+:root{--hero-w:600}
+
+html{scroll-behavior:smooth}
+body{font-family:var(--font-body);background:var(--page-bg);color:var(--text);-webkit-font-smoothing:antialiased;line-height:1.5;min-height:100vh}
+
+*{box-sizing:border-box;margin:0;padding:0}
+button{font:inherit}
+.hero{display:grid;gap:14px;padding:8px 0 4px}
+.hero h1{font-family:var(--font-head);font-size:clamp(36px,6.4vw,68px);font-weight:var(--hero-w,600);letter-spacing:-.025em;line-height:1.02}
+.hero .kicker{font-size:14px;color:var(--muted);font-weight:500}
+.hero p{color:var(--text-2);max-width:680px;font-size:16px}
+.hero .meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+section.block{margin-top:60px;scroll-margin-top:80px}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);box-shadow:var(--shadow);padding:20px}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.series{display:flex;height:46px;border-radius:var(--r-inner);overflow:hidden;margin-top:6px}
+.series div{flex:1;display:flex;align-items:flex-end;padding:6px 8px;font:500 11px var(--font-mono);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.25)}
+.flex{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.pb{margin:10px 0}
+.pb-h{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px}
+.chart{width:100%;height:auto;display:block;overflow:visible}
+pre{font-family:var(--font-mono);font-size:12.5px;line-height:1.65;white-space:pre-wrap;word-break:break-word;background:var(--code-bg);color:var(--code-text);border-radius:var(--r-inner);padding:22px;padding-top:56px;max-height:620px;overflow:auto}
+.toast{position:fixed;bottom:26px;left:50%;transform:translate(-50%,16px);opacity:0;pointer-events:none;background:#111;color:#fff;padding:10px 18px;border-radius:999px;font-size:13px;transition:.25s;z-index:99;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+footer{margin-top:70px;color:var(--muted);font-size:12.5px;text-align:center}
+@media (prefers-reduced-motion:reduce){
+*{animation:none !important;transition:none !important;scroll-behavior:auto !important}
+}
+.hero h1{font-family:var(--font-head)}
+.panel{border-color:transparent}
+.card{background:#fff;border-radius:var(--r-card);box-shadow:var(--shadow);padding:18px;min-width:0}
+.card-h{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
+.card-t{font-family:var(--font-head);font-size:15px;font-weight:500}
+.btn{font-family:var(--font-body);font-weight:500;font-size:12.5px;border-radius:999px;padding:9px 16px;border:1px solid transparent;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--wl-ink);color:#fff}
+.btn-secondary{background:#fff;border-color:var(--border);color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.btn-ghost{background:transparent;color:var(--text-2)}
+.btn-icon{width:34px;height:34px;border-radius:50%;border:1px solid var(--border);background:#fff;display:inline-grid;place-items:center;color:var(--text);cursor:pointer;font-size:9px;letter-spacing:1px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tab{padding:8px 14px;font-size:12.5px;font-weight:500;border-radius:999px;background:#fff;border:1px solid var(--border);color:var(--text)}
+.tab.active{background:var(--wl-ink);color:#fff;border-color:var(--wl-ink)}
+.seg{display:inline-flex;background:var(--surface-2);border-radius:999px;padding:4px;gap:2px}
+.seg span{padding:6px 13px;border-radius:999px;font-size:12px;color:var(--text-2)}
+.seg .on{background:#fff;color:var(--text);font-weight:500;box-shadow:0 2px 6px rgba(0,0,0,.06)}
+.kpi-t{display:flex;justify-content:space-between;font-family:var(--font-head);font-size:14px;font-weight:500}
+.kpi-t .arr{width:26px;height:26px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;font-size:12px}
+.kpi-v{font-family:var(--font-head);font-size:28px;font-weight:600;margin-top:8px;display:flex;align-items:center;gap:10px;font-variant-numeric:tabular-nums}
+.kpi-s{font-size:12px;color:var(--muted)}
+.trend{font-family:var(--font-body);font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:999px;display:inline-flex;gap:3px}
+.trend.up{background:#E8F6EF;color:var(--wl-positive)}
+.trend.down{background:var(--wl-rose-soft);color:var(--wl-crimson)}
+.badge{background:var(--wl-badge);color:#fff;font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:999px}
+.chip{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--text-2);background:var(--surface-2);padding:5px 11px;border-radius:999px}
+.chip i{width:8px;height:8px;border-radius:50%;background:var(--c)}
+.bar{height:10px;background:var(--surface-2);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;background:var(--c)}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;font-size:13.5px}
+.row>span:first-child{flex:1}
+@keyframes morph{50%{border-radius:55% 45% 58% 42%/45% 55% 45% 55%;transform:rotate(-8deg) scale(1.03)}}
+
+/* ---- skóra shella (layout w tracker.css) ---- */
+.tb-frame{background:var(--wl-canvas);box-shadow:var(--wl-shadow-device)}
+.tb-side{background:#fff}
+.tb-head{background:transparent}
+.tb-nav a.is-active{background:var(--wl-ink);color:#fff}

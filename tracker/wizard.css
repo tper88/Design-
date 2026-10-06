@@ -1,0 +1,93 @@
+/* ==========================================================================
+   WIZARD.CSS — dodatki tylko dla interfejsu kreatora.
+   Kreator korzysta z tracker.css i jednego motywu, więc tu jest wyłącznie to,
+   czego nie ma w warstwie trackera. Prefiks wz-.
+   ========================================================================== */
+
+.wz-frame { min-height: 86vh; }
+.wz-side-note { font-size: 11.5px; line-height: 1.5; padding: 0 var(--sp-2); }
+
+/* kafelki startowe i wybór motywu */
+.wz-tile {
+  display: flex; flex-direction: column; gap: 6px;
+  padding: var(--sp-4);
+  border: 1px solid var(--border);
+  border-radius: var(--r-inner);
+  background: var(--surface);
+  cursor: pointer; text-align: left;
+  font: inherit; color: inherit;
+  min-width: 0;
+}
+.wz-tile:hover { border-color: var(--accent); background: var(--hover); }
+.wz-tile[aria-pressed="true"] {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+.wz-tile-title { font-weight: 600; font-size: 13.5px; }
+.wz-tile-text { font-size: 12px; color: var(--text-2); }
+
+.wz-themes { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: var(--sp-3); }
+.wz-swatch {
+  display: flex; height: 44px; border-radius: 8px; overflow: hidden;
+  border: 1px solid var(--border);
+}
+.wz-swatch span { flex: 1; }
+.wz-swatch .wz-sw-series { display: flex; flex: 1.4; }
+.wz-swatch .wz-sw-series i { flex: 1; }
+
+/* listy pozycji z akcjami (kolumny, zakładki, komponenty, akcje menu) */
+.wz-row {
+  display: flex; align-items: center; gap: var(--sp-2);
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-inner);
+  background: var(--surface);
+  min-width: 0;
+}
+.wz-row + .wz-row { margin-top: 6px; }
+.wz-row-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.wz-row-title { font-size: 13px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wz-row-meta { font-size: 11.5px; color: var(--muted); }
+.wz-row-actions { display: flex; gap: 4px; flex: none; }
+.wz-mini {
+  width: 26px; height: 26px; flex: none; padding: 0;
+  border: 1px solid var(--border); border-radius: 7px;
+  background: transparent; color: var(--text-2);
+  cursor: pointer; font-size: 12px; line-height: 1;
+}
+.wz-mini:hover:not(:disabled) { background: var(--hover); color: var(--text); }
+.wz-mini:disabled { opacity: .35; cursor: not-allowed; }
+.wz-mini-danger:hover { color: var(--tb-bad); }
+
+/* siatka typów komponentów */
+.wz-types { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
+.wz-type {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--border); border-radius: var(--r-inner);
+  background: var(--surface); cursor: pointer; font: inherit; color: inherit;
+  font-size: 13px; text-align: left;
+}
+.wz-type:hover { border-color: var(--accent); background: var(--hover); }
+.wz-type i { font-style: normal; font-size: 16px; flex: none; }
+
+/* dwukolumnowy edytor: lista po lewej, konfiguracja po prawej */
+.wz-split { display: grid; grid-template-columns: minmax(0, 260px) minmax(0, 1fr); gap: var(--sp-4); }
+@media (max-width: 900px) { .wz-split { grid-template-columns: minmax(0, 1fr); } }
+
+.wz-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: var(--sp-3); }
+.wz-fields .tb-field.wz-wide { grid-column: 1 / -1; }
+
+/* podgląd */
+.wz-preview {
+  width: 100%; height: 72vh; border: 1px solid var(--border);
+  border-radius: var(--r-inner); background: var(--page-bg);
+}
+.wz-size {
+  font-family: var(--font-mono); font-size: 11.5px; color: var(--muted);
+}
+
+/* podsumowanie przed generowaniem */
+.wz-summary { display: grid; grid-template-columns: auto 1fr; gap: 6px var(--sp-4); font-size: 13px; margin: 0; }
+.wz-summary dt { color: var(--muted); }
+.wz-summary dd { margin: 0; }

@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title><!--TB:TITLE--></title>
+<!--TB:FONTLINK-->
+<style id="tb-theme"><!--TB:THEMECSS--></style>
+<style><!--TB:EXTRACSS--></style>
+</head>
+<body class="tb-body">
+
+<div class="tb-page">
+  <div class="tb-frame">
+    <aside class="tb-side">
+      <div class="tb-brand"><i>▦</i><span id="tb-brand-name"></span></div>
+      <nav class="tb-nav" id="tb-nav" data-tb-tabs aria-label="Zakładki trackera"></nav>
+      <div class="tb-spacer"></div>
+      <div id="tb-side-foot" class="tb-stack" style="gap:8px"></div>
+    </aside>
+    <main class="tb-main" id="tb-main">
+      <header class="tb-head" id="tb-head">
+        <h1 class="tb-title" id="tb-title"></h1>
+        <div class="tb-spacer"></div>
+        <div class="tb-flexrow" id="tb-head-actions"></div>
+      </header>
+      <div id="tb-notices" class="tb-stack" style="gap:8px"></div>
+      <div id="tb-panels" class="tb-stack"></div>
+    </main>
+  </div>
+</div>
+
+<!-- Konfiguracja trackera. "<" jest escapowane jako < przez emitter,
+     bo JSON.stringify tego NIE robi, a nazwa zakładki z </script> zamknęłaby
+     tę wyspę i wstrzyknęła skrypt. -->
+<script type="application/json" id="tb-config"><!--TB:CONFIG--></script>
+
+<!-- Pozostałe motywy jako nieaktywny tekst. Przełączenie stylu podmienia
+     textContent w <style id="tb-theme">, bez przepisywania selektorów. -->
+<!--TB:THEMES-->
+
+<script><!--TB:CHARTS--></script>
+<script><!--TB:UI--></script>
+<script><!--TB:XLSX--></script>
+<script><!--TB:RUNTIME--></script>
+</body>
+</html>

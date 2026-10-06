@@ -1,0 +1,153 @@
+/* Frosted Mono Glass — motyw trackera.
+   WYGENEROWANY z sources/03-frosted-mono-glass.html przez build-themes.py. Nie edytuj ręcznie.
+   Layout shella jest w tracker.css; tutaj tokeny, komponenty i skóra shella. */
+
+:root {
+  
+  --font-head: 'Montserrat', system-ui, sans-serif;
+  --font-body: 'Montserrat', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  
+  --gl-glass: rgba(255,255,255,.42);   
+  --gl-glass-strong: rgba(255,255,255,.68); 
+  --gl-glass-edge: rgba(255,255,255,.70); 
+  --gl-tile: rgba(58,58,62,.80);       
+  --gl-tile-solid: #48484C;            
+
+  
+  --gl-ink: #0D0D0F;                   
+  --gl-text: #141416;                  
+  --gl-text-2: #4A4A50;                
+  --gl-muted: #8C8C93;                 
+  --gl-line: rgba(20,20,22,.14);       
+  --gl-white: #FFFFFF;                 
+  --gl-white-60: rgba(255,255,255,.60); 
+
+  
+  --gl-bg-1: #F6F5F2;                  
+  --gl-bg-2: #E6E4DF;                  
+  --gl-bg-3: #C9C6C0;                  
+  --gl-plant: #6F7A63;                 
+
+  
+  --c1: var(--gl-ink);
+  --c2: var(--gl-tile-solid);
+  --c3: var(--gl-muted);
+  --c4: var(--gl-white);
+  --c5: var(--gl-bg-3);
+
+  
+  --gl-grad-scene: radial-gradient(900px 600px at 18% 8%, #FFFFFF 0%, transparent 60%), radial-gradient(800px 600px at 88% 18%, #F6F5F2 0%, transparent 60%), linear-gradient(180deg, #DCDAD5 0%, #ECEAE6 45%, #C9C6C0 100%); 
+  --gl-grad-tile: linear-gradient(160deg, rgba(92,92,96,.86) 0%, rgba(52,52,56,.84) 100%); 
+  --gl-grad-chrome: radial-gradient(circle at 34% 28%, #FFFFFF 0%, #D6D6DA 16%, #8E8E94 36%, #2A2A2E 62%, #0D0D0F 80%); 
+  --gl-grad-mountain: linear-gradient(180deg, #0D0D0F 0%, rgba(13,13,15,.55) 60%, rgba(13,13,15,.05) 100%); 
+
+  
+  --gl-r-panel: 32px; 
+  --gl-r-tile: 22px; 
+  --gl-r-inner: 14px; 
+  --gl-r-pill: 999px; 
+
+  
+  --gl-shadow: 0 10px 36px rgba(0,0,0,.08), inset 0 1px 0 rgba(255,255,255,.75); 
+  --gl-shadow-dark: 0 12px 30px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.12); 
+  --gl-blur: blur(24px) saturate(140%); 
+
+  
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+
+  
+  --page-bg: var(--gl-bg-2);
+  --surface: var(--gl-glass);
+  --surface-2: var(--gl-glass-strong);
+  --border: var(--gl-glass-edge);
+  --divider: var(--gl-line);
+  --text: var(--gl-text);
+  --text-2: var(--gl-text-2);
+  --muted: var(--gl-muted);
+  --accent: var(--gl-ink);
+  --hover: rgba(255,255,255,.6);
+  --toc-bg: rgba(255,255,255,.45);
+  --code-bg: rgba(20,20,22,.88);
+  --code-text: #F2F2F2;
+  --r-card: var(--gl-r-tile);
+  --r-inner: var(--gl-r-inner);
+  --r-pill: var(--gl-r-pill);
+  --shadow: var(--gl-shadow);
+  --up: var(--gl-ink);
+  --down: var(--gl-muted);
+}
+:root{--hero-w:400}
+
+html{scroll-behavior:smooth}
+body{font-family:var(--font-body);background:var(--page-bg);color:var(--text);-webkit-font-smoothing:antialiased;line-height:1.5;min-height:100vh}
+body{background:var(--gl-grad-scene);background-attachment:fixed}
+
+*{box-sizing:border-box;margin:0;padding:0}
+button{font:inherit}
+.hero{display:grid;gap:14px;padding:8px 0 4px}
+.hero h1{font-family:var(--font-head);font-size:clamp(36px,6.4vw,68px);font-weight:var(--hero-w,600);letter-spacing:-.025em;line-height:1.02}
+.hero .kicker{font-size:14px;color:var(--muted);font-weight:500}
+.hero p{color:var(--text-2);max-width:680px;font-size:16px}
+.hero .meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+section.block{margin-top:60px;scroll-margin-top:80px}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);box-shadow:var(--shadow);padding:20px}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.series{display:flex;height:46px;border-radius:var(--r-inner);overflow:hidden;margin-top:6px}
+.series div{flex:1;display:flex;align-items:flex-end;padding:6px 8px;font:500 11px var(--font-mono);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.25)}
+.flex{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.pb{margin:10px 0}
+.pb-h{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px}
+.chart{width:100%;height:auto;display:block;overflow:visible}
+pre{font-family:var(--font-mono);font-size:12.5px;line-height:1.65;white-space:pre-wrap;word-break:break-word;background:var(--code-bg);color:var(--code-text);border-radius:var(--r-inner);padding:22px;padding-top:56px;max-height:620px;overflow:auto}
+.toast{position:fixed;bottom:26px;left:50%;transform:translate(-50%,16px);opacity:0;pointer-events:none;background:#111;color:#fff;padding:10px 18px;border-radius:999px;font-size:13px;transition:.25s;z-index:99;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+footer{margin-top:70px;color:var(--muted);font-size:12.5px;text-align:center}
+@media (prefers-reduced-motion:reduce){
+*{animation:none !important;transition:none !important;scroll-behavior:auto !important}
+}
+.hero h1{font-weight:400}
+.panel,.card{backdrop-filter:var(--gl-blur);-webkit-backdrop-filter:var(--gl-blur)}
+.panel{border-radius:var(--gl-r-tile)}
+.card{background:var(--gl-glass);border:1px solid var(--gl-glass-edge);border-radius:var(--gl-r-tile);box-shadow:var(--gl-shadow);padding:18px;min-width:0;position:relative}
+.card-t{font-size:15px;font-weight:600}
+.card-h{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:10px}
+.btn{font-weight:500;font-size:13px;border-radius:999px;padding:9px 18px;border:1px solid transparent;cursor:pointer}
+.btn-primary{background:var(--gl-ink);color:#fff}
+.btn-secondary{background:var(--gl-glass-strong);border-color:var(--gl-glass-edge);color:var(--text);backdrop-filter:blur(12px)}
+.btn-ghost{background:transparent;color:var(--text-2)}
+.btn-icon{width:36px;height:36px;border-radius:50%;background:var(--gl-ink);color:#fff;border:0;display:inline-grid;place-items:center;cursor:pointer;font-size:9px;letter-spacing:1px}
+.tabs{display:inline-flex;gap:2px;padding:4px;border-radius:999px;background:rgba(40,40,44,.55);backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.18)}
+.tab{padding:7px 16px;border-radius:999px;font-size:13px;color:rgba(255,255,255,.75);font-weight:500}
+.tab.active{background:rgba(255,255,255,.22);color:#fff}
+.seg{display:inline-flex;gap:4px}
+.seg span{padding:5px 13px;border-radius:999px;font-size:12px;border:1px solid rgba(20,20,22,.18);color:var(--text-2)}
+.seg .on{background:var(--gl-ink);color:#fff;border-color:var(--gl-ink)}
+.kpi-t{display:flex;justify-content:space-between;font-size:15px;font-weight:600}
+.kpi-v{font-size:32px;font-weight:500;letter-spacing:-.01em;margin-top:6px;display:flex;align-items:center;gap:12px;font-variant-numeric:tabular-nums}
+.kpi-s{font-size:11.5px;color:var(--muted);font-weight:500}
+.trend{font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;background:var(--gl-ink);color:#fff}
+.trend.down{background:transparent;color:var(--gl-text-2);border:1px solid rgba(20,20,22,.25)}
+.badge{background:#fff;color:var(--gl-ink);font-size:11px;font-weight:600;padding:3px 10px;border-radius:999px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.chip{display:inline-flex;align-items:center;gap:7px;font-size:12px;padding:5px 11px;border-radius:999px;border:1px solid rgba(20,20,22,.18)}
+.chip i{width:7px;height:7px;border-radius:50%;background:var(--c);box-shadow:0 0 0 1px rgba(0,0,0,.25)}
+.bar{height:5px;background:var(--gl-line);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;background:var(--c)}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--gl-line);font-size:13.5px}
+.row:last-child{border-bottom:0}
+.row>span:first-child{flex:1}
+
+/* ---- skóra shella (layout w tracker.css) ---- */
+.tb-frame{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.6);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:var(--gl-shadow)}
+.tb-side{background:rgba(40,40,44,.45);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.tb-head{background:transparent}
+.tb-side .tb-nav a{color:rgba(255,255,255,.78)}
+.tb-nav a.is-active{background:rgba(255,255,255,.22);color:#fff}
