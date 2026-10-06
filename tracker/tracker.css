@@ -38,6 +38,12 @@
   --tb-chart-dot-bg: var(--surface);
   --tb-chart-muted: color-mix(in srgb, var(--text) 18%, transparent);
 
+  /* Powierzchnia dla elementów UNOSZĄCYCH SIĘ nad treścią. --surface bywa
+     półprzezroczystym szkłem (Amber Dusk, Frosted Mono) — świetne dla karty
+     leżącej na tle, nieczytelne dla menu nad tabelą. Podkładamy nieprzezroczyste
+     --page-bg pod warstwę --surface, zachowując kolor motywu. */
+  --tb-solid: linear-gradient(var(--surface), var(--surface)), var(--page-bg);
+
   --tb-side-w: 220px;
   --tb-max-w: 1320px;
   --tb-gap: var(--sp-4);
@@ -182,7 +188,7 @@
 .tb-tooltip {
   position: absolute; z-index: 5; pointer-events: none;
   transform: translate(-50%, -120%);
-  background: var(--surface);
+  background: var(--tb-solid);
   border: 1px solid var(--border);
   box-shadow: var(--shadow);
   color: var(--text);
@@ -365,7 +371,7 @@
 }
 .tb-table thead th {
   position: sticky; top: 0; z-index: 2;
-  background: var(--surface);
+  background: var(--tb-solid);
   color: var(--text-2);
   font-size: 11.5px; font-weight: 600;
   text-transform: uppercase; letter-spacing: .04em;
@@ -374,7 +380,7 @@
 }
 .tb-table tfoot td {
   position: sticky; bottom: 0;
-  background: var(--surface);
+  background: var(--tb-solid);
   font-weight: 600;
   border-top: 1px solid var(--border);
   border-bottom: 0;
@@ -553,7 +559,7 @@
   padding: 0;
   border: 1px solid var(--border);
   border-radius: var(--r-card);
-  background: var(--surface);
+  background: var(--tb-solid);
   color: var(--text);
   box-shadow: var(--shadow);
   overflow: hidden;
@@ -598,7 +604,7 @@
   position: fixed; inset: 0 0 0 auto;
   width: min(520px, 100vw);
   max-width: 100vw;
-  background: var(--surface);
+  background: var(--tb-solid);
   border-left: 1px solid var(--border);
   box-shadow: var(--shadow);
   z-index: 60;
@@ -637,7 +643,7 @@
   position: fixed; z-index: 90;
   min-width: 200px; max-width: 280px;
   padding: 5px;
-  background: var(--surface);
+  background: var(--tb-solid);
   border: 1px solid var(--border);
   border-radius: var(--r-inner);
   box-shadow: var(--shadow);
@@ -721,7 +727,7 @@
   display: inline-flex; align-items: center; gap: 6px;
   font-size: 12px; color: var(--text-2);
   padding: 4px 10px; border-radius: var(--r-pill);
-  border: 1px solid var(--border); background: var(--surface);
+  border: 1px solid var(--border); background: var(--tb-solid);
   white-space: nowrap;
 }
 .tb-save::before {
@@ -751,7 +757,7 @@
   content: attr(data-tip);
   position: absolute; bottom: calc(100% + 6px); left: 50%;
   transform: translateX(-50%);
-  background: var(--surface); color: var(--text);
+  background: var(--tb-solid); color: var(--text);
   border: 1px solid var(--border); box-shadow: var(--shadow);
   border-radius: 7px; padding: 4px 8px;
   font-size: 11.5px; font-weight: 500; white-space: nowrap;
