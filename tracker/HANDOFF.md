@@ -16,8 +16,8 @@ Tomasz's five styleguide HTMLs are the visual foundation. They sit untouched in
 
 ## Current state
 
-**Done and verified.** Branch `tracker-wizard`, pushed.
-**No pull request has been opened** — Tomasz has not asked for one.
+**Done and verified.** Branch `tracker-wizard`, pushed, with a pull request into
+the repo's default branch `claude/new-session-86m809` (there is no `main`).
 
 Build + 8 test parts: **263 assertions, zero console errors**, Chromium
 (+ LibreOffice Calc for part 8).
@@ -156,16 +156,15 @@ only the product UI is English. Tomasz confirmed this.
 - Month-grid calendar, calculated columns, OR filters, drag and drop, undo/redo
   and `.xlsx` import are out of scope for this version.
 
-**Verified as far as this environment allows — the last step is Tomasz's:**
-1. **Paste from Excel.** Tested with the real browser clipboard and a real
-   Ctrl+V keystroke, with clipboard text shaped exactly like Excel's (tabs,
-   CRLF, quoted multi-line cells, a trailing CRLF). The text was written to
-   match Excel, not produced by Excel itself.
-2. **`.xlsx` export.** Opened, re-saved and rendered by **LibreOffice Calc**
-   (part 8): dates are dates, amounts carry the currency format, Polish text is
-   intact. That is an independent OOXML implementation, but it is not Excel.
-3. **File System Access across a real browser restart** — not testable here at
-   all; headless Chromium has no persistent permission store.
+**Checked by Tomasz in real Chrome on 2026-10-06 — reported working.**
+Before that, in this environment:
+1. **Paste from Excel** was tested with the real browser clipboard and a real
+   Ctrl+V keystroke, with clipboard text shaped like Excel's (tabs, CRLF, quoted
+   multi-line cells).
+2. **`.xlsx` export** was opened, re-saved and rendered by LibreOffice Calc
+   (part 8) — an independent OOXML implementation.
+3. **File System Access across a browser restart** cannot be tested headless at
+   all; it rests on Tomasz's check.
 
 ## Screenshots
 
