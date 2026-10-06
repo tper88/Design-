@@ -70,6 +70,7 @@ def main():
         "charts": strip_js(read("tb-charts.js")),
         "ui": strip_js(read("tb-ui.js")),
         "xlsx": strip_js(read("tb-xlsx.js")),
+        "parse": strip_js(read("tb-parse.js")),
         "runtime": strip_js(read("tb-runtime.js")),
         "themes.json": reg_path.read_text(encoding="utf-8"),
     }
@@ -105,6 +106,7 @@ def main():
     put("<!--WZ:WIZARDCSS-->", strip_css(read("wizard.css")))
     put("<!--WZ:CHARTS-->", assets["charts"])
     put("<!--WZ:UI-->", assets["ui"])
+    put("<!--WZ:PARSE-->", assets["parse"])
     put("<!--WZ:WIZARDJS-->", strip_js(read("wizard.js")))
     put("<!--WZ:ASSETS-->", "\n".join(island(k, v) for k, v in sorted(assets.items())))
 
@@ -127,10 +129,10 @@ def main():
         problems.append("został @import z sieci w CSS strony")
     # szkielet trackera MUSI zachować swoje markery — podmienia je emitter w JS
     shell_markers = re.findall(r"<!--TB:[A-Z]+-->", assets["shell"])
-    if len(shell_markers) < 9:
-        problems.append("szkielet trackera ma tylko %d markerów TB: (oczekiwane 9)"
+    if len(shell_markers) < 10:
+        problems.append("szkielet trackera ma tylko %d markerów TB: (oczekiwane 10)"
                         % len(shell_markers))
-    for need in ("shell", "runtime", "charts", "ui", "xlsx", "trackercss"):
+    for need in ("shell", "runtime", "charts", "ui", "xlsx", "parse", "trackercss"):
         if ('data-asset="%s"' % need) not in out:
             problems.append("brak wyspy assetu %s" % need)
 

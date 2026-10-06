@@ -169,7 +169,8 @@
     usd: 4,
     pct: 5,
     int: 6,
-    num: 7
+    num: 7,
+    wrap: 8       // tekst z nową linią: zawijanie i wyrównanie do góry
   };
 
   /* Format waluty w Excelu zależy od kodu waluty — podmieniany przez
@@ -210,7 +211,7 @@
         '<bottom style="thin"><color rgb="FFB0B0B0"/></bottom><diagonal/></border>' +
     '</borders>' +
     '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>' +
-    '<cellXfs count="8">' +
+    '<cellXfs count="9">' +
       '<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>' +
       '<xf numFmtId="0" fontId="1" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1"/>' +
       '<xf numFmtId="164" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/>' +
@@ -219,6 +220,10 @@
       '<xf numFmtId="167" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/>' +
       '<xf numFmtId="168" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/>' +
       '<xf numFmtId="169" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/>' +
+      /* bez wrapText Excel pokazuje „Linia 1Linia 2” w jednej linii, a Calc
+         wypycha pierwszą linię ponad wiersz; z nim oba dopasowują wysokość */
+      '<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyAlignment="1">' +
+        '<alignment wrapText="1" vertical="top"/></xf>' +
     '</cellXfs>' +
     '<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>' +
     '</styleSheet>';
@@ -246,11 +251,18 @@
     if (value == null || value === '') return '';
     var type = col && col.type;
 
+    /* Do writera trafiają wartości już przetworzone przez tracker. String w
+       kolumnie tak/nie albo liczb to wartość, której nie dało się odczytać —
+       ma wyjść jako tekst, a nie jako TRUE („może” ? 1 : 0) ani jako 12
+       (parseFloat('12abc')). */
     if (type === 'bool') {
-      return '<c r="' + ref + '" t="b"><v>' + (value ? 1 : 0) + '</v></c>';
+      var b = value === true || value === 'true' ? 1 : value === false || value === 'false' ? 0 : null;
+      if (b == null) return inlineStr(ref, value, XF.base);
+      return '<c r="' + ref + '" t="b"><v>' + b + '</v></c>';
     }
     if (type === 'number') {
-      var n = typeof value === 'number' ? value : parseFloat(String(value).replace(',', '.'));
+      var n = typeof value === 'number' ? value
+        : /^-?\d+(\.\d+)?$/.test(String(value).trim()) ? +String(value).trim() : NaN;
       if (!isFinite(n)) return inlineStr(ref, value, XF.base);
       return '<c r="' + ref + '" s="' + numberStyle(col.format) + '"><v>' + n + '</v></c>';
     }
@@ -260,12 +272,31 @@
       if (serial == null) return inlineStr(ref, value, XF.base);
       return '<c r="' + ref + '" s="' + XF.date + '"><v>' + serial + '</v></c>';
     }
-    return inlineStr(ref, value, XF.base);
+    return inlineStr(ref, value, /\n/.test(String(value)) ? XF.wrap : XF.base);
   }
 
   function inlineStr(ref, value, style) {
     return '<c r="' + ref + '" t="inlineStr"' + (style ? ' s="' + style + '"' : '') +
       '><is><t xml:space="preserve">' + xmlEsc(value) + '</t></is></c>';
+  }
+
+  /* Szerokość z najdłuższej wartości w kolumnie (pierwsze 500 wierszy
+     wystarczy, a nie liczymy w nieskończoność), nie z samego nagłówka.
+     Dla tekstu wieloliniowego liczy się najdłuższa linia. Liczby i daty mają
+     stałe szerokości, bo ich długość zależy od formatu, nie od wartości. */
+  var FIXED_W = { date: 12, bool: 8 };
+  function autoWidth(c, rows, i) {
+    var longest = String(c.label || '').length + 2;    // +2 na strzałkę autofiltra
+    if (FIXED_W[c.type]) return Math.max(longest + 2, FIXED_W[c.type]);
+    for (var r = 0; r < rows.length && r < 500; r++) {
+      var v = rows[r][i];
+      if (v == null || v === '') continue;
+      var len = typeof v === 'number'
+        ? String(Math.round(Math.abs(v))).length * 1.35 + 5    // separatory, ułamek, waluta
+        : String(v).split(/\r?\n/).reduce(function (m, l) { return Math.max(m, l.length); }, 0);
+      if (len > longest) longest = len;
+    }
+    return Math.round(Math.min(60, Math.max(8, longest + 2)));
   }
 
   function sheetXml(sheet) {
@@ -289,7 +320,7 @@
     if (cols.length) {
       out.push('<cols>');
       cols.forEach(function (c, i) {
-        var w = c.width || Math.min(44, Math.max(10, String(c.label || '').length + 4));
+        var w = c.width || autoWidth(c, rows, i);
         out.push('<col min="' + (i + 1) + '" max="' + (i + 1) + '" width="' + w + '" customWidth="1"/>');
       });
       out.push('</cols>');
@@ -321,7 +352,7 @@
   /* Nazwa arkusza: Excel nie dopuszcza : \ / ? * [ ] i max 31 znaków. */
   function sheetName(name, index, used) {
     var s = String(name == null ? '' : name).replace(/[:\\\/\?\*\[\]]/g, ' ').trim();
-    if (!s) s = 'Arkusz' + (index + 1);
+    if (!s) s = 'Sheet' + (index + 1);
     s = s.slice(0, 31);
     var base = s, k = 2;
     while (used[s.toLowerCase()]) {
@@ -336,7 +367,7 @@
   /* ------------------------------------------------------------ build */
 
   function build(sheets) {
-    if (!sheets || !sheets.length) sheets = [{ name: 'Arkusz1', columns: [], rows: [] }];
+    if (!sheets || !sheets.length) sheets = [{ name: 'Sheet1', columns: [], rows: [] }];
     var used = {};
     var named = sheets.map(function (s, i) {
       return {

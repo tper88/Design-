@@ -191,24 +191,22 @@
     if (value == null || value === '') return null;
     if (!col) return value;
     switch (col.type) {
+      /* Liczby, daty i tak/nie czyta tb-parse.js według locale trackera —
+         „06/10/2026” to 6 października w en-GB i 10 czerwca w en-US. */
       case 'number': {
-        if (typeof value === 'number') return isFinite(value) ? value : { _bad: value };
-        var n = parseFloat(String(value).replace(/\s/g, '').replace(',', '.'));
-        return isFinite(n) ? n : { _bad: value };
+        var n = TBParse.number(value, locale());
+        return n == null ? { _bad: value } : n;
       }
       case 'date': {
-        if (/^\d{4}-\d{2}-\d{2}/.test(String(value))) return String(value).slice(0, 10);
-        var d = new Date(value);
-        if (!isNaN(d.getTime())) {
-          return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
-        }
-        return { _bad: value };
+        var d = TBParse.date(value, locale());
+        return d == null ? { _bad: value } : d;
       }
-      case 'bool':
-        if (typeof value === 'boolean') return value;
-        return /^(1|true|yes|y|x)$/i.test(String(value).trim());
+      case 'bool': {
+        var b = TBParse.bool(value);
+        return b == null ? { _bad: value } : b;
+      }
       case 'enum': {
-        var v = String(value);
+        var v = String(value).trim();
         if (optionOf(col, v)) return v;
         var opts = col.options || [];
         for (var i = 0; i < opts.length; i++) {
@@ -1630,7 +1628,9 @@
         [btn('+ Add row', 'btn-primary', function () {
           crud.detail(blankRecord(cmp.dataset), cmp, true);
         }),
-        btn('Paste from Excel', 'btn-secondary', function () { io.pasteDialog(cmp.dataset); })]));
+        btn('Paste from Excel', 'btn-secondary', function () {
+          io.pasteDialog(cmp.dataset, io.visibleCols(cmp));
+        })]));
     } else if (!rows.length) {
       wrap.appendChild(emptyBox('Nothing matches your filters',
         'Change the search term or clear the filter.',
@@ -2303,59 +2303,78 @@
       }
     }
 
-    function parseDelimited(text, delim) {
-      if (!delim) {
-        var head = text.split(/\r?\n/).slice(0, 5).join('\n');
-        var counts = { '\t': 0, ';': 0, ',': 0 };
-        Object.keys(counts).forEach(function (d) { counts[d] = head.split(d).length - 1; });
-        delim = '\t';
-        Object.keys(counts).forEach(function (d) { if (counts[d] > counts[delim]) delim = d; });
-        if (!counts[delim]) delim = ',';
-      }
-      var rows = [], row = [], field = '', inQ = false, i = 0;
-      text = text.replace(/^﻿/, '');
-      while (i < text.length) {
-        var ch = text[i];
-        if (inQ) {
-          if (ch === '"') {
-            if (text[i + 1] === '"') { field += '"'; i += 2; continue; }
-            inQ = false; i++; continue;
-          }
-          field += ch; i++; continue;
-        }
-        if (ch === '"') { inQ = true; i++; continue; }
-        if (ch === delim) { row.push(field); field = ''; i++; continue; }
-        if (ch === '\n' || ch === '\r') {
-          if (ch === '\r' && text[i + 1] === '\n') i++;
-          row.push(field); field = '';
-          rows.push(row); row = [];
-          i++; continue;
-        }
-        field += ch; i++;
-      }
-      if (field !== '' || row.length) { row.push(field); rows.push(row); }
-      return rows.filter(function (r) { return r.some(function (c) { return String(c).trim() !== ''; }); });
+    function parseDelimited(text, delim) { return TBParse.delimited(text, delim); }
+
+    function findCmp(id) {
+      var hit = null;
+      CFG.tabs.forEach(function (tab) {
+        (tab.components || []).forEach(function (c) { if (c.id === id) hit = c; });
+      });
+      return hit;
     }
 
-    function importDialog(dsId, rows) {
+    function visibleCols(cmp) {
+      var ds = DS[cmp.dataset];
+      var ids = (cmp.opts && cmp.opts.columns && cmp.opts.columns.length)
+        ? cmp.opts.columns : ds.columns.map(function (c) { return c.id; });
+      return ids.filter(function (id) { return column(cmp.dataset, id); });
+    }
+
+    /* Wklejka ze schowka Excela. Zawsze tabulator — Excel innego separatora
+       nie daje, a zgadywanie rozcięłoby jednokolumnowe „Smith, John”. */
+    function pasteRows(cmp, text) {
+      var rows = parseDelimited(text, '\t');
+      if (!rows.length) {
+        TBUI.toast('There is nothing to paste', 'warning');
+        return;
+      }
+      importDialog(cmp.dataset, rows, visibleCols(cmp));
+    }
+
+    /* colOrder: kolumny tabeli, w którą wklejono. Gdy pierwszy wiersz nie
+       wygląda na nagłówek (żadna komórka nie jest nazwą kolumny), to są dane
+       — dopasowujemy wtedy po pozycji, tak jak leżą kolumny w tabeli. */
+    function importDialog(dsId, rows, colOrder) {
       var ds = DS[dsId];
       if (!ds || !rows.length) return;
-      var header = rows[0];
-      var bodyRows = rows.slice(1);
+      function byLabel(h) {
+        var k = String(h).toLowerCase().trim();
+        return ds.columns.filter(function (c) {
+          return String(c.label).toLowerCase().trim() === k;
+        })[0] || null;
+      }
+      var hasHeader = rows[0].some(function (h) { return !!byLabel(h); }) || !colOrder;
+      var width = rows.reduce(function (m, r) { return Math.max(m, r.length); }, 0);
+      var header = [];
+      for (var hi = 0; hi < width; hi++) {
+        header.push(hasHeader ? (rows[0][hi] == null ? '' : rows[0][hi]) : 'Column ' + (hi + 1));
+      }
+      var bodyRows = hasHeader ? rows.slice(1) : rows;
+      if (!bodyRows.length) {
+        TBUI.toast('That is only a header row — copy some rows under it too', 'warning');
+        return;
+      }
 
       var wrap = div('tb-stack');
       var info = div('tb-banner tb-banner-accent');
       info.innerHTML = '<i>↓</i><div class="tb-banner-body"><div class="tb-banner-title">' +
         bodyRows.length + ' ' + plural(bodyRows.length, 'row', 'rows') + ' ready to import</div>' +
-        '<div class="tb-banner-text">Match the columns from your file to the columns of “' +
-        fmt.esc(ds.name) + '”. Anything left on “skip” is ignored.</div></div>';
+        '<div class="tb-banner-text">' + (hasHeader
+          ? 'Match the columns from your file to the columns of “' + fmt.esc(ds.name) + '”. '
+          : 'There is no header row, so columns are matched by position. Check them below. ') +
+        'Anything left on “skip” is ignored.</div></div>';
       wrap.appendChild(info);
 
       var selects = [];
-      header.forEach(function (h) {
+      header.forEach(function (h, hi) {
         var f = div('tb-field');
         var lab = doc.createElement('label');
-        lab.textContent = 'File column: “' + h + '”';
+        var sample = '';
+        for (var si = 0; si < bodyRows.length && !sample; si++) {
+          sample = String(bodyRows[si][hi] == null ? '' : bodyRows[si][hi]).trim();
+        }
+        lab.textContent = (hasHeader ? 'File column: “' + h + '”' : h) +
+          (sample ? ' — e.g. “' + (sample.length > 40 ? sample.slice(0, 40) + '…' : sample) + '”' : '');
         f.appendChild(lab);
         var s = doc.createElement('select');
         s.className = 'tb-select';
@@ -2369,9 +2388,7 @@
           o.textContent = c.label + ' (' + c.type + ')';
           s.appendChild(o);
         });
-        var guess = ds.columns.filter(function (c) {
-          return String(c.label).toLowerCase().trim() === String(h).toLowerCase().trim();
-        })[0];
+        var guess = hasHeader ? byLabel(h) : (colOrder[hi] ? column(dsId, colOrder[hi]) : null);
         if (guess) s.value = guess.id;
         selects.push(s);
         f.appendChild(s);
@@ -2414,12 +2431,12 @@
       });
     }
 
-    function pasteDialog(dsId) {
+    function pasteDialog(dsId, colOrder) {
       var ta = doc.createElement('textarea');
       ta.className = 'tb-textarea';
       ta.style.minHeight = '160px';
       ta.placeholder = 'Select a range in Excel, copy it (Ctrl+C) and paste here (Ctrl+V).\n' +
-        'The first row should hold the column names.';
+        'With a header row, columns are matched by name; without one, by position.';
       ta.setAttribute('aria-label', 'Paste data from Excel');
       var wrap = div('tb-stack');
       wrap.appendChild(ta);
@@ -2434,13 +2451,13 @@
           {
             label: 'Next — match columns', variant: 'primary', close: false,
             onClick: function () {
-              var rows = parseDelimited(ta.value);
-              if (rows.length < 2) {
-                TBUI.toast('I need a header row and at least one row of data', 'warning');
+              var rows = parseDelimited(ta.value, '\t');
+              if (!rows.length) {
+                TBUI.toast('There is nothing to import', 'warning');
                 return false;
               }
               TBUI.modal.close(wrap.closest('dialog'));
-              setTimeout(function () { importDialog(dsId, rows); }, 60);
+              setTimeout(function () { importDialog(dsId, rows, colOrder); }, 60);
               return false;
             }
           }
@@ -2472,7 +2489,8 @@
 
     return {
       exportXlsx: exportXlsx, exportMenu: exportMenu, exportJson: exportJson,
-      copyRows: copyRows, parseDelimited: parseDelimited,
+      copyRows: copyRows, parseDelimited: parseDelimited, pasteRows: pasteRows,
+      findCmp: findCmp, visibleCols: visibleCols,
       pasteDialog: pasteDialog, importJsonFile: importJsonFile, importDialog: importDialog
     };
   })();
@@ -3051,6 +3069,39 @@
         } else {
           store.pickFile().catch(noop);
         }
+      });
+
+      /* Ctrl+V na zakładce z tabelą: wklejka z Excela idzie prosto do
+         dopasowania kolumn. Nie przejmujemy wklejania w polach edycji ani przy
+         otwartym oknie — tam Ctrl+V ma wkleić tekst, jak zawsze. */
+      var lastTable = null;
+      doc.addEventListener('pointerdown', function (e) {
+        var tb = e.target && e.target.closest && e.target.closest('[data-tb-ctx^="table:"]');
+        if (tb) lastTable = tb.getAttribute('data-tb-ctx').slice(6);
+      }, true);
+      doc.addEventListener('paste', function (e) {
+        var t = e.target;
+        if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName || ''))) return;
+        if (doc.querySelector('dialog[open]')) return;
+        var text = e.clipboardData ? e.clipboardData.getData('text/plain') : '';
+        if (!text || !text.trim()) return;
+        var panel = doc.querySelector('#tb-panels > section:not([hidden])');
+        if (!panel) return;
+        var ids = Array.prototype.map.call(panel.querySelectorAll('[data-tb-ctx^="table:"]'),
+          function (el) { return el.getAttribute('data-tb-ctx').slice(6); });
+        /* ostatnio klikana tabela, jeśli jest na tej zakładce; inaczej pierwsza,
+           do której wolno dopisywać */
+        var pick = ids.indexOf(lastTable) >= 0 ? [lastTable] : ids;
+        var cmp = null;
+        pick.some(function (id) {
+          var c = io.findCmp(id);
+          var o = (c && c.opts) || {};
+          if (c && DS[c.dataset] && o.allowAdd !== false && o.editable !== false) { cmp = c; return true; }
+          return false;
+        });
+        if (!cmp) return;
+        e.preventDefault();
+        io.pasteRows(cmp, text);
       });
 
       doc.addEventListener('visibilitychange', function () {

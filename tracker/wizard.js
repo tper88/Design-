@@ -958,47 +958,24 @@
     });
   }
 
+  /* Wspólny parser z tb-parse.js. Bez tabulatora zgadujemy separator,
+     bo nagłówek bywa też wpisany ręcznie po przecinku. */
   function parseDelimited(text, delim) {
-    if (!delim) {
-      var head = text.split(/\r?\n/).slice(0, 5).join('\n');
-      var counts = { '\t': 0, ';': 0, ',': 0 };
-      Object.keys(counts).forEach(function (d) { counts[d] = head.split(d).length - 1; });
-      delim = '\t';
-      Object.keys(counts).forEach(function (d) { if (counts[d] > counts[delim]) delim = d; });
-      if (!counts[delim]) delim = ',';
-    }
-    var rows = [], row = [], f = '', inQ = false, i = 0;
-    text = text.replace(/^﻿/, '');
-    while (i < text.length) {
-      var ch = text[i];
-      if (inQ) {
-        if (ch === '"') {
-          if (text[i + 1] === '"') { f += '"'; i += 2; continue; }
-          inQ = false; i++; continue;
-        }
-        f += ch; i++; continue;
-      }
-      if (ch === '"') { inQ = true; i++; continue; }
-      if (ch === delim) { row.push(f); f = ''; i++; continue; }
-      if (ch === '\n' || ch === '\r') {
-        if (ch === '\r' && text[i + 1] === '\n') i++;
-        row.push(f); f = ''; rows.push(row); row = []; i++; continue;
-      }
-      f += ch; i++;
-    }
-    if (f !== '' || row.length) { row.push(f); rows.push(row); }
-    return rows.filter(function (r) { return r.some(function (c) { return String(c).trim() !== ''; }); });
+    return TBParse.delimited(text, delim || (text.indexOf('\t') >= 0 ? '\t' : null));
   }
 
   function guessType(samples) {
     if (!samples.length) return 'text';
+    var loc = W.cfg.meta.locale;
     var dates = 0, nums = 0, bools = 0, uniq = {};
     samples.forEach(function (s) {
       var v = String(s).trim();
       uniq[v.toLowerCase()] = 1;
-      if (/^\d{4}-\d{2}-\d{2}/.test(v) || /^\d{1,2}[./-]\d{1,2}[./-]\d{4}$/.test(v)) dates++;
-      else if (/^-?[\d\s]+([.,]\d+)?$/.test(v)) nums++;
-      if (/^(yes|no|true|false|tak|nie|1|0)$/i.test(v)) bools++;
+      /* gołą liczbę nie liczymy jako datę, choć 5 cyfr to poprawny serial
+         Excela — kolumna kwot 12345 zamieniłaby się w kolumnę dat */
+      if (TBParse.date(v, loc) && !/^\d+([.,]\d+)?$/.test(v)) dates++;
+      else if (TBParse.number(v, loc) != null) nums++;
+      if (TBParse.bool(v) != null) bools++;
     });
     var n = samples.length;
     if (bools === n && Object.keys(uniq).length <= 2) return 'bool';
@@ -2205,6 +2182,7 @@
     put('<!--TB:CHARTS-->', ASSET.charts);
     put('<!--TB:UI-->', ASSET.ui);
     put('<!--TB:XLSX-->', ASSET.xlsx);
+    put('<!--TB:PARSE-->', ASSET.parse);
     put('<!--TB:RUNTIME-->', (preview ? seedJs(cfg) + '\n' : '') + ASSET.runtime);
     return out;
   }

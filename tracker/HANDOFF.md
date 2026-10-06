@@ -19,10 +19,11 @@ Tomasz's five styleguide HTMLs are the visual foundation. They sit untouched in
 **Done and verified.** Branch `tracker-wizard`, pushed.
 **No pull request has been opened** — Tomasz has not asked for one.
 
-Build + 6 test parts: **197 assertions, zero console errors**, Chromium.
+Build + 8 test parts: **263 assertions, zero console errors**, Chromium
+(+ LibreOffice Calc for part 8).
 
 ```
-43 + 30 + 25 + 24 + 29 + 46 = 197
+43 + 30 + 25 + 24 + 29 + 46 + 36 + 30 = 263
 ```
 
 | | |
@@ -40,7 +41,7 @@ plan's number was simply wrong.
 ```bash
 python3 tracker/build-themes.py     # sources/*.html  -> themes/*.css + themes.json
 python3 tracker/build-wizard.py     # everything      -> dist/tracker-wizard.html
-sh tracker/tests/run-all.sh         # build + all 197 assertions (needs Chromium)
+sh tracker/tests/run-all.sh         # build + all 263 assertions (Chromium; part 8 also LibreOffice)
 node tracker/tests/e2e5.mjs         # one part on its own
 ```
 
@@ -62,11 +63,12 @@ it by hand is pointless — the next build overwrites it. Sources live in
 | `tracker.css` | 37 KB | the neutral `tb-*` layer; the only place layout lives |
 | `tb-charts.js` | 19 KB | SVG charts, port of `savance-charts.js`, palette on `--c1..--c5` |
 | `tb-ui.js` | 17 KB | tabs, modal, drawer, toast, dropzone, context menu |
-| `tb-xlsx.js` | 16 KB | real `.xlsx` writer, no libraries |
+| `tb-xlsx.js` | 17 KB | real `.xlsx` writer, no libraries |
+| `tb-parse.js` | 8 KB | numbers / dates / yes-no / CSV-TSV by locale — **shared by tracker and wizard** |
 | `tb-runtime.js` | 112 KB | the tracker engine — **the big one** |
-| `tracker-shell.html` | 1.5 KB | output template, 9 `<!--TB:*-->` markers |
+| `tracker-shell.html` | 1.5 KB | output template, 10 `<!--TB:*-->` markers |
 | `wizard-src.html` + `wizard.css` + `wizard.js` | 3.3 + 3.9 + 85 KB | the builder itself |
-| `tests/e2e*.mjs` + `run-all.sh` | — | 6 parts, 29 phases |
+| `tests/e2e*.mjs` + `run-all.sh` | — | 8 parts, 39 phases |
 | `sources/` | — | Tomasz's 6 uploaded files, md5-verified. **Read-only.** |
 
 `design-system/` is **not** touched. `savance.css` and `savance-charts.js` were
@@ -83,6 +85,9 @@ e2e4.mjs  16 paste Excel header · 17 paste Excel data · 18 search/quick filter
 e2e5.mjs  20 Request log template · 21 alerts · 22 profile + avatar · 23 profile photo · 24 number/date format picker
 e2e6.mjs  25 preset tiles · 26 each preset fits the columns · 27 quick filter chip editor
           28 dataset without dates · 29 preset tabs work in the tracker
+e2e7.mjs  30 real Ctrl+V, Excel clipboard, en-GB · 31 paste without header · 32 where Ctrl+V is left alone
+          33 en-US dates · 34 pl-PL numbers, PRAWDA/FAŁSZ, bad values · 35 wizard type guessing
+e2e8.mjs  36 export with hard values · 37 LibreOffice opens it · 38 cell types after Calc · 39 PDF render
 ```
 
 ## Invariants — break these and things fail quietly
@@ -113,9 +118,10 @@ e2e6.mjs  25 preset tiles · 26 each preset fits the columns · 27 quick filter 
    on a DataCloneError, so a bare `.catch` never attaches and the promise dies.
 9. **`requestPermission()` must be the first statement in a gesture handler** —
    no `await` before it, or the user-gesture requirement is lost.
-10. **Watch for raw U+2028/U+2029** in written files. The Write tool decoded
-    ` ` into the literal separator twice and broke regex literals. A
-    project-wide scan currently shows zero; re-run it after bulk edits.
+10. **Watch for decoded `\uXXXX` escapes** in written files. The Write tool turns
+    escapes such as `\u2028`, `\u00a0`, `\ufeff` inside source text into the raw
+    characters. It broke regex literals twice, hit `tb-parse.js` a third time and
+    even this file once. Write such code through a Python patch, or scan afterwards.
 
 ## Decisions already settled — do not reopen
 
@@ -133,6 +139,8 @@ e2e6.mjs  25 preset tiles · 26 each preset fits the columns · 27 quick filter 
 - Real `.xlsx` export, 4 scopes: selected rows / current view / whole dataset /
   whole tracker (a sheet per dataset).
 - Import is CSV + paste from Excel (TSV). No `.xlsx` input.
+- **Values are read by locale** in `tb-parse.js` (see README). An unreadable
+  value is kept as typed and flagged — never turned into 0 or an empty date.
 - **Tab presets** guess column roles from names and types (see README). A miss
   yields fewer components, never a broken tab — keep it that way.
 
@@ -148,15 +156,19 @@ only the product UI is English. Tomasz confirmed this.
 - Month-grid calendar, calculated columns, OR filters, drag and drop, undo/redo
   and `.xlsx` import are out of scope for this version.
 
-**Not verifiable in a headless session — Tomasz has to check these himself:**
-1. A real Ctrl+V of a range copied from Excel.
-2. Opening an exported `.xlsx` in real Excel (structure and types were verified
-   programmatically with `zipfile` + `ElementTree` + openpyxl round-trips, but
-   not Excel's own rendering).
-3. The full File System Access permission path across an actual browser restart.
+**Verified as far as this environment allows — the last step is Tomasz's:**
+1. **Paste from Excel.** Tested with the real browser clipboard and a real
+   Ctrl+V keystroke, with clipboard text shaped exactly like Excel's (tabs,
+   CRLF, quoted multi-line cells, a trailing CRLF). The text was written to
+   match Excel, not produced by Excel itself.
+2. **`.xlsx` export.** Opened, re-saved and rendered by **LibreOffice Calc**
+   (part 8): dates are dates, amounts carry the currency format, Polish text is
+   intact. That is an independent OOXML implementation, but it is not Excel.
+3. **File System Access across a real browser restart** — not testable here at
+   all; headless Chromium has no persistent permission store.
 
 ## Screenshots
 
-`shots/` holds 19 PNGs, regenerated after the modal fix. The generator is
+`shots/` holds 21 PNGs. `14-xlsx-in-libreoffice.png` is the export as Calc renders it. The generator is
 `tracker/tools/shots.mjs` (run it from the repo root with `node`); it was moved
 out of a scratch directory into the repo so it survives this session.

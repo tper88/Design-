@@ -23,7 +23,8 @@ touches the rows people have typed.
 ```bash
 python3 tracker/build-themes.py     # extracts the 5 themes from tracker/sources/
 python3 tracker/build-wizard.py     # assembles dist/tracker-wizard.html
-sh tracker/tests/run-all.sh         # build + 197 end-to-end assertions in Chromium
+sh tracker/tests/run-all.sh         # build + 263 end-to-end assertions in Chromium
+                                    # (part 8 opens the .xlsx export in LibreOffice Calc)
 ```
 
 `dist/tracker-wizard.html` is a **build artifact**. Editing it by hand is
@@ -78,6 +79,32 @@ the tab you nominated.
 They are deliberately **in-app only**. A plain HTML file cannot notify anyone
 while it is closed — there is nothing running in the background — so a desktop
 notification would only ever fire while the tracker is already open.
+
+## Pasting from Excel
+
+Copy a range in Excel and press **Ctrl+V** on a tab with a table — no button
+needed. The import window opens with the columns already matched:
+
+- **With a header row** (any cell equal to a column name) columns are matched by
+  name, in any order.
+- **Without one**, columns are matched by position, in the order the table shows
+  them, and the window says so.
+- Ctrl+V in a text field, or with a window open, pastes text as usual.
+
+Numbers, dates and yes/no are read according to the **locale chosen in the
+wizard** (`tracker/tb-parse.js`, shared by the tracker and the wizard):
+
+| value | en-GB | en-US | pl-PL |
+|---|---|---|---|
+| `06/10/2026` | 6 Oct | 10 Jun | 6 Oct |
+| `06.10.2026` | 6 Oct | 10 Jun | 6 Oct |
+| `1,234` | 1234 | 1234 | 1.234 |
+| `1,234.56` · `1 234,56 zł` · `$1,234.56` · `(50.00)` | 1234.56 · 1234.56 · 1234.56 · −50 | | |
+| `TRUE` `PRAWDA` `tak` `x` / `FALSE` `FAŁSZ` `nie` | yes / no | | |
+
+A day above 12 settles the order on its own (`13/10/2026` is October in every
+locale). A value that cannot be read is **kept as typed and marked** in the
+table, never turned into 0 or an empty date, and it exports to Excel as text.
 
 ## Tab presets
 
