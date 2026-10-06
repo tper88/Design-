@@ -150,7 +150,7 @@
     head.appendChild(titles);
     var x = el('button', 'tb-modal-close', '✕');
     x.type = 'button';
-    x.setAttribute('aria-label', 'Zamknij');
+    x.setAttribute('aria-label', 'Close');
     x.setAttribute('data-tb-close', '');
     head.appendChild(x);
 
@@ -186,13 +186,13 @@
       function finish(v) { if (!done) { done = true; resolve(v); } }
       showModal({
         size: 'sm',
-        title: o.title || 'Potwierdź',
+        title: o.title || 'Confirm',
         body: '<p style="margin:0;font-size:13.5px;color:var(--text-2)">' +
               escapeHtml(o.text || '') + '</p>',
         actions: [
-          { label: o.cancelLabel || 'Anuluj', variant: 'ghost', onClick: function () { finish(false); } },
+          { label: o.cancelLabel || 'Cancel', variant: 'ghost', onClick: function () { finish(false); } },
           {
-            label: o.confirmLabel || 'Potwierdź',
+            label: o.confirmLabel || 'Confirm',
             variant: o.tone === 'danger' ? 'secondary' : 'primary',
             autofocus: true,
             onClick: function () { finish(true); }
@@ -251,7 +251,7 @@
     var d = el('aside', 'tb-drawer');
     d.setAttribute('role', 'dialog');
     d.setAttribute('aria-modal', 'true');
-    d.setAttribute('aria-label', o.title || 'Szczegóły');
+    d.setAttribute('aria-label', o.title || 'Details');
 
     var head = el('div', 'tb-drawer-head');
     var titles = el('div');
@@ -260,7 +260,7 @@
     head.appendChild(titles);
     var x = el('button', 'tb-modal-close', '✕');
     x.type = 'button';
-    x.setAttribute('aria-label', 'Zamknij');
+    x.setAttribute('aria-label', 'Close');
     x.setAttribute('data-tb-close', '');
     head.appendChild(x);
 

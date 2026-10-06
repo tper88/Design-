@@ -172,13 +172,23 @@
     num: 7
   };
 
-  var STYLES_XML =
+  /* Format waluty w Excelu zależy od kodu waluty — podmieniany przez
+     TBXlsx.setCurrency() zanim writer zbuduje styles.xml. */
+  var CURRENCY_CODES = {
+    PLN: '#,##0.00&quot; zł&quot;',
+    EUR: '#,##0.00&quot; €&quot;',
+    USD: '&quot;$&quot;#,##0.00',
+    GBP: '&quot;£&quot;#,##0.00'
+  };
+  var CURRENCY_FMT = CURRENCY_CODES.PLN;
+
+  var STYLES_XML_TPL =
     '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
     '<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">' +
     '<numFmts count="6">' +
       '<numFmt numFmtId="164" formatCode="yyyy\\-mm\\-dd"/>' +
-      '<numFmt numFmtId="165" formatCode="#,##0.00&quot; zł&quot;"/>' +
-      '<numFmt numFmtId="166" formatCode="&quot;$&quot;#,##0"/>' +
+      '<numFmt numFmtId="165" formatCode="__CURRENCY__"/>' +
+      '<numFmt numFmtId="166" formatCode="#,##0"/>' +
       '<numFmt numFmtId="167" formatCode="0.0&quot;%&quot;"/>' +
       '<numFmt numFmtId="168" formatCode="#,##0"/>' +
       '<numFmt numFmtId="169" formatCode="#,##0.00"/>' +
@@ -213,10 +223,16 @@
     '<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>' +
     '</styleSheet>';
 
+  function buildStyles() {
+    /* Forma FUNKCYJNA jest konieczna: String.replace podstawia $& w zamienniku,
+       a format USD to &quot;$&quot;#,##0.00 — z zamiennikiem tekstowym $&
+       zostałby zastąpiony dopasowaniem i format by się rozsypał. */
+    return STYLES_XML_TPL.replace('__CURRENCY__', function () { return CURRENCY_FMT; });
+  }
+
   function numberStyle(format) {
     switch (format) {
-      case 'pln': return XF.pln;
-      case 'usd': return XF.usd;
+      case 'currency': return XF.pln;
       case 'pct': return XF.pct;
       case 'int': return XF.int;
       case 'compact': return XF.int;
@@ -377,7 +393,7 @@
       { name: '_rels/.rels', data: utf8(rootRels) },
       { name: 'xl/workbook.xml', data: utf8(workbook) },
       { name: 'xl/_rels/workbook.xml.rels', data: utf8(wbRels) },
-      { name: 'xl/styles.xml', data: utf8(STYLES_XML) }
+      { name: 'xl/styles.xml', data: utf8(buildStyles()) }
     ];
     named.forEach(function (s, i) {
       entries.push({ name: 'xl/worksheets/sheet' + (i + 1) + '.xml', data: utf8(sheetXml(s)) });
@@ -388,6 +404,7 @@
 
   global.TBXlsx = {
     build: build,
+    setCurrency: function (code) { CURRENCY_FMT = CURRENCY_CODES[code] || CURRENCY_CODES.PLN; },
     dateSerial: dateSerial,
     colLetter: colLetter,
     _crc32: crc32

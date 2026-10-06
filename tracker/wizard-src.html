@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="pl">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Kreator trackerów</title>
+<title>Tracker builder</title>
 <style><!--WZ:THEMECSS--></style>
 <style><!--WZ:EXTRACSS--></style>
 <style><!--WZ:WIZARDCSS--></style>
@@ -13,8 +13,8 @@
 <div class="tb-page">
   <div class="tb-frame wz-frame">
     <aside class="tb-side">
-      <div class="tb-brand"><i>▦</i><span>Kreator trackerów</span></div>
-      <nav class="tb-nav" id="wz-rail" aria-label="Kroki kreatora"></nav>
+      <div class="tb-brand"><i>▦</i><span>Tracker builder</span></div>
+      <nav class="tb-nav" id="wz-rail" aria-label="Wizard steps"></nav>
       <div class="tb-spacer"></div>
       <div class="wz-side-note tb-muted" id="wz-side-note"></div>
     </aside>
@@ -25,8 +25,8 @@
         <div class="tb-spacer"></div>
         <div class="tb-flexrow">
           <span class="tb-count" id="wz-progress"></span>
-          <button type="button" class="btn btn-ghost" id="wz-prev">← Wstecz</button>
-          <button type="button" class="btn btn-primary" id="wz-next">Dalej →</button>
+          <button type="button" class="btn btn-ghost" id="wz-prev">← Back</button>
+          <button type="button" class="btn btn-primary" id="wz-next">Next →</button>
         </div>
       </header>
 
@@ -34,23 +34,24 @@
 
       <section class="tb-stack" id="wz-step-0">
         <div class="card">
-          <div class="card-h"><div class="card-t">Zaczynamy</div></div>
+          <div class="card-h"><div class="card-t">Let’s start</div></div>
           <p class="tb-dim" style="font-size:13.5px;margin:0 0 14px">
-            Kreator składa pojedynczy plik HTML, który działa bez internetu i zapisuje dane
-            do wskazanego pliku <code>.json</code> na Twoim dysku.
+            This builder produces a single HTML file that runs without an internet connection and
+            writes your data to a <code>.json</code> file on your own disk.
           </p>
           <div class="tb-grid tb-grid-2" id="wz-start-cards"></div>
         </div>
         <div class="card">
-          <div class="card-h"><div class="card-t">Masz już tracker i chcesz go zmienić</div></div>
+          <div class="card-h"><div class="card-t">Already have a tracker and want to change it</div></div>
           <p class="tb-dim" style="font-size:13.5px;margin:0 0 12px">
-            Wczytaj plik <code>.tracker.json</code>, który kreator zapisał razem z trackerem.
-            Struktura wróci do edycji, a dane w gotowym trackerze zostaną nietknięte.
+            Load the <code>.tracker.json</code> the builder saved next to your tracker. Its structure
+            comes back for editing — including the style — and the data inside the deployed tracker
+            is left untouched.
           </p>
           <label class="tb-dropzone" id="wz-cfg-zone">
             <input type="file" id="wz-cfg-file" accept=".json,application/json">
-            <span class="tb-dropzone-title">Przeciągnij plik .tracker.json albo kliknij</span>
-            <span class="tb-dropzone-hint">Nie masz go? Zacznij od nowa — to tylko kilka kroków.</span>
+            <span class="tb-dropzone-title">Drop a .tracker.json file here, or click to pick one</span>
+            <span class="tb-dropzone-hint">Do not have one? Start from a template — it only takes a few steps.</span>
           </label>
         </div>
       </section>
@@ -60,13 +61,14 @@
       <section class="tb-stack" id="wz-step-3" hidden></section>
       <section class="tb-stack" id="wz-step-4" hidden></section>
       <section class="tb-stack" id="wz-step-5" hidden></section>
+      <section class="tb-stack" id="wz-step-6" hidden></section>
     </main>
   </div>
 </div>
 
 <!-- Assety trackera trzymane jako base64. Dzięki temu literalne "</script"
      albo "-->" w kodzie CSS/JS nie jest w stanie zamknąć wyspy. Samo atob()
-     zepsułoby polskie komentarze, więc dekodujemy przez TextDecoder. -->
+     zepsułoby znaki spoza ASCII, więc dekodujemy przez TextDecoder. -->
 <!--WZ:ASSETS-->
 
 <script><!--WZ:CHARTS--></script>

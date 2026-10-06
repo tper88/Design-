@@ -38,18 +38,18 @@ ok(await wz.locator('#wz-step-0').isVisible(), 'krok 0 widoczny na starcie');
 ok((await wz.locator('#wz-start-cards .wz-tile').count()) === 3, '3 szablony do wyboru');
 ok(await wz.locator('#wz-next').isDisabled(), '"Dalej" zablokowane, dopóki nie ma configu');
 
-await wz.locator('.wz-tile', { hasText: 'Rejestr zapytań' }).first().click();
+await wz.locator('.wz-tile', { hasText: 'Request log' }).first().click();
 await wz.waitForSelector('#wz-step-1:not([hidden])');
 ok(true, 'szablon wczytany, przeszedł do kroku 1');
 
 const themeCount = await wz.locator('#wz-step-1 .wz-themes .wz-tile').count();
 ok(themeCount === 5, 'krok 1 pokazuje 5 styli do wyboru', 'było ' + themeCount);
 
-for (const step of [2, 3, 4, 5]) {
+for (const step of [2, 3, 4, 5, 6]) {
   await wz.locator('#wz-next').click();
   await wz.waitForSelector(`#wz-step-${step}:not([hidden])`);
 }
-ok(true, 'przejście przez wszystkie kroki do 5');
+ok(true, 'przejście przez wszystkie 7 kroków');
 
 const problems = await wz.evaluate(() => TBWizard.validate());
 ok(problems.length === 0, 'walidacja szablonu bez błędów', JSON.stringify(problems));
@@ -62,6 +62,9 @@ const tableCmp = cfg.tabs.flatMap(t => t.components).find(c => c.type === 'table
 ok(tableCmp.opts.contextMenu.actions.length === 3,
   'tabela ma 3 własne akcje menu kontekstowego');
 ok(cfg.meta.trackerId && cfg.meta.trackerId.startsWith('trk_'), 'trackerId wygenerowany');
+ok(cfg.alerts.length === 2, 'szablon ma 2 reguły alertów', 'było ' + cfg.alerts.length);
+ok(cfg.meta.locale === 'en-GB', 'domyślny format to en-GB', cfg.meta.locale);
+ok(cfg.meta.personalization === true, 'personalizacja domyślnie włączona');
 
 const html = await wz.evaluate(() => TBWizard.emit(TBWizard.state.cfg, false));
 writeFileSync(OUT + '/tracker.html', html);
@@ -113,20 +116,20 @@ ok(await tr.locator('.tb-empty strong').first().isVisible(),
   'pusta tabela pokazuje stan pusty z podpowiedzią');
 
 /* dodanie wiersza przez interfejs */
-await tr.locator('#tb-nav a', { hasText: 'Rejestr' }).click();
-await tr.locator('button', { hasText: '+ Dodaj wiersz' }).first().click();
+await tr.locator('#tb-nav a', { hasText: 'Log' }).click();
+await tr.locator('button', { hasText: '+ Add row' }).first().click();
 await tr.waitForSelector('.tb-drawer.is-open');
 ok(true, 'drawer dodawania wiersza otwarty');
 
 /* walidacja: próba zapisu bez wymaganych pól */
-await tr.locator('.tb-drawer-foot button', { hasText: 'Dodaj wiersz' }).click();
+await tr.locator('.tb-drawer-foot button', { hasText: 'Add row' }).click();
 ok(await tr.locator('.tb-drawer .tb-err').count() > 0,
   'walidacja blokuje zapis i pokazuje komunikat przy wymaganym polu');
 
 const inputs = tr.locator('.tb-drawer .tb-field input.tb-input');
 await inputs.nth(0).fill('Anna Kowalska');
 await inputs.nth(1).fill('Korekta faktury 9/2026');
-await tr.locator('.tb-drawer-foot button', { hasText: 'Dodaj wiersz' }).click();
+await tr.locator('.tb-drawer-foot button', { hasText: 'Add row' }).click();
 await tr.waitForSelector('.tb-drawer', { state: 'detached' });
 let rows = await tr.locator('.tb-table tbody tr').count();
 ok(rows === 1, 'wiersz dodany przez interfejs', 'wierszy: ' + rows);
@@ -138,10 +141,10 @@ await tr.evaluate(() => {
   const col = n => ds.columns.find(c => new RegExp(n, 'i').test(c.label)).id;
   const mk = (who, subj, kwota, stat, due) => {
     const d = {};
-    d[col('Zgłaszający')] = who;
-    d[col('Temat')] = subj;
-    d[col('Wpłynęło')] = '2026-09-15';
-    d[col('Termin')] = due;
+    d[col('Requested by')] = who;
+    d[col('Subject')] = subj;
+    d[col('Received')] = '2026-09-15';
+    d[col('Due')] = due;
     d[col('Status')] = stat;
     return { id: 'r_test_' + who.length + subj.length, ds: ds.id, data: d,
              _c: Date.now(), _m: Date.now(), _d: 0 };
@@ -154,19 +157,19 @@ rows = await tr.locator('.tb-table tbody tr').count();
 ok(rows === 3, 'łącznie 3 wiersze w tabeli', 'wierszy: ' + rows);
 
 /* przeliczenie KPI bez reloadu */
-await tr.locator('#tb-nav a', { hasText: 'Podsumowanie' }).click();
+await tr.locator('#tb-nav a', { hasText: 'Summary' }).click();
 await tr.waitForTimeout(200);
 const kpis = await tr.locator('#tb-panels .kpi-v').allTextContents();
-ok(kpis.some(t => t.trim() === '3'), 'KPI „Wszystkie zapytania" pokazuje 3 bez reloadu',
+ok(kpis.some(t => t.trim() === '3'), 'KPI „All requests" pokazuje 3 bez reloadu',
   JSON.stringify(kpis));
-const overdue = await tr.locator('.card', { hasText: 'Po terminie' }).locator('.kpi-v').textContent();
-ok(overdue.trim() === '1', 'KPI „Po terminie" liczy 1 (termin 2026-01-01, status wip)',
+const overdue = await tr.locator('.card', { hasText: 'Overdue' }).locator('.kpi-v').textContent();
+ok(overdue.trim() === '1', 'KPI „Overdue" liczy 1 (termin 2026-01-01, status wip)',
   'było ' + overdue);
 ok(await tr.locator('#tb-panels .tb-chart svg').count() >= 2, 'wykresy się wyrysowały');
 ok(await tr.locator('#tb-panels .tb-banner-accent').count() >= 1, 'baner z wnioskiem obecny');
 
 /* checklista i karteczka */
-await tr.locator('#tb-nav a', { hasText: 'Terminy' }).click();
+await tr.locator('#tb-nav a', { hasText: 'Dates' }).click();
 await tr.waitForTimeout(150);
 ok(await tr.locator('.tb-agenda-item').count() >= 1, 'agenda pokazuje terminy z danych');
 ok(await tr.locator('.tb-agenda-day.is-overdue').count() >= 1, 'agenda wyróżnia wpisy po terminie');
@@ -178,9 +181,9 @@ await tr.locator('.tb-check-item input.tb-check').check();
 await tr.waitForTimeout(150);
 ok(await tr.locator('.tb-check-item.is-done').count() === 1, 'pozycja odhaczona');
 
-await tr.locator('#tb-nav a', { hasText: 'Notatki' }).click();
+await tr.locator('#tb-nav a', { hasText: 'Notes' }).click();
 await tr.waitForTimeout(150);
-await tr.locator('button', { hasText: '+ Dodaj karteczkę' }).click();
+await tr.locator('button', { hasText: '+ Add note' }).click();
 await tr.waitForTimeout(150);
 const noteText = tr.locator('.tb-note .tb-note-text').first();
 await noteText.click();
@@ -194,14 +197,14 @@ ok((await tr.locator('.tb-note .tb-note-text').first().textContent()).includes('
 section('FAZA 4 — trwałość po przeładowaniu (IndexedDB)');
 await tr.reload();
 await tr.waitForSelector('#tb-nav a');
-await tr.locator('#tb-nav a', { hasText: 'Rejestr' }).click();
+await tr.locator('#tb-nav a', { hasText: 'Log' }).click();
 await tr.waitForTimeout(300);
 rows = await tr.locator('.tb-table tbody tr').count();
 ok(rows === 3, '3 wiersze przetrwały reload', 'wierszy: ' + rows);
-await tr.locator('#tb-nav a', { hasText: 'Terminy' }).click();
+await tr.locator('#tb-nav a', { hasText: 'Dates' }).click();
 await tr.waitForTimeout(200);
 ok(await tr.locator('.tb-check-item.is-done').count() === 1, 'stan checklisty przetrwał reload');
-await tr.locator('#tb-nav a', { hasText: 'Notatki' }).click();
+await tr.locator('#tb-nav a', { hasText: 'Notes' }).click();
 await tr.waitForTimeout(200);
 ok((await tr.locator('.tb-note .tb-note-text').first().textContent() || '').includes('Kowalskiego'),
   'treść karteczki przetrwała reload');

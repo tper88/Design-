@@ -1,78 +1,107 @@
-# Kreator trackerów
+# Tracker builder
 
-Kreator składa **jeden plik HTML**, który działa offline i zapisuje dane
-do wskazanego pliku `.json` na dysku użytkownika.
+A wizard that produces a **single HTML file**: a tracker that runs offline and
+writes its data to a `.json` file on the user's own disk.
 
-## Dwa artefakty
+The product UI is English. **Code comments and commit messages are Polish** —
+they are maintenance notes, not product.
 
-| plik | co to jest | kto go tworzy |
+## What comes out of it
+
+| file | what it is | who writes it |
 |---|---|---|
-| `dist/tracker-wizard.html` | kreator — otwierasz go w przeglądarce | `build-wizard.py` |
-| `<nazwa>.html` | gotowy tracker dla użytkownika | kreator, w kroku 5 |
-| `<nazwa>.tracker.json` | **struktura** trackera do późniejszych zmian | kreator, w kroku 5 |
-| `<nazwa>.data.json` | **dane** użytkownika | sam tracker, w trakcie pracy |
+| `dist/tracker-wizard.html` | the builder — open it in Chrome | `build-wizard.py` |
+| `<name>.html` | the finished tracker | the builder, last step |
+| `<name>.tracker.json` | the tracker's **structure**, for later edits | the builder, last step |
+| `<name>.data.json` | the user's **data** | the tracker itself, while in use |
 
-Struktura i dane są rozdzielone na stałe. Dzięki temu przebudowa trackera
-nigdy nie rusza wpisanych rekordów.
+Structure and data are kept apart permanently, so rebuilding a tracker never
+touches the rows people have typed.
 
-## Build
+## Build and test
 
 ```bash
-python3 tracker/build-themes.py     # wyciąga 5 motywów z tracker/sources/
-python3 tracker/build-wizard.py     # składa dist/tracker-wizard.html
-node tracker/tests/e2e.mjs          # testy, 4 części: e2e / e2e2 / e2e3 / e2e4
+python3 tracker/build-themes.py     # extracts the 5 themes from tracker/sources/
+python3 tracker/build-wizard.py     # assembles dist/tracker-wizard.html
+sh tracker/tests/run-all.sh         # build + 150 end-to-end assertions in Chromium
 ```
 
-`dist/tracker-wizard.html` jest **artefaktem builda**. Każda ręczna edycja
-zniknie przy następnym uruchomieniu assemblera — źródła są w `tracker/`.
+`dist/tracker-wizard.html` is a **build artifact**. Editing it by hand is
+pointless — the next build overwrites it. Sources live in `tracker/`.
 
-## Wymagania przeglądarki
+## Browser support
 
-**Chrome albo Edge.** Tracker używa File System Access API do zapisu
-do pliku. Bez tego API pokazuje pełnoekranowy komunikat i nie uruchamia się —
-celowo, żeby nie udawać, że zapisuje dane, których nie zapisze.
-Firefox i Safari nie są obsługiwane.
+**Chrome and Edge.** The tracker writes to disk through the File System Access
+API. Without that API it shows a full-screen notice and refuses to start,
+rather than pretending to save. Firefox and Safari are not supported.
 
-## Trwałość danych — co trzeba wiedzieć
+## How data is kept
 
-Źródłem prawdy jest **plik `.data.json`**, nie przeglądarka. IndexedDB jest
-tylko szybkim cache'em. Powód jest konkretny: przy otwarciu przez `file://`
-magazyn przeglądarki jest kluczowany po **ścieżce pliku**, więc zmiana nazwy
-albo przeniesienie `tracker.html` wyglądałaby jak utrata wszystkiego.
-Plik `.data.json` tego nie dotyczy.
+The **`.data.json` file is the source of truth**; IndexedDB is only a fast local
+cache. The reason is concrete: when a page is opened over `file://`, browser
+storage is keyed to the **file path**, so renaming or moving `tracker.html`
+would look exactly like losing everything. The `.json` file does not care.
 
-Konsekwencje dla użytkownika:
+What this means for the person using it:
 
-- Przy pierwszym uruchomieniu tracker prosi o wskazanie pliku danych.
-- Po zamknięciu przeglądarki pokazuje pasek **„Połącz ponownie z plikiem"**
-  z nazwą zapamiętanego pliku. Jedno kliknięcie na sesję — tego nie da się
-  obejść, przeglądarka wymaga gestu użytkownika do odnowienia uprawnienia.
-- Zapis jest automatyczny (1,5 s po ostatniej zmianie) plus przycisk
-  **Zapisz** i **Ctrl+S**. Przy ukryciu karty leci wymuszony zapis.
-- `beforeunload` nie dokończy zapisu asynchronicznego — przy niezapisanych
-  zmianach przeglądarka pokaże swoje ostrzeżenie, a IndexedDB jest siatką
-  bezpieczeństwa.
-- Jeśli plik zmieni się poza kartą, tracker pokazuje pasek konfliktu
-  z trzema wyjściami. **Nic nie jest nadpisywane automatycznie.**
-- Aktualizując tracker, **nadpisz stary plik w tym samym miejscu i pod tą
-  samą nazwą**.
+- On first run the tracker asks them to pick a data file.
+- After the browser is closed and reopened it shows **“Reconnect to your data
+  file”** with the remembered file name. One click per browser session — that
+  cannot be avoided, because browsers require a user gesture to renew file
+  permission.
+- Saving is automatic (1.5 s after the last change) plus a **Save** button and
+  **Ctrl+S**. Hiding the tab forces a save.
+- `beforeunload` cannot finish an async write, so an unsaved state triggers the
+  browser's own warning and IndexedDB acts as the safety net.
+- If the file changed outside the tab, a conflict bar offers three ways out.
+  **Nothing is ever overwritten automatically.**
+- When updating a tracker, **overwrite the old file in place, same name**.
 
-## Dodanie szóstego motywu
+## Personalisation
 
-Motywy są generowane z plików styleguide'ów w `tracker/sources/` przez
-`build-themes.py`. Żeby dodać kolejny:
+Each person sets their own name, team, avatar colour and optional photo from
+the sidebar. Photos are cropped square and resized to 96×96 in the browser
+(≈1–4 KB) so the data file stays small. The profile is stored per machine in
+IndexedDB and also travels inside the data file; a local profile always wins
+over the one in the file, so sharing a file does not overwrite someone's name.
 
-1. Wrzuć plik HTML styleguide'u do `tracker/sources/`.
-2. Dopisz wpis do listy `THEMES` w `build-themes.py` (id, plik, nazwa, prefiks).
-3. Dopisz **skórę shella** do słownika `SKINS` — layout należy do `tracker.css`,
-   motyw dokłada tylko malowanie (`.tb-frame`, `.tb-side`, `.tb-head`,
-   `.tb-nav a.is-active`). Build sprawdza, że każdy token użyty w skórze
-   naprawdę istnieje w `:root` tego motywu.
+The `@user` and `@team` tokens — usable as column defaults, filter values and
+right-click action values — resolve to that profile.
 
-### Kontrakt 34 tokenów
+## Alerts
 
-Motyw **musi** definiować w `:root` wszystkie poniższe. Build pada, jeśli
-czegoś brakuje — i to jest zamierzone, bo `tracker.css` na nich stoi.
+Alerts are rules defined in the wizard: a dataset, a filter, a threshold, a
+tone and a message with `{{n}}`. The tracker shows them under a bell in the top
+bar with a count, recalculated after every change. Clicking an alert jumps to
+the tab you nominated.
+
+They are deliberately **in-app only**. A plain HTML file cannot notify anyone
+while it is closed — there is nothing running in the background — so a desktop
+notification would only ever fire while the tracker is already open.
+
+## Style
+
+The style is **baked into the generated file**: one theme, no switcher. To
+change it, load the `.tracker.json` back into the wizard, pick another style and
+generate again — the data stays where it is, because the tracker id does not
+change.
+
+### Adding a sixth theme
+
+Themes are generated from the styleguide files in `tracker/sources/` by
+`build-themes.py`:
+
+1. Drop the styleguide HTML into `tracker/sources/`.
+2. Add an entry to `THEMES` in `build-themes.py` (id, file, name, prefix).
+3. Add a **shell skin** to the `SKINS` dict — layout belongs to `tracker.css`,
+   the theme only paints (`.tb-frame`, `.tb-side`, `.tb-head`,
+   `.tb-nav a.is-active`). The build checks that every token used in a skin
+   really exists in that theme's `:root`.
+
+### The 34-token contract
+
+A theme **must** define all of these in `:root`. The build fails if any is
+missing, and that is deliberate: `tracker.css` stands on them.
 
 ```
 --page-bg  --surface  --surface-2  --text  --text-2  --muted
@@ -84,30 +113,34 @@ czegoś brakuje — i to jest zamierzone, bo `tracker.css` na nich stoi.
 --code-bg --code-text --toc-bg
 ```
 
-Opcjonalnie: `--c1-hi … --c5-hi` (jaśniejszy wierzch gradientu słupków).
-Bez nich gradient to ten sam odcień z malejącą alfą.
+Optional: `--c1-hi … --c5-hi` (a lighter top for bar gradients). Without them a
+gradient is the same hue fading out.
 
-### Klasy komponentów brane z motywu
+### Component classes taken from the theme
 
-Markup trackera używa **własnych nazw klas z Twoich styleguide'ów**, żeby każdy
-styl zachował charakter: `card card-h card-t panel hero kicker meta btn
-btn-primary btn-secondary btn-ghost btn-icon chip badge tabs tab seg kpi-t
-kpi-v kpi-s pb pb-h trend up down arr chart bar series av toast row flex`
-plus stany `active on show block`.
+The tracker markup uses **the class names from your own styleguides**, so each
+style keeps its character: `card card-h card-t panel hero kicker meta btn
+btn-primary btn-secondary btn-ghost btn-icon chip badge tabs tab seg kpi-t kpi-v
+kpi-s pb pb-h trend up down arr chart bar series av toast row flex` plus the
+states `active on show block`.
 
-Dwie świadome wyjątki: `.input` i `.select` w styleguide'ach są **atrapami**
-(divy z `display:flex` i `color:var(--muted)`), więc prawdziwe kontrolki mają
-własne klasy `tb-input` / `tb-select`. `.legend` występuje tylko w jednym
-motywie, więc legendy rysuje `tb-legend`.
+Two deliberate exceptions: `.input` and `.select` in the styleguides are
+**mock-ups** (divs with `display:flex` and `color:var(--muted)`), so real
+controls use `tb-input` / `tb-select`. `.legend` exists in only one theme, so
+legends are drawn by `tb-legend`.
 
-## Co jeszcze nie jest zrobione
+Anything that floats above content — the context menu, tooltips, the modal, the
+drawer, sticky table headers — uses `--tb-solid`, which lays the theme's
+`--surface` over an opaque `--page-bg`. Without it the glass themes show the
+table straight through the menu.
 
-- **Presety zakładek** istnieją tylko przez 3 szablony startowe. Dodając nową
-  zakładkę w kroku 3, dostajesz pustą — komponenty dokładasz sam.
-- **Tooltip, accordion, stepper, breadcrumbs** mają gotowe styles w
-  `tracker.css`, ale żaden komponent ich jeszcze nie używa i nie ma ich
-  w katalogu kreatora. Toggle jest używany (przełączniki w kreatorze).
-- **Skeleton** jest niewykorzystany — nic w trackerze nie ładuje się tak długo,
-  żeby miał sens.
-- Siatka miesiąca kalendarza, kolumny liczone (formuły), filtry OR,
-  drag & drop, undo/redo, import `.xlsx` — poza zakresem pierwszej wersji.
+## Not built yet
+
+- **Tab presets** only exist through the three starting templates. A new tab
+  starts empty.
+- **Tooltip, accordion, stepper, breadcrumbs** have styles in `tracker.css`, but
+  no component uses them and they are not in the wizard's catalogue. The toggle
+  is used (the wizard's own switches).
+- **Skeleton** is unused — nothing in the tracker loads slowly enough to need it.
+- Month-grid calendar, calculated columns, OR filters, drag and drop, undo/redo
+  and `.xlsx` import are out of scope for this version.

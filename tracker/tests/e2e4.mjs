@@ -25,31 +25,31 @@ await wz.waitForSelector('#wz-start-cards .wz-tile');
 
 /* ---- wklejanie nagłówka w kreatorze ---- */
 section('FAZA 16 — kreator: wklejanie nagłówka z Excela');
-await wz.locator('.wz-tile', { hasText: 'Pusty tracker' }).first().click();
+await wz.locator('.wz-tile', { hasText: 'Blank tracker' }).first().click();
 await wz.waitForSelector('#wz-step-1:not([hidden])');
-await wz.locator('#wz-rail a', { hasText: 'Dane' }).click();
+await wz.locator('#wz-rail a', { hasText: 'Data' }).click();
 await wz.waitForSelector('#wz-step-2:not([hidden])');
 const colsBefore = await wz.evaluate(() => TBWizard.state.cfg.datasets[0].columns.length);
-await wz.locator('button', { hasText: 'Wklej nagłówek z Excela' }).click();
+await wz.locator('button', { hasText: 'Paste a header from Excel' }).click();
 await wz.waitForSelector('dialog.tb-modal textarea');
 const TSV = [
-  'Klient\tData\tKwota\tStatus\tPilne',
-  'Nordic sp. z o.o.\t2026-09-28\t48200,50\tOtwarte\ttak',
-  'Baltic SA\t2026-09-14\t12750,00\tZamknięte\tnie',
-  'Vistula sp.j.\t2026-08-30\t9300,25\tOtwarte\ttak'
+  'Client\tDate\tAmount\tStatus\tUrgent',
+  'Nordic Ltd\t2026-09-28\t48200.50\tOpen\tyes',
+  'Baltic SA\t2026-09-14\t12750.00\tClosed\tno',
+  'Vistula LLP\t2026-08-30\t9300.25\tOpen\tyes'
 ].join('\n');
 await wz.locator('dialog.tb-modal textarea').fill(TSV);
-await wz.locator('dialog.tb-modal button', { hasText: 'Utwórz kolumny' }).click();
+await wz.locator('dialog.tb-modal button', { hasText: 'Create columns' }).click();
 await wz.waitForTimeout(400);
 const cols = await wz.evaluate(() => TBWizard.state.cfg.datasets[0].columns);
 ok(cols.length === colsBefore + 5, '5 kolumn utworzonych z nagłówka',
   colsBefore + ' → ' + cols.length);
 const byLabel = {};
 cols.forEach(c => { byLabel[c.label] = c.type; });
-ok(byLabel['Data'] === 'date', 'typ „Data" rozpoznany jako data', byLabel['Data']);
-ok(byLabel['Kwota'] === 'number', 'typ „Kwota" rozpoznany jako liczba (przecinek dziesiętny)', byLabel['Kwota']);
-ok(byLabel['Klient'] === 'text', 'typ „Klient" rozpoznany jako tekst', byLabel['Klient']);
-ok(byLabel['Pilne'] === 'bool', 'typ „Pilne" rozpoznany jako tak/nie', byLabel['Pilne']);
+ok(byLabel['Date'] === 'date', 'typ „Date" rozpoznany jako data', byLabel['Date']);
+ok(byLabel['Amount'] === 'number', 'typ „Amount" rozpoznany jako liczba (przecinek dziesiętny)', byLabel['Amount']);
+ok(byLabel['Client'] === 'text', 'typ „Client" rozpoznany jako tekst', byLabel['Client']);
+ok(byLabel['Urgent'] === 'bool', 'typ „Urgent" rozpoznany jako tak/nie', byLabel['Urgent']);
 ok(byLabel['Status'] === 'enum', 'typ „Status" rozpoznany jako lista wyboru', byLabel['Status']);
 
 /* ---- tracker z tego configu ---- */
@@ -59,12 +59,12 @@ const html = await wz.evaluate(() => {
      tak jak zrobiłby to użytkownik w edytorze opcji */
   const ds = TBWizard.state.cfg.datasets[0];
   const st = ds.columns.find(c => c.label === 'Status');
-  st.options = [{ value: 'Otwarte', label: 'Otwarte', tone: 'warning' },
-                { value: 'Zamknięte', label: 'Zamknięte', tone: 'success' }];
+  st.options = [{ value: 'Open', label: 'Open', tone: 'warning' },
+                { value: 'Closed', label: 'Closed', tone: 'success' }];
   const tbl = TBWizard.state.cfg.tabs[0].components[0];
   tbl.opts.columns = ds.columns.map(c => c.id);
-  tbl.opts.quickFilters = [{ label: 'Tylko otwarte',
-    filter: { op: 'and', rules: [{ field: st.id, cmp: 'eq', value: 'Otwarte' }] } }];
+  tbl.opts.quickFilters = [{ label: 'Open only',
+    filter: { op: 'and', rules: [{ field: st.id, cmp: 'eq', value: 'Open' }] } }];
   tbl.opts.pageSize = 10;
   return TBWizard.emit(TBWizard.state.cfg, false);
 });
@@ -74,17 +74,17 @@ watch(tr, 'tracker');
 await tr.goto('file://' + OUT + '/tracker.html');
 await tr.waitForSelector('.tb-table');
 
-await tr.locator('button', { hasText: 'Wklej z Excela' }).click();
+await tr.locator('button', { hasText: 'Paste from Excel' }).click();
 await tr.waitForSelector('dialog.tb-modal textarea');
 await tr.locator('dialog.tb-modal textarea').fill(TSV);
-await tr.locator('dialog.tb-modal button', { hasText: 'Dalej' }).click();
+await tr.locator('dialog.tb-modal button', { hasText: 'Next' }).click();
 await tr.waitForTimeout(400);
 ok(await tr.locator('dialog.tb-modal select').count() === 5,
   'krok mapowania pokazuje 5 selectów (po jednym na kolumnę pliku)');
 const mapped = await tr.evaluate(() =>
   [...document.querySelectorAll('dialog.tb-modal select')].filter(s => s.value).length);
 ok(mapped === 5, 'kolumny dopasowały się automatycznie po nazwie', 'dopasowanych: ' + mapped);
-await tr.locator('dialog.tb-modal button', { hasText: 'Wczytaj' }).click();
+await tr.locator('dialog.tb-modal button', { hasText: 'Import' }).click();
 await tr.waitForTimeout(600);
 let rows = await tr.locator('.tb-table tbody tr').count();
 ok(rows === 3, '3 wiersze wczytane z wklejonego TSV', 'wierszy: ' + rows);
@@ -92,10 +92,14 @@ const cellText = await tr.locator('.tb-table tbody tr').first().locator('td').al
 /* pl-PL używa TWARDEJ spacji (U+00A0) jako separatora tysięcy — normalizujemy
    białe znaki, inaczej porównanie ze zwykłą spacją zawsze zawiedzie */
 const flat = cellText.join(' ').replace(/\s/g, ' ');
-ok(flat.includes('48 200,50'),
-  'liczba z przecinkiem dziesiętnym wczytana i sformatowana (separator = NBSP)',
+/* Oczekiwania liczymy formaterem trackera — format jest wybierany w kreatorze,
+   więc zaszycie go w teście zepsułoby się przy każdej zmianie locale. */
+const wantNum = await tr.evaluate(() => TB.fmt.number(48200.5, 'number'));
+const wantDate = await tr.evaluate(() => TB.fmt.date('2026-09-28'));
+ok(flat.includes(wantNum.replace(/\s/g, ' ')),
+  'liczba wczytana i sformatowana wg wybranego formatu (' + wantNum + ')',
   JSON.stringify(cellText));
-ok(cellText.join(' ').includes('28.09.2026'), 'data wczytana i sformatowana po polsku');
+ok(flat.includes(wantDate), 'data wczytana i sformatowana wg wybranego formatu (' + wantDate + ')');
 ok(await tr.locator('.tb-table tbody tr .tb-tag').count() >= 1,
   'wartość listy wyboru pokazuje się jako tag ze kolorem');
 
@@ -107,13 +111,13 @@ rows = await tr.locator('.tb-table tbody tr').count();
 ok(rows === 1, 'szukanie zawęża do 1 wiersza', 'wierszy: ' + rows);
 await tr.locator('.tb-search input').fill('');
 await tr.waitForTimeout(500);
-await tr.locator('.tb-chip-btn', { hasText: 'Tylko otwarte' }).click();
+await tr.locator('.tb-chip-btn', { hasText: 'Open only' }).click();
 await tr.waitForTimeout(400);
 rows = await tr.locator('.tb-table tbody tr').count();
 ok(rows === 2, 'filtr szybki „Tylko otwarte" daje 2 wiersze', 'wierszy: ' + rows);
 ok(await tr.locator('.tb-chip-btn[aria-pressed="true"]').count() === 1,
   'aktywny filtr jest oznaczony');
-await tr.locator('.tb-chip-btn', { hasText: 'Tylko otwarte' }).click();
+await tr.locator('.tb-chip-btn', { hasText: 'Open only' }).click();
 await tr.waitForTimeout(400);
 
 /* paginacja: dosypujemy 25 wierszy przy pageSize 10 */
@@ -121,7 +125,7 @@ await tr.evaluate(() => {
   const ds = TB.config().datasets[0];
   const c = ds.columns[0].id;
   for (let i = 0; i < 25; i++) {
-    const d = {}; d[c] = 'Klient ' + i;
+    const d = {}; d[c] = 'Client ' + i;
     TB.store.putRecord({ id: 'r_p' + i, ds: ds.id, data: d, _c: Date.now(), _m: Date.now(), _d: 0 });
   }
 });
@@ -141,12 +145,12 @@ await tr.locator('.tb-pager .tb-pg', { hasText: '1' }).first().click();
 await tr.waitForTimeout(300);
 await tr.locator('.tb-table tbody tr').first().click();
 await tr.waitForSelector('.tb-drawer.is-open');
-ok(await tr.locator('.tb-drawer').getByText('Karteczki do tego wiersza').count() === 1,
+ok(await tr.locator('.tb-drawer').getByText('Notes on this row').count() === 1,
   'drawer ma sekcję karteczek wiersza');
 const hasNotesCmp = await tr.evaluate(() =>
   TB.config().tabs.some(t => (t.components || []).some(c => c.type === 'notes')));
 if (!hasNotesCmp) {
-  await tr.locator('.tb-drawer button', { hasText: 'Przypnij karteczkę' }).click();
+  await tr.locator('.tb-drawer button', { hasText: 'Pin a note' }).click();
   await tr.waitForTimeout(300);
   ok(await tr.locator('.toast.show').count() === 1,
     'bez komponentu karteczek tracker MÓWI, że trzeba go dodać, zamiast milczeć');
@@ -159,7 +163,7 @@ await tr.waitForTimeout(300);
 /* teraz z komponentem karteczek */
 const html2 = await wz.evaluate(() => {
   TBWizard.state.cfg.tabs.push({
-    id: 'tab_notes', label: 'Notatki', icon: '🗒', preset: 'notes',
+    id: 'tab_notes', label: 'Notes', icon: '🗒', preset: 'notes',
     layout: { cols: 1, variant: 'even' },
     components: [{ id: 'k_notes1', type: 'notes', title: 'Karteczki', col: 0, order: 10,
       span: 'full', opts: {} }]
@@ -172,7 +176,7 @@ await tr.reload();
 await tr.waitForSelector('.tb-table tbody tr');
 await tr.locator('.tb-table tbody tr').first().click();
 await tr.waitForSelector('.tb-drawer.is-open');
-await tr.locator('.tb-drawer button', { hasText: 'Przypnij karteczkę' }).click();
+await tr.locator('.tb-drawer button', { hasText: 'Pin a note' }).click();
 await tr.waitForTimeout(400);
 ok(await tr.locator('.tb-drawer .tb-note').count() === 1, 'karteczka przypięta do wiersza');
 const pin = tr.locator('.tb-drawer .tb-note .tb-note-text').first();
@@ -184,7 +188,7 @@ await tr.keyboard.press('Escape');
 await tr.waitForTimeout(400);
 
 /* karteczka przypięta NIE powinna zaśmiecać tablicy karteczek */
-await tr.locator('#tb-nav a', { hasText: 'Notatki' }).click();
+await tr.locator('#tb-nav a', { hasText: 'Notes' }).click();
 await tr.waitForTimeout(400);
 const boardNotes = await tr.locator('#tb-panels .tb-note').count();
 ok(boardNotes === 0, 'przypięta karteczka nie pojawia się na ogólnej tablicy',

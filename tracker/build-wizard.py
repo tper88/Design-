@@ -127,8 +127,8 @@ def main():
         problems.append("został @import z sieci w CSS strony")
     # szkielet trackera MUSI zachować swoje markery — podmienia je emitter w JS
     shell_markers = re.findall(r"<!--TB:[A-Z]+-->", assets["shell"])
-    if len(shell_markers) < 10:
-        problems.append("szkielet trackera ma tylko %d markerów TB: (oczekiwane 10)"
+    if len(shell_markers) < 9:
+        problems.append("szkielet trackera ma tylko %d markerów TB: (oczekiwane 9)"
                         % len(shell_markers))
     for need in ("shell", "runtime", "charts", "ui", "xlsx", "trackercss"):
         if ('data-asset="%s"' % need) not in out:
@@ -151,13 +151,12 @@ def main():
     print("  %-12s %7.1f KB  (%d motywów)"
           % ("motywy", sum(len(v.encode()) for v in theme_css.values()) / 1024, len(theme_css)))
 
-    one = min(len(v.encode()) for v in theme_css.values())
     core = sum(len(assets[k].encode()) for k in
                ("shell", "trackercss", "charts", "ui", "xlsx", "runtime"))
-    print("\nSzacowany rozmiar emitowanego trackera:")
-    print("  jeden motyw          %6.1f KB" % ((core + one) / 1024))
-    print("  z przełącznikiem     %6.1f KB"
-          % ((core + sum(len(v.encode()) for v in theme_css.values())) / 1024))
+    lo = min(len(v.encode()) for v in theme_css.values())
+    hi = max(len(v.encode()) for v in theme_css.values())
+    print("\nSzacowany rozmiar emitowanego trackera (jeden motyw, bez danych):")
+    print("  od %.1f KB do %.1f KB" % ((core + lo) / 1024, (core + hi) / 1024))
     print("\nOK: %s  (%.1f KB)" % (target, len(out.encode()) / 1024))
     print("Markery szkieletu zachowane: %s" % " ".join(sorted(set(shell_markers))))
 

@@ -35,7 +35,7 @@
   var ORDER = ['c1', 'c2', 'c3', 'c4', 'c5'];
   var uid = 0;
 
-  var cfg = { locale: 'pl-PL', currency: 'PLN' };
+  var cfg = { locale: 'en-GB', currency: 'PLN' };
 
   function nf(v, d) {
     return (+v).toLocaleString(cfg.locale, { maximumFractionDigits: d == null ? 1 : d });
@@ -48,8 +48,10 @@
       if (a >= 1e3) return nf(v / 1e3) + 'k';
       return nf(v, 2);
     },
-    pln: function (v) { return nf(Math.round(v), 0) + ' zł'; },
-    usd: function (v) { return '$' + Math.round(v).toLocaleString('en-US'); },
+    currency: function (v) {
+      return (+v).toLocaleString(cfg.locale,
+        { style: 'currency', currency: cfg.currency, maximumFractionDigits: 2 });
+    },
     pct: function (v) { return nf(v) + '%'; },
     num: function (v) { return nf(v, 2); },
     int: function (v) { return nf(Math.round(v), 0); }
@@ -136,7 +138,7 @@
     var m = { t: 12, r: 10, b: 22, l: Math.max(30, String(fmtFn(yMax)).length * 6 + 10) };
     var svg = el('svg', {
       viewBox: '0 0 ' + W + ' ' + H, 'class': 'chart',
-      role: 'img', 'aria-label': opt.title || 'Wykres'
+      role: 'img', 'aria-label': opt.title || 'Chart'
     }, host);
     var tip = tooltip(host);
     var iw = W - m.l - m.r, ih = H - m.t - m.b;
@@ -208,7 +210,7 @@
   }
 
   function line(host, opt) {
-    var src = opt.series || [{ name: opt.name || opt.title || 'Wartość', values: opt.values, color: opt.color }];
+    var src = opt.series || [{ name: opt.name || opt.title || 'Value', values: opt.values, color: opt.color }];
     var series = src.map(function (s, i) {
       var o = {};
       for (var k in s) o[k] = s[k];
@@ -327,14 +329,14 @@
     if (items.length > 6) {
       var rest = items.slice(5).reduce(function (s, d) { return s + d.value; }, 0);
       items = items.slice(0, 5).concat([{
-        label: opt.otherLabel || 'Inne', value: rest, color: 'var(--tb-chart-muted)'
+        label: opt.otherLabel || 'Other', value: rest, color: 'var(--tb-chart-muted)'
       }]);
     }
     var total = items.reduce(function (s, d) { return s + d.value; }, 0) || 1;
     var S = 160, R = 64, r = 46, cx = S / 2, cy = S / 2;
     var svg = el('svg', {
       viewBox: '0 0 ' + S + ' ' + S, 'class': 'chart',
-      role: 'img', 'aria-label': opt.title || 'Udział'
+      role: 'img', 'aria-label': opt.title || 'Share'
     }, host);
     var tip = tooltip(host), a0 = -Math.PI / 2;
     var gapA = items.length > 1 ? 0.025 : 0;
@@ -365,7 +367,7 @@
     var t1 = el('text', { x: cx, y: cy + 4, 'text-anchor': 'middle', 'class': 'tb-donut-center' }, svg);
     t1.textContent = opt.centerValue != null ? opt.centerValue : fmtFn(total);
     var t2 = el('text', { x: cx, y: cy + 20, 'text-anchor': 'middle', 'class': 'tb-donut-sub' }, svg);
-    t2.textContent = opt.centerLabel || 'Razem';
+    t2.textContent = opt.centerLabel || 'Total';
     var ul = document.createElement('ul');
     ul.className = 'tb-legend';
     ul.innerHTML = items.map(function (d) {

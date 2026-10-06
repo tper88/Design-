@@ -1,17 +1,19 @@
 /* ==========================================================================
-   TB RUNTIME v1.0 — silnik wygenerowanego trackera.
+   TB RUNTIME v1.1 — silnik wygenerowanego trackera.
+
+   Interfejs jest po angielsku; komentarze zostają po polsku, bo to kod
+   do utrzymania, nie produkt.
 
    Źródłem prawdy jest PLIK .data.json na dysku użytkownika; IndexedDB jest
    szybkim cache'em lokalnym. Taki podział, bo przy otwarciu przez file://
    magazyn przeglądarki jest kluczowany po ŚCIEŻCE pliku — zmiana nazwy albo
    przeniesienie tracker.html wyglądałaby jak utrata wszystkich danych.
-   Plik .data.json tego nie dotyczy.
 
    Target: Chrome i Edge. Bez File System Access albo IndexedDB tracker
-   pokazuje bramę, a nie udaje, że zapisuje.
+   pokazuje bramę, zamiast udawać, że zapisuje.
 
-   Moduły: cfg · fmt · store · data · agg · render · shell · crud · menu
-           · sel · io · boot
+   Moduły: cfg · fmt · data · agg · store · profile · alerts · sel · render
+           · crud · menu · io · shell · boot
    ========================================================================== */
 (function (global) {
   'use strict';
@@ -23,8 +25,8 @@
   /* ====================================================================== cfg */
 
   var CFG = null;
-  var DS = {};        // id → dataset
-  var COL = {};       // dsId → { colId → column }
+  var DS = {};
+  var COL = {};
   var PREVIEW = false;
 
   function parseConfig() {
@@ -34,11 +36,12 @@
     try {
       cfg = JSON.parse(raw);
     } catch (e) {
-      throw new Error('Nie udało się odczytać konfiguracji trackera: ' + e.message);
+      throw new Error('Could not read the tracker configuration: ' + e.message);
     }
     cfg.meta = cfg.meta || {};
     cfg.datasets = cfg.datasets || [];
     cfg.tabs = cfg.tabs || [];
+    cfg.alerts = cfg.alerts || [];
     cfg.datasets.forEach(function (ds) {
       ds.columns = ds.columns || [];
       DS[ds.id] = ds;
@@ -51,9 +54,12 @@
 
   function column(dsId, colId) { return (COL[dsId] || {})[colId]; }
 
+  TB.config = function () { return CFG; };
+
   /* ====================================================================== fmt */
 
   var fmt = {};
+  var dtf = {};
 
   fmt.esc = function (s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
@@ -61,46 +67,32 @@
     });
   };
 
+  function locale() { return (CFG && CFG.meta.locale) || 'en-GB'; }
+  function currency() { return (CFG && CFG.meta.currency) || 'PLN'; }
+
   fmt.nf = function (v, d) {
-    return (+v).toLocaleString(CFG.meta.locale || 'pl-PL',
+    return (+v).toLocaleString(locale(),
       { maximumFractionDigits: d == null ? 1 : d, minimumFractionDigits: d == null ? 0 : d });
   };
 
   fmt.number = function (v, format, decimals) {
     if (v == null || v === '' || isNaN(v)) return '';
     switch (format) {
-      case 'pln': return fmt.nf(v, decimals == null ? 2 : decimals) + ' zł';
-      case 'usd': return '$' + (+v).toLocaleString('en-US', { maximumFractionDigits: 0 });
-      case 'pct': return fmt.nf(v, decimals == null ? 1 : decimals) + '%';
-      case 'int': return fmt.nf(Math.round(v), 0);
+      case 'currency':
+        return (+v).toLocaleString(locale(),
+          { style: 'currency', currency: currency(), maximumFractionDigits: 2 });
+      case 'percent': return fmt.nf(v, decimals == null ? 1 : decimals) + '%';
+      case 'integer': return fmt.nf(Math.round(v), 0);
       case 'compact': return TBCharts.fmt.compact(v);
       default: return fmt.nf(v, decimals == null ? 2 : decimals);
     }
   };
 
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+
   fmt.todayISO = function () {
     var d = new Date();
     return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
-  };
-  function pad(n) { return (n < 10 ? '0' : '') + n; }
-
-  fmt.date = function (iso) {
-    if (!iso) return '';
-    var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(iso));
-    return m ? m[3] + '.' + m[2] + '.' + m[1] : String(iso);
-  };
-
-  var DAY_NAMES = ['niedz.', 'pon.', 'wt.', 'śr.', 'czw.', 'pt.', 'sob.'];
-  var MONTHS = ['sty', 'lut', 'mar', 'kwi', 'maj', 'cze', 'lip', 'sie', 'wrz', 'paź', 'lis', 'gru'];
-
-  fmt.dayLabel = function (iso) {
-    var today = fmt.todayISO();
-    if (iso === today) return 'Dziś';
-    if (iso === fmt.shiftISO(today, 1)) return 'Jutro';
-    if (iso === fmt.shiftISO(today, -1)) return 'Wczoraj';
-    var d = fmt.parseISO(iso);
-    if (!d) return String(iso);
-    return DAY_NAMES[d.getDay()] + ' ' + fmt.date(iso);
   };
 
   fmt.parseISO = function (iso) {
@@ -117,18 +109,45 @@
     return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
   };
 
-  fmt.monthLabel = function (key) {
-    var m = /^(\d{4})-(\d{2})$/.exec(key);
-    return m ? MONTHS[+m[2] - 1] + ' ' + m[1] : key;
+  function intl(key, opts) {
+    if (!dtf[key]) dtf[key] = new Intl.DateTimeFormat(locale(), opts);
+    return dtf[key];
+  }
+
+  /* Kolejność dnia i miesiąca bierze się z wybranego formatu, nie z kodu:
+     en-GB daje 31/12/2026, en-US 12/31/2026, pl-PL 31.12.2026. */
+  fmt.date = function (iso) {
+    var d = fmt.parseISO(iso);
+    if (!d) return iso ? String(iso) : '';
+    return intl('d', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(d);
   };
 
-  /* Formatuje wartość do wyświetlenia w komórce / na liście. */
+  fmt.dayLabel = function (iso) {
+    var today = fmt.todayISO();
+    if (iso === today) return 'Today';
+    if (iso === fmt.shiftISO(today, 1)) return 'Tomorrow';
+    if (iso === fmt.shiftISO(today, -1)) return 'Yesterday';
+    var d = fmt.parseISO(iso);
+    if (!d) return String(iso);
+    return intl('wd', { weekday: 'short' }).format(d) + ' ' + fmt.date(iso);
+  };
+
+  fmt.monthLabel = function (key) {
+    var m = /^(\d{4})-(\d{2})$/.exec(key);
+    if (!m) return key;
+    return intl('m', { month: 'short', year: 'numeric' }).format(new Date(+m[1], +m[2] - 1, 1));
+  };
+
+  fmt.time = function (date) {
+    return intl('t', { hour: '2-digit', minute: '2-digit' }).format(date);
+  };
+
   fmt.cell = function (value, col) {
     if (value == null || value === '') return '';
-    if (!col) return fmt.esc(value);
+    if (!col) return String(value);
     if (col.type === 'number') return fmt.number(value, col.format, col.decimals);
     if (col.type === 'date') return fmt.date(value);
-    if (col.type === 'bool') return value ? 'tak' : 'nie';
+    if (col.type === 'bool') return value ? 'Yes' : 'No';
     if (col.type === 'enum') {
       var o = optionOf(col, value);
       return o ? o.label : String(value);
@@ -142,23 +161,19 @@
     return null;
   }
 
+  function plural(n, one, many) { return n === 1 ? one : many; }
+
   TB.fmt = fmt;
-  TB.config = function () { return CFG; };
 
   /* ====================================================================== data */
 
-  var data = {
-    byDs: {},        // dsId → [record]
-    rev: {},         // dsId → licznik rewizji (do memoizacji agregacji)
-    index: {}        // recordId → record
-  };
+  var data = { byDs: {}, rev: {}, index: {} };
 
   function dsList(dsId) {
     if (!data.byDs[dsId]) data.byDs[dsId] = [];
     return data.byDs[dsId];
   }
   function bumpRev(dsId) { data.rev[dsId] = (data.rev[dsId] || 0) + 1; }
-
   function liveRecords(dsId) {
     return dsList(dsId).filter(function (r) { return !r._d; });
   }
@@ -191,7 +206,7 @@
       }
       case 'bool':
         if (typeof value === 'boolean') return value;
-        return /^(1|true|tak|yes|y|x)$/i.test(String(value).trim());
+        return /^(1|true|yes|y|x)$/i.test(String(value).trim());
       case 'enum': {
         var v = String(value);
         if (optionOf(col, v)) return v;
@@ -212,7 +227,8 @@
     var d = col.default;
     if (d === '@today') return fmt.todayISO();
     if (d === '@now') return new Date().toISOString();
-    if (d === '@user') return store.userName() || '';
+    if (d === '@user') return profile.get().name || '';
+    if (d === '@team') return profile.get().team || '';
     return d == null ? null : d;
   }
 
@@ -239,15 +255,39 @@
       tomorrow: fmt.shiftISO(today, 1),
       next7: fmt.shiftISO(today, 7),
       next30: fmt.shiftISO(today, 30),
-      monthStart: today.slice(0, 8) + '01',
-      yearStart: today.slice(0, 4) + '-01-01'
+      monthStart: today.slice(0, 8) + '01'
     };
   }
 
   function resolveValue(v, ctx) {
     if (v === '@today') return ctx.today;
-    if (v === '@user') return store.userName() || '';
+    if (v === '@user') return profile.get().name || '';
+    if (v === '@team') return profile.get().team || '';
     return v;
+  }
+
+  function num(v) { var n = parseFloat(v); return isFinite(n) ? n : NaN; }
+
+  function relDate(v, kind, ctx) {
+    if (!v) return false;
+    var iso = String(v).slice(0, 10);
+    var m = /^lastNDays:(\d+)$/.exec(kind || '');
+    if (m) return iso >= fmt.shiftISO(ctx.today, -(+m[1])) && iso <= ctx.today;
+    switch (kind) {
+      case 'today': return iso === ctx.today;
+      case 'tomorrow': return iso === ctx.tomorrow;
+      case 'overdue': return iso < ctx.today;
+      case 'next7': return iso >= ctx.today && iso <= ctx.next7;
+      case 'next30': return iso >= ctx.today && iso <= ctx.next30;
+      case 'thisMonth': return iso.slice(0, 7) === ctx.today.slice(0, 7);
+      case 'lastMonth': {
+        var d = fmt.parseISO(ctx.monthStart);
+        d.setMonth(d.getMonth() - 1);
+        return iso.slice(0, 7) === d.getFullYear() + '-' + pad(d.getMonth() + 1);
+      }
+      case 'thisYear': return iso.slice(0, 4) === ctx.today.slice(0, 4);
+      default: return true;
+    }
   }
 
   function ruleMatch(rec, rule, ctx) {
@@ -278,33 +318,8 @@
     }
   }
 
-  function num(v) { var n = parseFloat(v); return isFinite(n) ? n : NaN; }
-
-  function relDate(v, kind, ctx) {
-    if (!v) return false;
-    var iso = String(v).slice(0, 10);
-    var m = /^lastNDays:(\d+)$/.exec(kind || '');
-    if (m) return iso >= fmt.shiftISO(ctx.today, -(+m[1])) && iso <= ctx.today;
-    switch (kind) {
-      case 'today': return iso === ctx.today;
-      case 'tomorrow': return iso === ctx.tomorrow;
-      case 'overdue': return iso < ctx.today;
-      case 'next7': return iso >= ctx.today && iso <= ctx.next7;
-      case 'next30': return iso >= ctx.today && iso <= ctx.next30;
-      case 'thisMonth': return iso.slice(0, 7) === ctx.today.slice(0, 7);
-      case 'lastMonth': {
-        var d = fmt.parseISO(ctx.monthStart);
-        d.setMonth(d.getMonth() - 1);
-        return iso.slice(0, 7) === d.getFullYear() + '-' + pad(d.getMonth() + 1);
-      }
-      case 'thisYear': return iso.slice(0, 4) === ctx.today.slice(0, 4);
-      default: return true;
-    }
-  }
-
   function filterMatch(rec, filter, ctx) {
     if (!filter) return true;
-    if (filter.op === 'not') return !filterMatch(rec, filter.rule || filter.rules, ctx);
     var rules = filter.rules || [];
     if (!rules.length) return true;
     if (filter.op === 'any') {
@@ -326,8 +341,7 @@
       if (grain === 'month') return iso.slice(0, 7);
       return iso;
     }
-    if (col && col.type === 'enum') return String(value);
-    if (col && col.type === 'bool') return value ? 'tak' : 'nie';
+    if (col && col.type === 'bool') return value ? 'Yes' : 'No';
     return String(value);
   }
 
@@ -362,8 +376,7 @@
     }
   }
 
-  /* Jedna specyfikacja agregacji zasila wszystkie renderery. Zwraca
-     znormalizowany kształt: { scalar, labels, series, total, rows }. */
+  /* Jedna specyfikacja agregacji zasila wszystkie renderery. */
   function aggregate(dsId, spec) {
     spec = spec || { op: 'count' };
     var key = dsId + '|' + (data.rev[dsId] || 0) + '|' + JSON.stringify(spec);
@@ -374,8 +387,7 @@
 
     function valuesOf(list) {
       return list.map(function (r) {
-        var raw = r.data[spec.field];
-        var v = coerce(raw, column(dsId, spec.field));
+        var v = coerce(r.data[spec.field], column(dsId, spec.field));
         return isBad(v) ? null : v;
       }).filter(function (v) { return v != null || spec.op === 'count'; });
     }
@@ -391,24 +403,23 @@
     var grain = spec.groupBy.grain || (gCol && gCol.type === 'date' ? 'month' : null);
     var sCol = spec.split && spec.split.field ? column(dsId, spec.split.field) : null;
 
-    var buckets = {}, order = [];
-    var splitKeys = {}, splitOrder = [];
+    var buckets = {}, order = [], splitSeen = {}, splitOrder = [];
 
     recs.forEach(function (r) {
       var gk = groupKey(r.data[spec.groupBy.field], gCol, grain);
       if (!buckets[gk]) { buckets[gk] = {}; order.push(gk); }
       var sk = sCol ? groupKey(r.data[spec.split.field], sCol, null) : '_';
-      if (!splitKeys[sk]) { splitKeys[sk] = 1; splitOrder.push(sk); }
+      if (!splitSeen[sk]) { splitSeen[sk] = 1; splitOrder.push(sk); }
       if (!buckets[gk][sk]) buckets[gk][sk] = [];
       buckets[gk][sk].push(r);
     });
 
-    var sort = spec.groupBy.sort || 'key_asc';
     function bucketTotal(gk) {
       var all = [];
       for (var sk in buckets[gk]) all = all.concat(buckets[gk][sk]);
       return reduceOp(spec.op, spec.op === 'count' ? all : valuesOf(all)) || 0;
     }
+    var sort = spec.groupBy.sort || 'key_asc';
     if (sort === 'key_asc') order.sort();
     else if (sort === 'key_desc') order.sort().reverse();
     else if (sort === 'value_desc') order.sort(function (a, b) { return bucketTotal(b) - bucketTotal(a); });
@@ -425,7 +436,7 @@
     out.series = splitOrder.map(function (sk) {
       return {
         key: sk,
-        name: sCol ? groupLabel(sk, sCol, null) : (spec.name || 'Wartość'),
+        name: sCol ? groupLabel(sk, sCol, null) : (spec.name || 'Value'),
         values: order.map(function (gk) {
           var list = (buckets[gk] && buckets[gk][sk]) || [];
           return reduceOp(spec.op, spec.op === 'count' ? list : valuesOf(list)) || 0;
@@ -448,15 +459,13 @@
   var store = (function () {
     var db = null;
     var handle = null;
-    var mode = 'none';       // none | auto | prompt | denied
-    var dirtyDs = {};
-    var pending = {};        // recordId → record (do batcha w IndexedDB)
+    var mode = 'none';
+    var pending = {};
     var idbTimer = null, fileTimer = null;
     var lastFileMtime = 0;
     var saveState = 'off';
     var handleRemembered = true;
     var structureNote = null;
-    var userName = '';
 
     function idbOpen() {
       return new Promise(function (res, rej) {
@@ -473,9 +482,7 @@
       });
     }
 
-    function tx(storeName, mode2) {
-      return db.transaction(storeName, mode2).objectStore(storeName);
-    }
+    function tx(name, m) { return db.transaction(name, m).objectStore(name); }
     function reqP(req) {
       return new Promise(function (res, rej) {
         req.onsuccess = function () { res(req.result); };
@@ -486,11 +493,7 @@
        wartości), więc wywołania muszą być owinięte — inaczej wyjątek ucieka
        obok obietnicy i zrywa cały łańcuch zamiast trafić do .catch(). */
     function safe(fn) {
-      try {
-        return fn();
-      } catch (err) {
-        return Promise.reject(err);
-      }
+      try { return fn(); } catch (err) { return Promise.reject(err); }
     }
     function kvGet(k) {
       return safe(function () {
@@ -499,12 +502,6 @@
     }
     function kvPut(k, v) {
       return safe(function () { return reqP(tx('kv', 'readwrite').put({ k: k, v: v })); });
-    }
-
-    function loadFromIdb() {
-      return reqP(tx('records', 'readonly').getAll()).then(function (all) {
-        ingest(all);
-      });
     }
 
     function ingest(records) {
@@ -527,6 +524,7 @@
         trackerId: CFG.meta.trackerId,
         configRev: CFG.rev || 0,
         savedAt: new Date().toISOString(),
+        profile: profile.get(),
         records: all
       };
     }
@@ -537,31 +535,32 @@
       var list = Object.keys(pending).map(function (id) { return pending[id]; });
       pending = {};
       if (!list.length) return Promise.resolve();
-      var s = tx('records', 'readwrite');
-      list.forEach(function (r) { s.put(r); });
-      return new Promise(function (res) {
-        s.transaction.oncomplete = function () { res(); };
-        s.transaction.onerror = function () { res(); };
-      });
+      return safe(function () {
+        var s = tx('records', 'readwrite');
+        list.forEach(function (r) { s.put(r); });
+        return new Promise(function (res) {
+          s.transaction.oncomplete = function () { res(); };
+          s.transaction.onerror = function () { res(); };
+        });
+      }).catch(function () {});
     }
 
     function setSaveState(s) {
       saveState = s;
-      var el = doc.getElementById('tb-save');
-      if (!el) return;
-      el.setAttribute('data-state', s);
-      el.textContent = {
-        off: 'Nie połączono z plikiem',
-        dirty: 'Niezapisane zmiany',
-        saving: 'Zapisuję…',
-        saved: 'Zapisano ' + new Date().toLocaleTimeString(CFG.meta.locale || 'pl-PL',
-          { hour: '2-digit', minute: '2-digit' })
+      var el2 = doc.getElementById('tb-save');
+      if (!el2) return;
+      el2.setAttribute('data-state', s);
+      el2.textContent = {
+        off: 'Not linked to a file',
+        dirty: 'Unsaved changes',
+        saving: 'Saving…',
+        saved: 'Saved ' + fmt.time(new Date())
       }[s] || s;
     }
 
     function flushFile() {
       fileTimer = null;
-      if (!handle || mode !== 'auto') { setSaveState(mode === 'auto' ? 'dirty' : 'off'); return Promise.resolve(); }
+      if (!handle || mode !== 'auto') { setSaveState(handle ? 'dirty' : 'off'); return Promise.resolve(); }
       setSaveState('saving');
       var obj = dataFileObject();
       return handle.createWritable().then(function (w) {
@@ -575,7 +574,7 @@
         setSaveState('saved');
       }).catch(function (err) {
         setSaveState('dirty');
-        TBUI.toast('Nie udało się zapisać pliku: ' + err.message, 'danger', 6000);
+        TBUI.toast('Could not write the data file: ' + err.message, 'danger', 6000);
       });
     }
 
@@ -594,7 +593,6 @@
     function touch(rec) {
       rec._m = Date.now();
       pending[rec.id] = rec;
-      dirtyDs[rec.ds] = 1;
       bumpRev(rec.ds);
       aggCache = {};
       scheduleSave();
@@ -609,35 +607,27 @@
       touch(rec);
     }
 
-    function softDelete(rec) {
-      rec._d = 1;
-      touch(rec);
-    }
+    function softDelete(rec) { rec._d = 1; touch(rec); }
 
-    function saveNow() {
-      return flushIdb().then(flushFile);
-    }
-
-    /* ---- File System Access ---- */
+    function saveNow() { return flushIdb().then(flushFile); }
 
     function pickFile() {
       return global.showSaveFilePicker({
         suggestedName: (CFG.meta.name || 'tracker').replace(/[^\w\-. ]+/g, '_') + '.data.json',
-        types: [{ description: 'Dane trackera', accept: { 'application/json': ['.json'] } }]
+        types: [{ description: 'Tracker data', accept: { 'application/json': ['.json'] } }]
       }).then(function (h) {
         handle = h;
         mode = 'auto';
-        // Nieudane zapamiętanie uchwytu nie może przerwać połączenia —
-        // zapis do pliku działa dalej, tylko nie przetrwa restartu.
+        // Nieudane zapamiętanie uchwytu nie może przerwać połączenia.
         return kvPut('fileHandle', h).catch(function (err) {
           handleRemembered = false;
-          if (global.console) console.warn('[TB] nie zapamiętano uchwytu pliku:', err && err.message);
+          if (global.console) console.warn('[TB] file handle not remembered:', err && err.message);
         });
       }).then(function () {
         return saveNow();
       }).then(function () {
         TB.shell.renderNotices();
-        TBUI.toast('Połączono z plikiem danych', 'success');
+        TBUI.toast('Linked to the data file', 'success');
       });
     }
 
@@ -656,9 +646,14 @@
       });
     }
 
+    /* Profil jest osobisty, więc lokalny ma pierwszeństwo; z pliku bierzemy go
+       tylko wtedy, gdy na tej maszynie jeszcze żadnego nie ma. */
+    function adoptProfile(obj) {
+      if (obj && obj.profile && !profile.hasLocal()) profile.set(obj.profile, true);
+    }
+
     function afterConnect() {
       return handle.getFile().then(function (f) {
-        // Plik jest źródłem prawdy: nowszy niż ostatni nasz zapis ⇒ pytamy.
         if (f.lastModified > lastFileMtime + 2000 && Object.keys(data.index).length) {
           TB.shell.conflict(f);
           return;
@@ -668,13 +663,17 @@
             var obj = JSON.parse(t);
             if (obj && obj.records) {
               ingest(obj.records);
-              var s = tx('records', 'readwrite');
-              obj.records.forEach(function (r) { s.put(r); });
+              adoptProfile(obj);
+              safe(function () {
+                var s = tx('records', 'readwrite');
+                obj.records.forEach(function (r) { s.put(r); });
+              });
             }
           }
           lastFileMtime = f.lastModified;
           setSaveState('saved');
           TB.shell.renderNotices();
+          TB.shell.renderProfile();
           TB.shell.renderActive(true);
         });
       });
@@ -685,9 +684,12 @@
         return f.text().then(function (t) {
           var obj = t && t.trim() ? JSON.parse(t) : { records: [] };
           ingest(obj.records || []);
-          var s = tx('records', 'readwrite');
-          s.clear();
-          (obj.records || []).forEach(function (r) { s.put(r); });
+          adoptProfile(obj);
+          safe(function () {
+            var s = tx('records', 'readwrite');
+            s.clear();
+            (obj.records || []).forEach(function (r) { s.put(r); });
+          });
           lastFileMtime = f.lastModified;
           setSaveState('saved');
           TB.shell.renderNotices();
@@ -703,14 +705,12 @@
       });
     }
 
-    /* Porównanie wersji struktury. Rekordy NIE są przepisywane — zmiana
-       configu dotyczy tylko tego, jak dane są pokazywane. Użytkownik dowiaduje
-       się jednak, co się zmieniło, bo cicha zmiana struktury jest myląca. */
+    /* Porównanie wersji struktury. Rekordy NIE są przepisywane — cicha zmiana
+       struktury jest myląca, więc użytkownik dostaje podsumowanie. */
     function noteStructureChange(prevRev, prevJson) {
       var rev = CFG.rev || 0;
       try {
-        if (prevRev == null) return;              // pierwsze uruchomienie
-        if (rev === prevRev) return;
+        if (prevRev == null || rev === prevRev) return;
         if (rev < prevRev) {
           structureNote = { older: true, from: prevRev, to: rev };
           return;
@@ -753,12 +753,16 @@
       }
       return idbOpen().then(function (d) {
         db = d;
-        return Promise.all([loadFromIdb(), kvGet('fileHandle'), kvGet('lastFileMtime'),
-          kvGet('userName'), kvGet('configRev'), kvGet('configJson')]);
+        return Promise.all([
+          reqP(tx('records', 'readonly').getAll()),
+          kvGet('fileHandle'), kvGet('lastFileMtime'),
+          kvGet('profile'), kvGet('configRev'), kvGet('configJson')
+        ]);
       }).then(function (res) {
+        ingest(res[0]);
         handle = res[1] || null;
         lastFileMtime = res[2] || 0;
-        userName = res[3] || CFG.meta.userName || '';
+        if (res[3]) profile.set(res[3], true);
         noteStructureChange(res[4], res[5]);
         if (!handle) { mode = 'none'; setSaveState('off'); return; }
         return handle.queryPermission({ mode: 'readwrite' }).then(function (p) {
@@ -770,58 +774,181 @@
     }
 
     return {
-      init: init,
-      putRecord: putRecord,
-      softDelete: softDelete,
-      touch: touch,
-      saveNow: saveNow,
-      pickFile: pickFile,
-      reconnect: reconnect,
-      loadFileNow: loadFileNow,
-      keepLocal: keepLocal,
-      dataFileObject: dataFileObject,
-      ingest: ingest,
+      init: init, putRecord: putRecord, softDelete: softDelete, touch: touch,
+      saveNow: saveNow, pickFile: pickFile, reconnect: reconnect,
+      loadFileNow: loadFileNow, keepLocal: keepLocal,
+      dataFileObject: dataFileObject, ingest: ingest,
       replaceAll: function (records) {
         ingest(records);
-        if (db) {
+        safe(function () {
           var s = tx('records', 'readwrite');
           s.clear();
           records.forEach(function (r) { s.put(r); });
-        }
+        });
         return saveNow();
       },
+      persistProfile: function (p) { return kvPut('profile', p).catch(function () {}); },
       mode: function () { return mode; },
       handle: function () { return handle; },
       fileName: function () { return handle ? handle.name : ''; },
       setSaveState: setSaveState,
       state: function () { return saveState; },
-      structureNote: function () { return structureNote; },
       remembered: function () { return handleRemembered; },
-      userName: function () { return userName; },
-      setUserName: function (n) { userName = n; if (db) kvPut('userName', n); }
+      structureNote: function () { return structureNote; }
     };
   })();
 
   TB.store = store;
 
+  /* ====================================================================== profile */
+
+  var profile = (function () {
+    var p = { name: '', team: '', color: 'c1', photo: null };
+    var local = false;
+
+    function initials(name) {
+      var parts = String(name || '').trim().split(/\s+/).filter(Boolean);
+      if (!parts.length) return '?';
+      if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+
+    function set(np, fromStorage) {
+      p = {
+        name: np.name != null ? np.name : p.name,
+        team: np.team != null ? np.team : p.team,
+        color: np.color || p.color || 'c1',
+        photo: np.photo !== undefined ? np.photo : p.photo
+      };
+      if (fromStorage) local = true;
+      return p;
+    }
+
+    function save(np) {
+      set(np);
+      local = true;
+      store.persistProfile(p);
+      store.saveNow();
+      TB.shell.renderProfile();
+      TB.shell.renderActive(true);
+    }
+
+    /* Zdjęcie przeskalowane w przeglądarce do kwadratu 96×96 i skompresowane.
+       Bez tego jedno zdjęcie z telefonu dokładałoby kilka MB do pliku danych,
+       przepisywanych na dysk przy każdym zapisie. */
+    function readPhoto(file, size) {
+      size = size || 96;
+      return new Promise(function (res, rej) {
+        if (!/^image\//.test(file.type)) {
+          rej(new Error('That file is not an image'));
+          return;
+        }
+        var url = URL.createObjectURL(file);
+        var img = new Image();
+        img.onload = function () {
+          try {
+            var c = doc.createElement('canvas');
+            c.width = c.height = size;
+            var g = c.getContext('2d');
+            var s = Math.min(img.width, img.height);
+            g.drawImage(img, (img.width - s) / 2, (img.height - s) / 2, s, s, 0, 0, size, size);
+            res(c.toDataURL('image/jpeg', 0.82));
+          } catch (e) {
+            rej(e);
+          } finally {
+            URL.revokeObjectURL(url);
+          }
+        };
+        img.onerror = function () {
+          URL.revokeObjectURL(url);
+          rej(new Error('Could not read that image'));
+        };
+        img.src = url;
+      });
+    }
+
+    function avatar(extraClass) {
+      var a = doc.createElement('div');
+      a.className = 'tb-avatar' + (extraClass ? ' ' + extraClass : '');
+      a.textContent = initials(p.name);
+      if (p.photo) {
+        a.style.backgroundImage = 'url(' + p.photo + ')';
+        a.classList.add('tb-avatar-has-photo');
+      } else {
+        a.style.background = 'var(--' + (p.color || 'c1') + ')';
+      }
+      return a;
+    }
+
+    return {
+      get: function () { return p; },
+      set: set, save: save, avatar: avatar, initials: initials, readPhoto: readPhoto,
+      hasLocal: function () { return local; }
+    };
+  })();
+
+  TB.profile = profile;
+
+  /* ====================================================================== alerts */
+
+  var alerts = (function () {
+    function compare(n, cmp, value) {
+      switch (cmp) {
+        case 'gte': return n >= value;
+        case 'lt': return n < value;
+        case 'lte': return n <= value;
+        case 'eq': return n === value;
+        case 'ne': return n !== value;
+        default: return n > value;
+      }
+    }
+
+    function active() {
+      return (CFG.alerts || []).map(function (a) {
+        if (!DS[a.dataset]) return null;
+        var r = aggregate(a.dataset, { op: 'count', filter: a.filter });
+        var n = r.scalar || 0;
+        if (!compare(n, a.cmp || 'gt', a.value == null ? 0 : a.value)) return null;
+        return {
+          id: a.id, label: a.label || 'Alert', tone: a.tone || 'warning',
+          count: n, goToTab: a.goToTab || null,
+          text: String(a.message || '{{n}} matching rows').replace(/\{\{n\}\}/g, n)
+        };
+      }).filter(Boolean);
+    }
+
+    var RANK = { danger: 3, warning: 2, info: 1, success: 0 };
+    function worstTone(list) {
+      var best = 'info';
+      list.forEach(function (a) {
+        if ((RANK[a.tone] || 0) > (RANK[best] || 0)) best = a.tone;
+      });
+      return best;
+    }
+
+    return { active: active, worstTone: worstTone };
+  })();
+
+  TB.alerts = alerts;
+
   /* ====================================================================== sel */
 
   var sel = (function () {
-    var byCmp = {};            // componentId → { recordId: 1 }
+    var byCmp = {};
     function set(cmpId) { if (!byCmp[cmpId]) byCmp[cmpId] = {}; return byCmp[cmpId]; }
     return {
-      ids: function (cmpId) { return Object.keys(set(cmpId)); },
-      has: function (cmpId, id) { return !!set(cmpId)[id]; },
-      count: function (cmpId) { return Object.keys(set(cmpId)).length; },
-      toggle: function (cmpId, id, on) {
-        var s = set(cmpId);
+      ids: function (c) { return Object.keys(set(c)); },
+      has: function (c, id) { return !!set(c)[id]; },
+      count: function (c) { return Object.keys(set(c)).length; },
+      toggle: function (c, id, on) {
+        var s = set(c);
         if (on == null) on = !s[id];
         if (on) s[id] = 1; else delete s[id];
         return on;
       },
-      clear: function (cmpId) { byCmp[cmpId] = {}; },
-      setMany: function (cmpId, ids, on) {
-        var s = set(cmpId);
+      clear: function (c) { byCmp[c] = {}; },
+      setMany: function (c, ids, on) {
+        var s = set(c);
         ids.forEach(function (id) { if (on) s[id] = 1; else delete s[id]; });
       }
     };
@@ -831,40 +958,12 @@
 
   /* ====================================================================== render */
 
-  var hostByCmp = {};         // componentId → element hosta wykresu (reużywany)
-  var viewState = {};         // componentId → { q, sort, dir, page, quick }
+  var viewState = {};
+  var lastView = {};
 
   function vs(cmpId) {
     if (!viewState[cmpId]) viewState[cmpId] = { q: '', sort: null, dir: 'asc', page: 1, quick: -1 };
     return viewState[cmpId];
-  }
-
-  function card(title, sub, bodyEl, headExtra) {
-    var c = doc.createElement('section');
-    c.className = 'card';
-    if (title || sub || headExtra) {
-      var h = doc.createElement('div');
-      h.className = 'card-h';
-      var t = doc.createElement('div');
-      if (title) {
-        var tt = doc.createElement('div');
-        tt.className = 'card-t';
-        tt.textContent = title;
-        t.appendChild(tt);
-      }
-      if (sub) {
-        var ss = doc.createElement('div');
-        ss.className = 'tb-muted';
-        ss.style.fontSize = '11.5px';
-        ss.textContent = sub;
-        t.appendChild(ss);
-      }
-      h.appendChild(t);
-      if (headExtra) h.appendChild(headExtra);
-      c.appendChild(h);
-    }
-    if (bodyEl) c.appendChild(bodyEl);
-    return c;
   }
 
   function div(cls, html) {
@@ -881,6 +980,53 @@
     if (onClick) b.addEventListener('click', onClick);
     return b;
   }
+  function card(title, sub, bodyEl, headExtra) {
+    var c = doc.createElement('section');
+    c.className = 'card';
+    if (title || sub || headExtra) {
+      var h = div('card-h');
+      var t = div('');
+      if (title) {
+        var tt = div('card-t');
+        tt.textContent = title;
+        t.appendChild(tt);
+      }
+      if (sub) {
+        var ss = div('tb-muted');
+        ss.style.fontSize = '11.5px';
+        ss.textContent = sub;
+        t.appendChild(ss);
+      }
+      h.appendChild(t);
+      if (headExtra) h.appendChild(headExtra);
+      c.appendChild(h);
+    }
+    if (bodyEl) c.appendChild(bodyEl);
+    return c;
+  }
+  function emptyBox(title, text, actions) {
+    var e = div('tb-empty');
+    var s = doc.createElement('strong');
+    s.textContent = title;
+    e.appendChild(s);
+    if (text) {
+      var p = doc.createElement('div');
+      p.textContent = text;
+      e.appendChild(p);
+    }
+    if (actions && actions.length) {
+      var a = div('tb-empty-actions');
+      actions.forEach(function (x) { a.appendChild(x); });
+      e.appendChild(a);
+    }
+    return e;
+  }
+  function toneColor(tone) {
+    return {
+      success: 'var(--tb-ok)', danger: 'var(--tb-bad)',
+      warning: 'var(--tb-warn)', info: 'var(--tb-info)'
+    }[tone] || 'var(--c1)';
+  }
 
   var render = {};
 
@@ -889,18 +1035,17 @@
     var opts = cmp.opts || {};
     var body = div('');
     var v = div('kpi-v');
-    v.textContent = fmt.number(r.scalar == null ? 0 : r.scalar, opts.format || 'num', opts.decimals);
+    v.textContent = fmt.number(r.scalar == null ? 0 : r.scalar, opts.format || 'number', opts.decimals);
     body.appendChild(v);
     if (opts.spark && opts.spark.field) {
-      var spec = {
+      var sp = aggregate(cmp.dataset, {
         op: cmp.agg.op, field: cmp.agg.field, filter: cmp.agg.filter,
         groupBy: { field: opts.spark.field, grain: opts.spark.grain || 'month', sort: 'key_asc' }
-      };
-      var sp = aggregate(cmp.dataset, spec);
+      });
       if (sp.series.length && sp.series[0].values.length > 1) {
         var sdiv = div('');
         body.appendChild(sdiv);
-        TBCharts.spark(sdiv, { values: sp.series[0].values, color: opts.tone || 'c1' });
+        TBCharts.spark(sdiv, { values: sp.series[0].values, color: 'c1' });
       }
     }
     var t = div('kpi-t');
@@ -924,36 +1069,36 @@
     var kind = opts.kind || 'bar';
     var r = aggregate(cmp.dataset, cmp.agg);
     host.innerHTML = '';
-
     var chartHost = div('');
-    var legendWrap = null;
     var c = card(cmp.title, cmp.subtitle, chartHost);
     host.appendChild(c);
 
-    if (!r.labels.length && kind !== 'donut') {
-      chartHost.appendChild(emptyBox('Brak danych do pokazania',
-        'Dodaj rekordy w zakładce z tabelą, a wykres policzy się sam.'));
+    if (!r.labels.length) {
+      chartHost.appendChild(emptyBox('Nothing to chart yet',
+        'Add rows in a table tab — the chart recalculates on its own.'));
       return;
     }
 
-    var fmtFn = function (v) { return fmt.number(v, opts.format || cmp.agg.format || 'compact'); };
+    var fmtFn = function (v) { return fmt.number(v, opts.format || 'compact'); };
 
     if (kind === 'donut') {
       var items = r.labels.map(function (l, i) {
         return { label: l, value: r.series.length ? r.series[0].values[i] : 0 };
       }).filter(function (d) { return d.value > 0; });
       if (!items.length) {
-        chartHost.appendChild(emptyBox('Brak danych do pokazania', ''));
+        chartHost.appendChild(emptyBox('Nothing to chart yet', ''));
         return;
       }
-      TBCharts.donut(chartHost, { items: items, format: fmtFn, centerLabel: opts.centerLabel || 'Razem' });
+      TBCharts.donut(chartHost, { items: items, format: fmtFn, centerLabel: opts.centerLabel || 'Total' });
       return;
     }
     if (kind === 'hbar') {
-      var hitems = r.labels.map(function (l, i) {
-        return { label: l, value: r.series.length ? r.series[0].values[i] : 0 };
+      TBCharts.hbar(chartHost, {
+        items: r.labels.map(function (l, i) {
+          return { label: l, value: r.series.length ? r.series[0].values[i] : 0 };
+        }),
+        format: fmtFn, fill: 'c1'
       });
-      TBCharts.hbar(chartHost, { items: hitems, format: fmtFn, fill: 'c1' });
       return;
     }
 
@@ -971,36 +1116,18 @@
       TBCharts.bar(chartHost, callOpts);
     }
 
-    // Legenda jest obowiązkowa od 2 serii — reguła z PROMPT.md §5.
+    // Legenda jest obowiązkowa od 2 serii.
     if (series.length >= 2) {
-      legendWrap = doc.createElement('ul');
-      legendWrap.className = 'tb-legend';
-      legendWrap.style.cssText = 'display:flex;flex-direction:row;gap:14px;flex-wrap:wrap;margin-top:8px';
-      legendWrap.innerHTML = series.map(function (s, i) {
+      var legend = doc.createElement('ul');
+      legend.className = 'tb-legend';
+      legend.style.cssText = 'display:flex;flex-direction:row;gap:14px;flex-wrap:wrap;margin-top:8px';
+      legend.innerHTML = series.map(function (s, i) {
         return '<li class="tb-legend-row"><span class="tb-dot" style="--tb-dot:var(--c' +
           ((i % 5) + 1) + ')"></span>' + fmt.esc(s.name) + '</li>';
       }).join('');
-      c.appendChild(legendWrap);
+      c.appendChild(legend);
     }
   };
-
-  function emptyBox(title, text, actions) {
-    var e = div('tb-empty');
-    var s = doc.createElement('strong');
-    s.textContent = title;
-    e.appendChild(s);
-    if (text) {
-      var p = doc.createElement('div');
-      p.textContent = text;
-      e.appendChild(p);
-    }
-    if (actions && actions.length) {
-      var a = div('tb-empty-actions');
-      actions.forEach(function (x) { a.appendChild(x); });
-      e.appendChild(a);
-    }
-    return e;
-  }
 
   render.progress = function (host, cmp) {
     var opts = cmp.opts || {};
@@ -1010,9 +1137,9 @@
     var pctv = target > 0 ? Math.min(100, (value / target) * 100) : 0;
     var body = div('');
     var meta = div('tb-bar-meta');
-    meta.innerHTML = '<span>' + fmt.esc(cmp.subtitle || 'Realizacja') + '</span><b>' +
-      fmt.esc(fmt.number(value, opts.format || 'num')) +
-      (target > 0 ? ' / ' + fmt.esc(fmt.number(target, opts.format || 'num')) : '') + '</b>';
+    meta.innerHTML = '<span>' + fmt.esc(cmp.subtitle || 'Progress') + '</span><b>' +
+      fmt.esc(fmt.number(value, opts.format || 'number')) +
+      (target > 0 ? ' / ' + fmt.esc(fmt.number(target, opts.format || 'number')) : '') + '</b>';
     var track = div('bar');
     var fill = div('tb-bar-fill' + (pctv >= 100 ? ' tb-bar-fill-ok' : ''));
     fill.style.width = pctv.toFixed(1) + '%';
@@ -1028,7 +1155,7 @@
     var text = opts.text || '';
     if (cmp.dataset && cmp.agg) {
       var r = aggregate(cmp.dataset, cmp.agg);
-      text = text.replace(/\{\{v\}\}/g, fmt.number(r.scalar == null ? 0 : r.scalar, opts.format || 'int'));
+      text = text.replace(/\{\{v\}\}/g, fmt.number(r.scalar == null ? 0 : r.scalar, opts.format || 'integer'));
     }
     var b = div('tb-banner' + (opts.tone ? ' tb-banner-' + opts.tone : ''));
     b.innerHTML = '<i>' + fmt.esc(opts.icon || 'ℹ') + '</i><div class="tb-banner-body">' +
@@ -1040,23 +1167,24 @@
 
   render.agenda = function (host, cmp) {
     var opts = cmp.opts || {};
-    var sources = opts.sources || [];
     var ctx = ctxNow();
     var items = [];
-    sources.forEach(function (src) {
+    (opts.sources || []).forEach(function (src) {
       var ds = DS[src.dataset];
       if (!ds) return;
       filtered(src.dataset, src.filter).forEach(function (r) {
         var iso = r.data[src.dateField];
         if (!iso) return;
         iso = String(iso).slice(0, 10);
-        if (opts.range === 'next30' && (iso < ctx.today && !opts.showOverdue)) return;
-        if (opts.range === 'next30' && iso > ctx.next30) return;
+        if (opts.range === 'next30') {
+          if (iso > ctx.next30) return;
+          if (iso < ctx.today && !opts.showOverdue) return;
+        }
         var toneCol = src.toneField ? column(src.dataset, src.toneField) : null;
         var o = toneCol ? optionOf(toneCol, r.data[src.toneField]) : null;
         items.push({
           iso: iso,
-          title: r.data[src.titleField] || r.data[ds.titleField] || '(bez nazwy)',
+          title: r.data[src.titleField] || r.data[ds.titleField] || '(untitled)',
           meta: src.metaField ? fmt.cell(r.data[src.metaField], column(src.dataset, src.metaField)) : '',
           tone: o ? o.tone : null,
           rec: r
@@ -1067,8 +1195,8 @@
 
     var body = div('tb-agenda');
     if (!items.length) {
-      body.appendChild(emptyBox(opts.emptyText || 'Brak terminów',
-        'Terminy pojawią się tu automatycznie, gdy uzupełnisz kolumnę z datą.'));
+      body.appendChild(emptyBox(opts.emptyText || 'No dates yet',
+        'Entries show up here as soon as a date column is filled in.'));
     } else {
       var groups = {}, order = [];
       items.forEach(function (it) {
@@ -1080,7 +1208,7 @@
           (iso === ctx.today ? ' is-today' : '') + (iso < ctx.today ? ' is-overdue' : ''));
         var head = div('tb-agenda-date');
         head.innerHTML = fmt.esc(fmt.dayLabel(iso)) +
-          (iso < ctx.today ? ' <small>po terminie</small>' : '') +
+          (iso < ctx.today ? ' <small>overdue</small>' : '') +
           ' <small>' + groups[iso].length + '</small>';
         g.appendChild(head);
         groups[iso].forEach(function (it) {
@@ -1099,14 +1227,7 @@
     host.appendChild(card(cmp.title, cmp.subtitle, body));
   };
 
-  function toneColor(tone) {
-    return {
-      success: 'var(--tb-ok)', danger: 'var(--tb-bad)',
-      warning: 'var(--tb-warn)', info: 'var(--tb-info)'
-    }[tone] || 'var(--c1)';
-  }
-
-  /* ---- karteczki ---- */
+  /* ---- sticky notes ---- */
 
   render.notes = function (host, cmp) {
     var dsId = 'c:' + cmp.id;
@@ -1116,16 +1237,17 @@
     var body = div('tb-notes');
     recs.forEach(function (r) { body.appendChild(noteCard(r, false)); });
 
-    var add = btn('+ Dodaj karteczkę', 'btn-secondary', function () {
-      var rec = { id: newId('r_'), ds: dsId, data: { text: '', color: 'c1', order: Date.now(), rowRef: null },
-        _c: Date.now(), _m: Date.now(), _d: 0 };
-      store.putRecord(rec);
+    var add = btn('+ Add note', 'btn-secondary', function () {
+      store.putRecord({
+        id: newId('r_'), ds: dsId,
+        data: { text: '', color: 'c1', order: Date.now(), rowRef: null },
+        _c: Date.now(), _m: Date.now(), _d: 0
+      });
     });
     host.innerHTML = '';
-    var c = card(cmp.title, cmp.subtitle, recs.length ? body :
-      emptyBox('Brak karteczek', 'Dodaj pierwszą, żeby zapisać myśl, której nie chcesz trzymać w głowie.'),
-      add);
-    host.appendChild(c);
+    host.appendChild(card(cmp.title, cmp.subtitle, recs.length ? body :
+      emptyBox('No notes yet', 'Add one to park a thought you do not want to keep in your head.'),
+      add));
   };
 
   function noteCard(rec, pinned) {
@@ -1133,7 +1255,7 @@
     var t = doc.createElement('div');
     t.className = 'tb-note-text';
     t.contentEditable = 'true';
-    t.setAttribute('data-placeholder', 'Wpisz treść…');
+    t.setAttribute('data-placeholder', 'Write something…');
     t.textContent = rec.data.text || '';
     // commit na blur, nie na input — żeby nie zapisywać każdego klawisza
     t.addEventListener('blur', function () {
@@ -1151,8 +1273,8 @@
     ['c1', 'c2', 'c3', 'c4', 'c5'].forEach(function (c) {
       var b = doc.createElement('button');
       b.type = 'button';
-      b.title = 'Zmień kolor';
-      b.setAttribute('aria-label', 'Kolor ' + c);
+      b.title = 'Change colour';
+      b.setAttribute('aria-label', 'Colour ' + c);
       b.style.background = 'var(--' + c + ')';
       b.addEventListener('click', function () {
         rec.data.color = c;
@@ -1163,15 +1285,15 @@
     foot.appendChild(colors);
     var del = doc.createElement('button');
     del.type = 'button';
-    del.setAttribute('aria-label', 'Usuń karteczkę');
-    del.title = 'Usuń';
+    del.setAttribute('aria-label', 'Delete note');
+    del.title = 'Delete';
     del.textContent = '✕';
     del.style.cssText = 'border:0;background:none;cursor:pointer;color:inherit;opacity:.6;padding:0 2px';
     del.addEventListener('click', function () {
       TBUI.confirm({
-        title: 'Usunąć karteczkę?',
-        text: 'Treść zostanie usunięta z trackera.',
-        confirmLabel: 'Usuń karteczkę', tone: 'danger'
+        title: 'Delete this note?',
+        text: 'The text will be removed from the tracker.',
+        confirmLabel: 'Delete note', tone: 'danger'
       }).then(function (ok) { if (ok) store.softDelete(rec); });
     });
     foot.appendChild(del);
@@ -1179,7 +1301,7 @@
     return n;
   }
 
-  /* ---- checklista ---- */
+  /* ---- checklist ---- */
 
   render.checklist = function (host, cmp) {
     var dsId = 'c:' + cmp.id;
@@ -1187,7 +1309,6 @@
     var recs = liveRecords(dsId);
     recs.sort(function (a, b) { return (a.data.order || 0) - (b.data.order || 0); });
 
-    // resetDaily: pozycja odhaczona innego dnia wraca jako niezrobiona
     var today = fmt.todayISO();
     recs.forEach(function (r) {
       if (r.data.resetDaily && r.data.done && r.data.lastDoneOn !== today) {
@@ -1215,14 +1336,16 @@
     var addWrap = div('tb-check-add');
     var inp = doc.createElement('input');
     inp.className = 'tb-input tb-input-sm';
-    inp.placeholder = 'Nowa pozycja i Enter';
-    inp.setAttribute('aria-label', 'Nowa pozycja checklisty');
+    inp.placeholder = 'New item, then Enter';
+    inp.setAttribute('aria-label', 'New checklist item');
     inp.addEventListener('keydown', function (e) {
       if (e.key !== 'Enter' || !inp.value.trim()) return;
       store.putRecord({
         id: newId('r_'), ds: dsId,
-        data: { text: inp.value.trim(), done: false, order: Date.now(), group: '', due: null,
-          resetDaily: !!opts.resetDaily },
+        data: {
+          text: inp.value.trim(), done: false, order: Date.now(), group: '', due: null,
+          resetDaily: !!opts.resetDaily
+        },
         _c: Date.now(), _m: Date.now(), _d: 0
       });
       inp.value = '';
@@ -1236,7 +1359,7 @@
     host.innerHTML = '';
     var inner = div('');
     inner.appendChild(recs.length ? body :
-      emptyBox('Checklista jest pusta', 'Dopisz pierwszą pozycję w polu poniżej.'));
+      emptyBox('Checklist is empty', 'Type the first item in the box below.'));
     inner.appendChild(addWrap);
     host.appendChild(card(cmp.title, cmp.subtitle, inner, counter));
   };
@@ -1249,7 +1372,7 @@
     cb.type = 'checkbox';
     cb.className = 'tb-check';
     cb.checked = !!rec.data.done;
-    cb.setAttribute('aria-label', rec.data.text || 'Pozycja');
+    cb.setAttribute('aria-label', rec.data.text || 'Item');
     cb.addEventListener('change', function () {
       rec.data.done = cb.checked;
       rec.data.lastDoneOn = cb.checked ? fmt.todayISO() : null;
@@ -1281,22 +1404,63 @@
     del.type = 'button';
     del.className = 'tb-modal-close';
     del.style.cssText = 'width:22px;height:22px;font-size:11px';
-    del.setAttribute('aria-label', 'Usuń pozycję');
+    del.setAttribute('aria-label', 'Delete item');
     del.textContent = '✕';
     del.addEventListener('click', function () { store.softDelete(rec); });
     it.appendChild(del);
     return it;
   }
 
-  /* ---- tabela ---- */
+  /* ---- table ---- */
+
+  function cmpVal(a, b, col) {
+    var va = coerce(a, col), vb = coerce(b, col);
+    if (isBad(va)) va = a;
+    if (isBad(vb)) vb = b;
+    if (va == null && vb == null) return 0;
+    if (va == null) return 1;
+    if (vb == null) return -1;
+    if (typeof va === 'number' && typeof vb === 'number') return va - vb;
+    if (typeof va === 'boolean') return (va ? 1 : 0) - (vb ? 1 : 0);
+    return String(va).localeCompare(String(vb), locale());
+  }
+
+  function pgBtn(label, enabled, onClick) {
+    var b = doc.createElement('button');
+    b.type = 'button';
+    b.className = 'tb-pg';
+    b.textContent = label;
+    b.disabled = !enabled;
+    if (enabled) b.addEventListener('click', onClick);
+    return b;
+  }
+
+  function pageNumbers(cur, pages) {
+    if (pages <= 7) {
+      var a = [];
+      for (var i = 1; i <= pages; i++) a.push(i);
+      return a;
+    }
+    var out = [1];
+    if (cur > 3) out.push('…');
+    for (var p = Math.max(2, cur - 1); p <= Math.min(pages - 1, cur + 1); p++) out.push(p);
+    if (cur < pages - 2) out.push('…');
+    out.push(pages);
+    return out;
+  }
 
   render.table = function (host, cmp) {
     var opts = cmp.opts || {};
     var ds = DS[cmp.dataset];
-    if (!ds) { host.innerHTML = ''; host.appendChild(emptyBox('Brak zbioru danych', '')); return; }
+    if (!ds) {
+      host.innerHTML = '';
+      host.appendChild(emptyBox('No dataset selected', ''));
+      return;
+    }
 
     var state = vs(cmp.id);
-    var cols = (opts.columns && opts.columns.length ? opts.columns : ds.columns.map(function (c) { return c.id; }))
+    var cols = (opts.columns && opts.columns.length
+      ? opts.columns : ds.columns.map(function (c) { return c.id; }))
       .map(function (id) { return column(cmp.dataset, id); })
       .filter(Boolean);
 
@@ -1333,16 +1497,16 @@
     host.innerHTML = '';
     var wrap = div('');
 
-    /* --- pasek narzędzi --- */
+    /* --- toolbar --- */
     var bar = div('tb-toolbar');
     if (opts.search !== false) {
       var sw = div('tb-search');
       var si = doc.createElement('input');
       si.type = 'search';
       si.className = 'tb-input';
-      si.placeholder = 'Szukaj…';
+      si.placeholder = 'Search…';
       si.value = state.q || '';
-      si.setAttribute('aria-label', 'Szukaj w tabeli');
+      si.setAttribute('aria-label', 'Search the table');
       var tmr = null;
       si.addEventListener('input', function () {
         clearTimeout(tmr);
@@ -1379,22 +1543,18 @@
     var selN = sel.count(cmp.id);
     if (selN) {
       var selInfo = div('tb-count');
-      selInfo.textContent = 'zaznaczono ' + selN;
+      selInfo.textContent = selN + ' selected';
       bar.appendChild(selInfo);
     }
     if (opts.allowAdd !== false) {
-      bar.appendChild(btn('+ Dodaj wiersz', 'btn-primary', function () {
+      bar.appendChild(btn('+ Add row', 'btn-primary', function () {
         crud.detail(blankRecord(cmp.dataset), cmp, true);
       }));
     }
-    if (opts.export === undefined || opts.export) {
-      bar.appendChild(btn('Eksport', 'btn-secondary', function (e) {
-        io.exportMenu(e, cmp, { rows: rows, cols: cols, pageRows: pageRows });
-      }));
-    }
+    bar.appendChild(btn('Export', 'btn-secondary', function (e) { io.exportMenu(e, cmp); }));
     wrap.appendChild(bar);
 
-    /* --- tabela --- */
+    /* --- table --- */
     var tw = div('tb-table-wrap');
     var table = doc.createElement('table');
     table.className = 'tb-table';
@@ -1408,7 +1568,7 @@
       var all = doc.createElement('input');
       all.type = 'checkbox';
       all.className = 'tb-check';
-      all.setAttribute('aria-label', 'Zaznacz wszystkie na stronie');
+      all.setAttribute('aria-label', 'Select all rows on this page');
       var pageIds = pageRows.map(function (r) { return r.id; });
       var selOnPage = pageIds.filter(function (id) { return sel.has(cmp.id, id); }).length;
       all.checked = pageIds.length > 0 && selOnPage === pageIds.length;
@@ -1437,16 +1597,14 @@
     table.appendChild(thead);
 
     var tbody = doc.createElement('tbody');
-    pageRows.forEach(function (r) {
-      tbody.appendChild(tableRow(r, cols, cmp, opts, host));
-    });
+    pageRows.forEach(function (r) { tbody.appendChild(tableRow(r, cols, cmp, opts, host)); });
     table.appendChild(tbody);
 
     if (opts.totals && Object.keys(opts.totals).length) {
       var tfoot = doc.createElement('tfoot');
       var ftr = doc.createElement('tr');
       if (opts.selectable !== false) ftr.appendChild(doc.createElement('td'));
-      cols.forEach(function (c) {
+      cols.forEach(function (c, ci) {
         var td = doc.createElement('td');
         var op = opts.totals[c.id];
         if (op) {
@@ -1454,8 +1612,8 @@
           var vals = rows.map(function (r) { return coerce(r.data[c.id], c); })
             .filter(function (v) { return typeof v === 'number'; });
           td.textContent = fmt.number(reduceOp(op, vals), c.format, c.decimals);
-        } else if (c === cols[0]) {
-          td.textContent = 'Razem';
+        } else if (ci === 0) {
+          td.textContent = 'Total';
         }
         ftr.appendChild(td);
       });
@@ -1467,26 +1625,27 @@
     wrap.appendChild(tw);
 
     if (!base.length) {
-      wrap.appendChild(emptyBox('Jeszcze nie ma żadnych wierszy',
-        'Dodaj pierwszy wiersz albo wklej dane z Excela przez Ctrl+V.',
-        [btn('+ Dodaj wiersz', 'btn-primary', function () {
+      wrap.appendChild(emptyBox('No rows yet',
+        'Add the first row, or paste straight from Excel with Ctrl+V.',
+        [btn('+ Add row', 'btn-primary', function () {
           crud.detail(blankRecord(cmp.dataset), cmp, true);
         }),
-        btn('Wklej z Excela', 'btn-secondary', function () { io.pasteDialog(cmp.dataset); })]));
+        btn('Paste from Excel', 'btn-secondary', function () { io.pasteDialog(cmp.dataset); })]));
     } else if (!rows.length) {
-      wrap.appendChild(emptyBox('Nic nie pasuje do filtrów',
-        'Zmień wyszukiwaną frazę albo wyłącz filtr.',
-        [btn('Wyczyść filtry', 'btn-secondary', function () {
+      wrap.appendChild(emptyBox('Nothing matches your filters',
+        'Change the search term or clear the filter.',
+        [btn('Clear filters', 'btn-secondary', function () {
           state.q = ''; state.quick = -1; state.page = 1;
           render.table(host, cmp);
         })]));
     }
 
-    /* --- paginacja --- */
+    /* --- pagination --- */
     var pager = div('tb-pager');
     var info = doc.createElement('span');
-    info.textContent = rows.length + (capped ? ' z ponad 500 (pokazuję pierwsze 500)' : '') +
-      (rows.length !== base.length ? ' z ' + base.length : '') + ' · strona ' + state.page + '/' + pages;
+    info.textContent = rows.length + ' ' + plural(rows.length, 'row', 'rows') +
+      (rows.length !== base.length ? ' of ' + base.length : '') +
+      ' · page ' + state.page + ' of ' + pages;
     pager.appendChild(info);
     if (pages > 1) {
       pager.appendChild(div('tb-spacer'));
@@ -1509,54 +1668,16 @@
     if (capped) {
       var warn = div('tb-banner tb-banner-warning');
       warn.innerHTML = '<i>⚠</i><div class="tb-banner-body"><div class="tb-banner-title">' +
-        'Pokazuję pierwsze 500 wierszy</div><div class="tb-banner-text">' +
-        'Zawęź filtry albo wyszukiwanie, żeby zobaczyć pozostałe. Eksport obejmuje ' +
-        'wszystkie pasujące wiersze.</div></div>';
+        'Showing the first 500 rows</div><div class="tb-banner-text">' +
+        'Narrow the filter or the search to see the rest. Export still covers every ' +
+        'matching row.</div></div>';
       wrap.appendChild(warn);
     }
 
     host.appendChild(card(cmp.title, cmp.subtitle, wrap));
-    // zapamiętujemy widok, żeby menu kontekstowe i eksport znały aktualne
-    // wiersze i kolejność kolumn bez ponownego liczenia
     lastView[cmp.id] = { rows: rows, cols: cols, pageRows: pageRows };
-    menu.register(cmp, host);
+    menu.register(cmp);
   };
-
-  function pgBtn(label, enabled, onClick) {
-    var b = doc.createElement('button');
-    b.type = 'button';
-    b.className = 'tb-pg';
-    b.textContent = label;
-    b.disabled = !enabled;
-    if (enabled) b.addEventListener('click', onClick);
-    return b;
-  }
-
-  function pageNumbers(cur, pages) {
-    if (pages <= 7) {
-      var a = [];
-      for (var i = 1; i <= pages; i++) a.push(i);
-      return a;
-    }
-    var out = [1];
-    if (cur > 3) out.push('…');
-    for (var p = Math.max(2, cur - 1); p <= Math.min(pages - 1, cur + 1); p++) out.push(p);
-    if (cur < pages - 2) out.push('…');
-    out.push(pages);
-    return out;
-  }
-
-  function cmpVal(a, b, col) {
-    var va = coerce(a, col), vb = coerce(b, col);
-    if (isBad(va)) va = a;
-    if (isBad(vb)) vb = b;
-    if (va == null && vb == null) return 0;
-    if (va == null) return 1;
-    if (vb == null) return -1;
-    if (typeof va === 'number' && typeof vb === 'number') return va - vb;
-    if (typeof va === 'boolean') return (va ? 1 : 0) - (vb ? 1 : 0);
-    return String(va).localeCompare(String(vb), CFG.meta.locale || 'pl-PL');
-  }
 
   function tableRow(rec, cols, cmp, opts, host) {
     var tr = doc.createElement('tr');
@@ -1570,12 +1691,10 @@
       cb.type = 'checkbox';
       cb.className = 'tb-check';
       cb.checked = sel.has(cmp.id, rec.id);
-      cb.setAttribute('aria-label', 'Zaznacz wiersz');
+      cb.setAttribute('aria-label', 'Select row');
       cb.addEventListener('change', function () {
         sel.toggle(cmp.id, rec.id, cb.checked);
-        tr.classList.toggle('is-selected', cb.checked);
-        var bar = host.querySelector('.tb-toolbar');
-        if (bar) render.table(host, cmp);
+        render.table(host, cmp);
       });
       cb.addEventListener('click', function (e) { e.stopPropagation(); });
       td0.appendChild(cb);
@@ -1591,7 +1710,7 @@
 
       if (isBad(v)) {
         td.className += ' tb-cell-warn';
-        td.title = 'Wartość nie pasuje do typu kolumny (' + c.type + '). Oryginał zachowany.';
+        td.title = 'This value does not match the column type (' + c.type + '). The original is kept.';
         td.textContent = String(raw);
       } else if (c.type === 'enum') {
         var o = optionOf(c, v);
@@ -1619,7 +1738,6 @@
         td.textContent = fmt.cell(v, c);
       }
 
-      // edycja inline: commit na blur/Enter, NIGDY na input
       if (opts.editable !== false && opts.inlineEdit !== false &&
           c.type !== 'bool' && c.type !== 'longtext') {
         td.addEventListener('dblclick', function () { editCell(td, rec, c); });
@@ -1661,7 +1779,7 @@
     } else {
       input = doc.createElement('input');
       input.className = 'tb-input';
-      input.type = col.type === 'date' ? 'date' : (col.type === 'number' ? 'text' : 'text');
+      input.type = col.type === 'date' ? 'date' : 'text';
       if (col.type === 'number') input.inputMode = 'decimal';
       input.value = isBad(v) ? String(rec.data[col.id]) : (v == null ? '' : String(v));
     }
@@ -1676,7 +1794,7 @@
       done = true;
       var nv = coerce(input.value, col);
       if (isBad(nv)) {
-        TBUI.toast('„' + input.value + '" nie pasuje do kolumny ' + col.label, 'warning', 4000);
+        TBUI.toast('“' + input.value + '” does not fit the ' + col.label + ' column', 'warning', 4000);
         td.classList.remove('tb-cell-edit');
         td.innerHTML = old;
         return;
@@ -1704,11 +1822,45 @@
 
   var crud = {};
 
+  function validateField(inp, col, fieldEl) {
+    var val = col.type === 'bool' ? inp.checked : inp.value;
+    var err = null;
+    if (col.required && (val === '' || val == null)) err = 'This field is required.';
+    else if (val !== '' && col.type !== 'bool') {
+      var v = coerce(val, col);
+      if (isBad(v)) {
+        err = col.type === 'number' ? 'Enter a number, for example 1234.50.'
+          : col.type === 'date' ? 'Pick a date from the calendar.'
+          : 'That value does not fit this field.';
+      }
+    }
+    var old = fieldEl ? fieldEl.querySelector('.tb-err') : null;
+    if (old) old.remove();
+    if (err) {
+      inp.setAttribute('aria-invalid', 'true');
+      if (fieldEl) {
+        var e = div('tb-err');
+        e.textContent = err;
+        fieldEl.appendChild(e);
+      }
+      return false;
+    }
+    inp.removeAttribute('aria-invalid');
+    return true;
+  }
+
+  function firstNotesComponent() {
+    var found = null;
+    CFG.tabs.forEach(function (t) {
+      (t.components || []).forEach(function (c) { if (!found && c.type === 'notes') found = c; });
+    });
+    return found;
+  }
+
   crud.detail = function (rec, cmp, isNew) {
     var ds = DS[rec.ds];
     if (!ds) return;
-    var form = doc.createElement('div');
-    form.className = 'tb-stack';
+    var form = div('tb-stack');
     var inputs = {};
 
     ds.columns.forEach(function (c) {
@@ -1760,11 +1912,10 @@
       form.appendChild(f);
     });
 
-    // karteczki przypięte do tego wiersza
     var notesWrap = div('tb-stack');
     notesWrap.style.gap = '8px';
     var pinHead = div('tb-check-group');
-    pinHead.textContent = 'Karteczki do tego wiersza';
+    pinHead.textContent = 'Notes on this row';
     notesWrap.appendChild(pinHead);
     var pinBox = div('tb-notes');
     notesWrap.appendChild(pinBox);
@@ -1782,15 +1933,15 @@
       if (!found.length) {
         var p = div('tb-muted');
         p.style.fontSize = '12.5px';
-        p.textContent = 'Brak karteczek przypiętych do tego wiersza.';
+        p.textContent = 'No notes pinned to this row yet.';
         pinBox.appendChild(p);
       }
     }
     renderPins();
-    var addPin = btn('+ Przypnij karteczkę', 'btn-ghost', function () {
+    notesWrap.appendChild(btn('+ Pin a note', 'btn-ghost', function () {
       var target = firstNotesComponent();
       if (!target) {
-        TBUI.toast('Dodaj w wizardzie komponent karteczek, żeby móc je przypinać', 'warning', 5000);
+        TBUI.toast('Add a notes component in the wizard to pin notes to rows', 'warning', 5000);
         return;
       }
       store.putRecord({
@@ -1799,19 +1950,18 @@
         _c: Date.now(), _m: Date.now(), _d: 0
       });
       renderPins();
-    });
-    notesWrap.appendChild(addPin);
+    }));
     form.appendChild(notesWrap);
 
-    var actions = [{ label: 'Zamknij', variant: 'ghost' }];
+    var actions = [{ label: 'Close', variant: 'ghost' }];
     if (!isNew) {
       actions.unshift({
-        label: 'Usuń wiersz', variant: 'secondary', close: false,
+        label: 'Delete row', variant: 'secondary', close: false,
         onClick: function () {
           TBUI.confirm({
-            title: 'Usunąć wiersz?',
-            text: 'Wiersz zniknie z tabeli i z wyliczeń. Operacja dotyczy 1 wiersza.',
-            confirmLabel: 'Usuń wiersz', tone: 'danger'
+            title: 'Delete this row?',
+            text: 'It disappears from the table and from every calculation. This affects 1 row.',
+            confirmLabel: 'Delete row', tone: 'danger'
           }).then(function (ok) {
             if (!ok) return;
             store.softDelete(rec);
@@ -1822,7 +1972,7 @@
       });
     }
     actions.unshift({
-      label: isNew ? 'Dodaj wiersz' : 'Zapisz zmiany', variant: 'primary', close: false,
+      label: isNew ? 'Add row' : 'Save changes', variant: 'primary', close: false,
       onClick: function () {
         var bad = null;
         ds.columns.forEach(function (c) {
@@ -1837,56 +1987,19 @@
           rec.data[c.id] = inp.value === '' ? null : (isBad(nv) ? inp.value : nv);
         });
         store.putRecord(rec);
-        TBUI.toast(isNew ? 'Wiersz dodany' : 'Zmiany zapisane', 'success');
+        TBUI.toast(isNew ? 'Row added' : 'Changes saved', 'success');
         TBUI.drawer.close();
         return false;
       }
     });
 
     TBUI.drawer.show({
-      title: isNew ? 'Nowy wiersz — ' + ds.name : (rec.data[ds.titleField] || ds.name),
-      sub: isNew ? null : 'Zmieniono ' + new Date(rec._m).toLocaleString(CFG.meta.locale || 'pl-PL'),
+      title: isNew ? 'New row — ' + ds.name : (rec.data[ds.titleField] || ds.name),
+      sub: isNew ? null : 'Last changed ' + fmt.date(new Date(rec._m).toISOString().slice(0, 10)),
       body: form,
       actions: actions
     });
   };
-
-  function validateField(inp, col, fieldEl) {
-    var val = col.type === 'bool' ? inp.checked : inp.value;
-    var err = null;
-    if (col.required && (val === '' || val == null)) err = 'To pole jest wymagane.';
-    else if (val !== '' && col.type !== 'bool') {
-      var v = coerce(val, col);
-      if (isBad(v)) {
-        err = col.type === 'number' ? 'Wpisz liczbę, na przykład 1234,50.'
-          : col.type === 'date' ? 'Wybierz datę z kalendarza.'
-          : 'Ta wartość nie pasuje do pola.';
-      }
-    }
-    var old = fieldEl ? fieldEl.querySelector('.tb-err') : null;
-    if (old) old.remove();
-    if (err) {
-      inp.setAttribute('aria-invalid', 'true');
-      if (fieldEl) {
-        var e = div('tb-err');
-        e.textContent = err;
-        fieldEl.appendChild(e);
-      }
-      return false;
-    }
-    inp.removeAttribute('aria-invalid');
-    return true;
-  }
-
-  function firstNotesComponent() {
-    var found = null;
-    CFG.tabs.forEach(function (t) {
-      (t.components || []).forEach(function (c) {
-        if (!found && c.type === 'notes') found = c;
-      });
-    });
-    return found;
-  }
 
   TB.crud = crud;
 
@@ -1897,7 +2010,7 @@
 
     function targetRecords(cmp, rec) {
       // Akcja z wiersza W ZAZNACZENIU dotyczy całego zaznaczenia.
-      // Z wiersza poza zaznaczeniem — tylko tego wiersza, a zaznaczenie zostaje.
+      // Z wiersza poza zaznaczeniem — tylko tego wiersza.
       if (rec && sel.has(cmp.id, rec.id) && sel.count(cmp.id) > 1) {
         return sel.ids(cmp.id).map(function (id) { return data.index[id]; }).filter(Boolean);
       }
@@ -1912,31 +2025,30 @@
           switch (act.kind) {
             case 'setField': r.data[act.field] = resolveValue(act.value, ctx); break;
             case 'clearField': r.data[act.field] = null; break;
-            case 'duplicate': {
-              var copy = { id: newId('r_'), ds: r.ds, data: JSON.parse(JSON.stringify(r.data)),
-                _c: Date.now(), _m: Date.now(), _d: 0 };
-              store.putRecord(copy);
+            case 'duplicate':
+              store.putRecord({
+                id: newId('r_'), ds: r.ds, data: JSON.parse(JSON.stringify(r.data)),
+                _c: Date.now(), _m: Date.now(), _d: 0
+              });
               return;
-            }
             case 'delete': store.softDelete(r); return;
             case 'moveTo': r.ds = act.dataset; break;
             default: break;
           }
           store.touch(r);
         });
-        if (act.kind !== 'delete') {
-          TBUI.toast(n === 1 ? 'Zmieniono 1 wiersz' : 'Zmieniono ' + n + ' wierszy', 'success');
-        } else {
-          TBUI.toast(n === 1 ? 'Usunięto 1 wiersz' : 'Usunięto ' + n + ' wierszy', 'success');
+        if (act.kind === 'delete') {
+          TBUI.toast('Deleted ' + n + ' ' + plural(n, 'row', 'rows'), 'success');
           sel.clear(cmp.id);
+        } else {
+          TBUI.toast('Updated ' + n + ' ' + plural(n, 'row', 'rows'), 'success');
         }
       }
       if (act.confirm || act.kind === 'delete') {
         TBUI.confirm({
-          title: act.kind === 'delete' ? 'Usunąć wiersze?' : act.label,
-          text: (act.kind === 'delete' ? 'Operacja dotyczy ' : 'Operacja dotyczy ') +
-            n + (n === 1 ? ' wiersza.' : ' wierszy.'),
-          confirmLabel: act.kind === 'delete' ? 'Usuń' : 'Wykonaj',
+          title: act.kind === 'delete' ? 'Delete rows?' : act.label,
+          text: 'This affects ' + n + ' ' + plural(n, 'row', 'rows') + '.',
+          confirmLabel: act.kind === 'delete' ? 'Delete' : 'Apply',
           tone: act.kind === 'delete' ? 'danger' : ''
         }).then(function (ok) { if (ok) go(); });
       } else {
@@ -1944,7 +2056,7 @@
       }
     }
 
-    function buildItems(cmp, rec, view) {
+    function buildItems(cmp, rec) {
       var opts = cmp.opts || {};
       var cm = opts.contextMenu || {};
       var builtins = cm.builtins || ['edit', 'duplicate', 'delete', 'addNote', 'copyRow', 'exportSelected'];
@@ -1952,29 +2064,29 @@
       var n = recs.length;
       var items = [];
 
-      if (n > 1) items.push({ head: 'Zaznaczono ' + n + ' wierszy' });
+      if (n > 1) items.push({ head: n + ' rows selected' });
 
       if (builtins.indexOf('edit') >= 0) {
         items.push({
-          label: n > 1 ? 'Otwórz pierwszy wiersz' : 'Edytuj wiersz', icon: '✎',
+          label: n > 1 ? 'Open first row' : 'Edit row', icon: '✎',
           onClick: function () { crud.detail(recs[0], cmp); }
         });
       }
       if (builtins.indexOf('duplicate') >= 0) {
         items.push({
-          label: 'Duplikuj', icon: '⧉',
-          onClick: function () { applyAction({ kind: 'duplicate', label: 'Duplikuj' }, recs, cmp); }
+          label: 'Duplicate', icon: '⧉',
+          onClick: function () { applyAction({ kind: 'duplicate', label: 'Duplicate' }, recs, cmp); }
         });
       }
       if (builtins.indexOf('addNote') >= 0) {
         items.push({
-          label: 'Dodaj karteczkę', icon: '🗒',
+          label: 'Add a note', icon: '🗒',
           onClick: function () { crud.detail(recs[0], cmp); }
         });
       }
       if (builtins.indexOf('copyRow') >= 0) {
         items.push({
-          label: 'Kopiuj jako tekst', icon: '⎘', kbd: 'Ctrl+C',
+          label: 'Copy as text', icon: '⎘', kbd: 'Ctrl+C',
           onClick: function () { io.copyRows(recs, cmp); }
         });
       }
@@ -1993,47 +2105,44 @@
       if (builtins.indexOf('exportSelected') >= 0) {
         items.push({ sep: true });
         items.push({
-          label: 'Eksportuj zaznaczone do Excela', icon: '⤓',
+          label: 'Export selected to Excel', icon: '⤓',
           disabled: !sel.count(cmp.id),
-          onClick: function () { io.exportXlsx(cmp, 'selected', view); }
+          onClick: function () { io.exportXlsx(cmp, 'selected'); }
         });
       }
       if (builtins.indexOf('delete') >= 0) {
         items.push({ sep: true });
         items.push({
-          label: n > 1 ? 'Usuń ' + n + ' wierszy' : 'Usuń wiersz',
+          label: n > 1 ? 'Delete ' + n + ' rows' : 'Delete row',
           icon: '🗑', danger: true,
-          onClick: function () { applyAction({ kind: 'delete', label: 'Usuń' }, recs, cmp); }
+          onClick: function () { applyAction({ kind: 'delete', label: 'Delete' }, recs, cmp); }
         });
       }
       return items;
     }
 
-    function register(cmp, host) {
+    function register(cmp) {
       var name = 'table:' + cmp.id;
       if (registered[name]) return;
       registered[name] = true;
-      TBUI.menu.provider(name, function (e, hostEl) {
+      TBUI.menu.provider(name, function (e) {
         var tr = (e.target && e.target.closest) ? e.target.closest('[data-tb-row]') : null;
         var rec = tr ? data.index[tr.getAttribute('data-tb-row')] : null;
         if (!rec) return null;
-        var view = lastView[cmp.id];
-        return buildItems(cmp, rec, view);
+        return buildItems(cmp, rec);
       });
     }
 
     return { register: register, applyAction: applyAction };
   })();
 
-  var lastView = {};
-
   /* ====================================================================== io */
 
   var io = (function () {
 
-    function rowsToSheet(cmp, recs, cols) {
+    function sheetOf(name, recs, cols) {
       return {
-        name: cmp && cmp.title ? cmp.title : (DS[cmp.dataset] ? DS[cmp.dataset].name : 'Dane'),
+        name: name,
         columns: cols.map(function (c) {
           return { label: c.label, type: c.type, format: c.format };
         }),
@@ -2043,34 +2152,12 @@
             if (isBad(v)) return String(r.data[c.id]);
             if (c.type === 'enum') {
               var o = optionOf(c, v);
-              return o ? o.label : v;              // enum eksportuje się jako LABELKA
+              return o ? o.label : v;       // enum eksportuje się jako LABELKA
             }
             return v;
           });
         })
       };
-    }
-
-    function download(blob, filename) {
-      if (global.showSaveFilePicker) {
-        global.showSaveFilePicker({
-          suggestedName: filename,
-          types: [{ description: 'Arkusz Excel', accept: { 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'] } }]
-        }).then(function (h) {
-          return h.createWritable().then(function (w) {
-            return blob.arrayBuffer().then(function (buf) {
-              return w.write(buf).then(function () { return w.close(); });
-            });
-          });
-        }).then(function () {
-          TBUI.toast('Wyeksportowano ' + filename, 'success');
-        }).catch(function (err) {
-          if (err && err.name === 'AbortError') return;
-          saveViaLink(blob, filename);
-        });
-      } else {
-        saveViaLink(blob, filename);
-      }
     }
 
     function saveViaLink(blob, filename) {
@@ -2082,19 +2169,43 @@
       setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
     }
 
-    function stamp() { return fmt.todayISO(); }
-    function baseName(scope) {
-      return (CFG.meta.name || 'tracker').replace(/[^\w\-. ]+/g, '_') + '-' + scope + '-' + stamp();
+    function download(blob, filename) {
+      if (!global.showSaveFilePicker) { saveViaLink(blob, filename); return; }
+      global.showSaveFilePicker({
+        suggestedName: filename,
+        types: [{
+          description: 'Excel workbook',
+          accept: {
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx']
+          }
+        }]
+      }).then(function (h) {
+        return h.createWritable().then(function (w) {
+          return blob.arrayBuffer().then(function (buf) {
+            return w.write(buf).then(function () { return w.close(); });
+          });
+        });
+      }).then(function () {
+        TBUI.toast('Exported ' + filename, 'success');
+      }).catch(function (err) {
+        if (err && err.name === 'AbortError') return;
+        saveViaLink(blob, filename);
+      });
     }
 
-    function exportXlsx(cmp, scope, view) {
-      var ds = DS[cmp ? cmp.dataset : null];
+    function baseName(scope) {
+      return (CFG.meta.name || 'tracker').replace(/[^\w\-. ]+/g, '_') + '-' + scope + '-' + fmt.todayISO();
+    }
+
+    function exportXlsx(cmp, scope) {
+      TBXlsx.setCurrency(currency());
+      var view = cmp ? lastView[cmp.id] : null;
       var sheets;
+
       if (scope === 'all') {
         sheets = CFG.datasets.map(function (d) {
-          return rowsToSheet({ dataset: d.id, title: d.name }, liveRecords(d.id), d.columns);
+          return sheetOf(d.name, liveRecords(d.id), d.columns);
         });
-        // notatki i checklisty jako osobne arkusze
         var notes = [], checks = [];
         Object.keys(data.byDs).forEach(function (dsId) {
           if (dsId.indexOf('c:') !== 0) return;
@@ -2104,9 +2215,9 @@
         });
         if (notes.length) {
           sheets.push({
-            name: 'Karteczki',
-            columns: [{ label: 'Treść', type: 'text' }, { label: 'Kolor', type: 'text' },
-              { label: 'Przypięta do', type: 'text' }],
+            name: 'Notes',
+            columns: [{ label: 'Text', type: 'text' }, { label: 'Colour', type: 'text' },
+              { label: 'Pinned to', type: 'text' }],
             rows: notes.map(function (r) {
               return [r.data.text || '', r.data.color || '',
                 r.data.rowRef ? r.data.rowRef.recordId : ''];
@@ -2115,72 +2226,70 @@
         }
         if (checks.length) {
           sheets.push({
-            name: 'Checklisty',
-            columns: [{ label: 'Pozycja', type: 'text' }, { label: 'Zrobione', type: 'bool' },
-              { label: 'Grupa', type: 'text' }, { label: 'Termin', type: 'date' }],
+            name: 'Checklists',
+            columns: [{ label: 'Item', type: 'text' }, { label: 'Done', type: 'bool' },
+              { label: 'Group', type: 'text' }, { label: 'Due', type: 'date' }],
             rows: checks.map(function (r) {
               return [r.data.text || '', !!r.data.done, r.data.group || '', r.data.due || null];
             })
           });
         }
       } else {
+        var ds = DS[cmp.dataset];
         var cols = view && view.cols ? view.cols : (ds ? ds.columns : []);
         var recs;
         if (scope === 'selected') {
           recs = sel.ids(cmp.id).map(function (id) { return data.index[id]; }).filter(Boolean);
-          if (!recs.length) { TBUI.toast('Nic nie jest zaznaczone', 'warning'); return; }
+          if (!recs.length) { TBUI.toast('Nothing is selected', 'warning'); return; }
         } else if (scope === 'view') {
           recs = (view && view.rows) || [];
         } else {
           recs = liveRecords(cmp.dataset);
         }
-        sheets = [rowsToSheet(cmp, recs, cols)];
+        sheets = [sheetOf(cmp.title || (ds ? ds.name : 'Data'), recs, cols)];
       }
-      var blob = TBXlsx.build(sheets);
-      var label = { selected: 'zaznaczone', view: 'widok', dataset: 'caly-zbior', all: 'caly-tracker' }[scope];
-      download(blob, baseName(label) + '.xlsx');
+
+      var label = { selected: 'selected', view: 'view', dataset: 'dataset', all: 'everything' }[scope];
+      download(TBXlsx.build(sheets), baseName(label) + '.xlsx');
     }
 
-    function exportMenu(e, cmp, view) {
-      lastView[cmp.id] = view;
+    function exportMenu(e, cmp) {
+      var view = lastView[cmp.id] || { rows: [] };
       var r = e.currentTarget.getBoundingClientRect();
       TBUI.menu.open(r.left, r.bottom + 4, [
-        { head: 'Eksport do Excela' },
+        { head: 'Export to Excel' },
         {
-          label: 'Zaznaczone wiersze (' + sel.count(cmp.id) + ')', icon: '☑',
+          label: 'Selected rows (' + sel.count(cmp.id) + ')', icon: '☑',
           disabled: !sel.count(cmp.id),
-          onClick: function () { exportXlsx(cmp, 'selected', view); }
+          onClick: function () { exportXlsx(cmp, 'selected'); }
         },
         {
-          label: 'Aktualny widok (' + view.rows.length + ')', icon: '▤',
-          onClick: function () { exportXlsx(cmp, 'view', view); }
+          label: 'Current view (' + view.rows.length + ')', icon: '▤',
+          onClick: function () { exportXlsx(cmp, 'view'); }
         },
         {
-          label: 'Cały zbiór (' + liveRecords(cmp.dataset).length + ')', icon: '▦',
-          onClick: function () { exportXlsx(cmp, 'dataset', view); }
-        },
-        { sep: true },
-        {
-          label: 'Cały tracker — arkusz na zbiór', icon: '🗂',
-          onClick: function () { exportXlsx(cmp, 'all', view); }
+          label: 'Whole dataset (' + liveRecords(cmp.dataset).length + ')', icon: '▦',
+          onClick: function () { exportXlsx(cmp, 'dataset'); }
         },
         { sep: true },
         {
-          label: 'Kopia danych jako JSON', icon: '{ }',
-          onClick: function () { exportJson(); }
-        }
+          label: 'Everything — one sheet per dataset', icon: '🗂',
+          onClick: function () { exportXlsx(cmp, 'all'); }
+        },
+        { sep: true },
+        { label: 'Data backup as JSON', icon: '{ }', onClick: exportJson }
       ]);
     }
 
     function exportJson() {
-      var blob = new Blob([JSON.stringify(store.dataFileObject(), null, 2)], { type: 'application/json' });
-      saveViaLink(blob, baseName('dane') + '.json');
-      TBUI.toast('Zapisano kopię JSON', 'success');
+      saveViaLink(new Blob([JSON.stringify(store.dataFileObject(), null, 2)],
+        { type: 'application/json' }), baseName('backup') + '.json');
+      TBUI.toast('JSON backup saved', 'success');
     }
 
     function copyRows(recs, cmp) {
       var ds = DS[cmp.dataset];
-      var cols = (cmp.opts && cmp.opts.columns && cmp.opts.columns.length
+      var cols = ((cmp.opts && cmp.opts.columns && cmp.opts.columns.length)
         ? cmp.opts.columns.map(function (id) { return column(cmp.dataset, id); })
         : ds.columns).filter(Boolean);
       var text = [cols.map(function (c) { return c.label; }).join('\t')]
@@ -2189,26 +2298,20 @@
         })).join('\n');
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(text).then(function () {
-          TBUI.toast('Skopiowano ' + recs.length + (recs.length === 1 ? ' wiersz' : ' wierszy'), 'success');
+          TBUI.toast('Copied ' + recs.length + ' ' + plural(recs.length, 'row', 'rows'), 'success');
         });
       }
     }
 
-    /* ---- parser CSV/TSV ---- */
-
-    function detectDelimiter(text) {
-      var head = text.split(/\r?\n/).slice(0, 5).join('\n');
-      var counts = { '\t': 0, ';': 0, ',': 0 };
-      Object.keys(counts).forEach(function (d) {
-        counts[d] = head.split(d).length - 1;
-      });
-      var best = '\t';
-      Object.keys(counts).forEach(function (d) { if (counts[d] > counts[best]) best = d; });
-      return counts[best] ? best : ',';
-    }
-
     function parseDelimited(text, delim) {
-      delim = delim || detectDelimiter(text);
+      if (!delim) {
+        var head = text.split(/\r?\n/).slice(0, 5).join('\n');
+        var counts = { '\t': 0, ';': 0, ',': 0 };
+        Object.keys(counts).forEach(function (d) { counts[d] = head.split(d).length - 1; });
+        delim = '\t';
+        Object.keys(counts).forEach(function (d) { if (counts[d] > counts[delim]) delim = d; });
+        if (!counts[delim]) delim = ',';
+      }
       var rows = [], row = [], field = '', inQ = false, i = 0;
       text = text.replace(/^﻿/, '');
       while (i < text.length) {
@@ -2240,26 +2343,25 @@
       var header = rows[0];
       var bodyRows = rows.slice(1);
 
-      var wrap = doc.createElement('div');
-      wrap.className = 'tb-stack';
+      var wrap = div('tb-stack');
       var info = div('tb-banner tb-banner-accent');
       info.innerHTML = '<i>↓</i><div class="tb-banner-body"><div class="tb-banner-title">' +
-        bodyRows.length + (bodyRows.length === 1 ? ' wiersz' : ' wierszy') + ' do wczytania</div>' +
-        '<div class="tb-banner-text">Dopasuj kolumny z pliku do kolumn zbioru „' +
-        fmt.esc(ds.name) + '". Kolumny ustawione na „— pomiń —" nie zostaną wczytane.</div></div>';
+        bodyRows.length + ' ' + plural(bodyRows.length, 'row', 'rows') + ' ready to import</div>' +
+        '<div class="tb-banner-text">Match the columns from your file to the columns of “' +
+        fmt.esc(ds.name) + '”. Anything left on “skip” is ignored.</div></div>';
       wrap.appendChild(info);
 
       var selects = [];
-      header.forEach(function (h, i) {
+      header.forEach(function (h) {
         var f = div('tb-field');
         var lab = doc.createElement('label');
-        lab.textContent = 'Kolumna z pliku: „' + h + '"';
+        lab.textContent = 'File column: “' + h + '”';
         f.appendChild(lab);
         var s = doc.createElement('select');
         s.className = 'tb-select';
         var skip = doc.createElement('option');
         skip.value = '';
-        skip.textContent = '— pomiń —';
+        skip.textContent = '— skip —';
         s.appendChild(skip);
         ds.columns.forEach(function (c) {
           var o = doc.createElement('option');
@@ -2267,7 +2369,6 @@
           o.textContent = c.label + ' (' + c.type + ')';
           s.appendChild(o);
         });
-        // automatyczne dopasowanie po nazwie
         var guess = ds.columns.filter(function (c) {
           return String(c.label).toLowerCase().trim() === String(h).toLowerCase().trim();
         })[0];
@@ -2278,18 +2379,15 @@
       });
 
       TBUI.modal.show({
-        size: 'lg',
-        title: 'Wczytaj dane',
-        sub: 'Mapowanie kolumn',
-        body: wrap,
+        size: 'lg', title: 'Import rows', sub: 'Column mapping', body: wrap,
         actions: [
-          { label: 'Anuluj', variant: 'ghost' },
+          { label: 'Cancel', variant: 'ghost' },
           {
-            label: 'Wczytaj ' + bodyRows.length + ' wierszy', variant: 'primary', close: false,
+            label: 'Import ' + bodyRows.length + ' rows', variant: 'primary', close: false,
             onClick: function () {
               var map = selects.map(function (s) { return s.value; });
               if (!map.some(Boolean)) {
-                TBUI.toast('Dopasuj przynajmniej jedną kolumnę', 'warning');
+                TBUI.toast('Match at least one column first', 'warning');
                 return false;
               }
               var added = 0, warn = 0;
@@ -2305,8 +2403,8 @@
                 store.putRecord(rec);
                 added++;
               });
-              TBUI.toast('Wczytano ' + added + ' wierszy' +
-                (warn ? ', ' + warn + ' wartości nie pasowało do typów' : ''),
+              TBUI.toast('Imported ' + added + ' rows' +
+                (warn ? ', ' + warn + ' values did not match their column type' : ''),
                 warn ? 'warning' : 'success', 5000);
               TBUI.modal.close(wrap.closest('dialog'));
               return false;
@@ -2320,27 +2418,25 @@
       var ta = doc.createElement('textarea');
       ta.className = 'tb-textarea';
       ta.style.minHeight = '160px';
-      ta.placeholder = 'Zaznacz zakres w Excelu, skopiuj (Ctrl+C) i wklej tutaj (Ctrl+V).\n' +
-        'Pierwszy wiersz powinien zawierać nazwy kolumn.';
-      ta.setAttribute('aria-label', 'Wklej dane z Excela');
-      var wrap = doc.createElement('div');
-      wrap.className = 'tb-stack';
+      ta.placeholder = 'Select a range in Excel, copy it (Ctrl+C) and paste here (Ctrl+V).\n' +
+        'The first row should hold the column names.';
+      ta.setAttribute('aria-label', 'Paste data from Excel');
+      var wrap = div('tb-stack');
       wrap.appendChild(ta);
 
       TBUI.modal.show({
-        size: 'lg',
-        title: 'Wklej z Excela',
-        sub: 'Dane trafią do zbioru „' + (DS[dsId] ? DS[dsId].name : '') + '"',
+        size: 'lg', title: 'Paste from Excel',
+        sub: 'Rows go into “' + (DS[dsId] ? DS[dsId].name : '') + '”',
         body: wrap,
         onOpen: function () { setTimeout(function () { ta.focus(); }, 50); },
         actions: [
-          { label: 'Anuluj', variant: 'ghost' },
+          { label: 'Cancel', variant: 'ghost' },
           {
-            label: 'Dalej — dopasuj kolumny', variant: 'primary', close: false,
+            label: 'Next — match columns', variant: 'primary', close: false,
             onClick: function () {
               var rows = parseDelimited(ta.value);
               if (rows.length < 2) {
-                TBUI.toast('Potrzebuję nagłówka i co najmniej jednego wiersza', 'warning');
+                TBUI.toast('I need a header row and at least one row of data', 'warning');
                 return false;
               }
               TBUI.modal.close(wrap.closest('dialog'));
@@ -2352,33 +2448,23 @@
       });
     }
 
-    function importCsvFile(dsId, file) {
-      file.text().then(function (t) {
-        var rows = parseDelimited(t);
-        if (rows.length < 2) {
-          TBUI.toast('Plik nie zawiera nagłówka i danych', 'warning');
-          return;
-        }
-        importDialog(dsId, rows);
-      });
-    }
-
     function importJsonFile(file) {
       file.text().then(function (t) {
         var obj = JSON.parse(t);
         if (!obj || !obj.records) {
-          TBUI.toast('To nie jest plik danych trackera', 'danger');
+          TBUI.toast('That is not a tracker data file', 'danger');
           return;
         }
         TBUI.confirm({
-          title: 'Wczytać dane z pliku?',
-          text: 'Obecne dane w przeglądarce zostaną zastąpione ' + obj.records.length + ' rekordami z pliku.',
-          confirmLabel: 'Zastąp dane'
+          title: 'Load data from this file?',
+          text: 'Everything currently in the browser is replaced by ' + obj.records.length +
+            ' records from the file.',
+          confirmLabel: 'Replace data'
         }).then(function (ok) {
           if (!ok) return;
           store.replaceAll(obj.records).then(function () {
             TB.shell.renderActive(true);
-            TBUI.toast('Wczytano dane z pliku', 'success');
+            TBUI.toast('Data loaded from file', 'success');
           });
         });
       });
@@ -2386,9 +2472,8 @@
 
     return {
       exportXlsx: exportXlsx, exportMenu: exportMenu, exportJson: exportJson,
-      copyRows: copyRows, parseDelimited: parseDelimited, detectDelimiter: detectDelimiter,
-      pasteDialog: pasteDialog, importCsvFile: importCsvFile, importJsonFile: importJsonFile,
-      importDialog: importDialog
+      copyRows: copyRows, parseDelimited: parseDelimited,
+      pasteDialog: pasteDialog, importJsonFile: importJsonFile, importDialog: importDialog
     };
   })();
 
@@ -2399,12 +2484,14 @@
   var shell = (function () {
     var activeTab = null;
     var staleTabs = {};
-    var renderedTabs = {};   // zakładka jeszcze nieodwiedzona MUSI się wyrenderować
+    var renderedTabs = {};
     var dirtyDatasets = {};
     var rafId = null;
-    var cmpHost = {};        // componentId → element kontenera (STABILNY, reużywany)
-    var cmpTab = {};         // componentId → tabId
-    var depsByDs = {};       // dsId → [componentId]
+    var cmpHost = {};
+    var cmpTab = {};
+    var depsByDs = {};
+
+    function noop() {}
 
     function componentDatasets(cmp) {
       var out = [];
@@ -2413,8 +2500,6 @@
       if (cmp.type === 'agenda') {
         ((cmp.opts || {}).sources || []).forEach(function (s) { if (s.dataset) out.push(s.dataset); });
       }
-      // karteczki przypięte do wiersza widać w drawerze tabeli, więc tabela
-      // zależy też od zbiorów karteczek
       if (cmp.type === 'table') {
         CFG.tabs.forEach(function (t) {
           (t.components || []).forEach(function (c) {
@@ -2438,7 +2523,7 @@
         a.href = '#' + tab.id;
         a.setAttribute('data-tb-tab', 'panel-' + tab.id);
         if (ti === 0) a.className = 'is-active';
-        a.innerHTML = '<i>' + fmt.esc(tab.icon || '▦') + '</i>' + fmt.esc(tab.label || 'Zakładka');
+        a.innerHTML = '<i>' + fmt.esc(tab.icon || '▦') + '</i>' + fmt.esc(tab.label || 'Tab');
         nav.appendChild(a);
 
         var panel = doc.createElement('section');
@@ -2482,97 +2567,227 @@
         if (fullRow.children.length) panel.appendChild(fullRow);
         if (cols > 1 && comps.some(function (c) { return c.span !== 'full'; })) panel.appendChild(grid);
         if (!comps.length) {
-          panel.appendChild(emptyBox('Ta zakładka jest pusta',
-            'Wróć do wizarda i dodaj do niej komponenty.'));
+          panel.appendChild(emptyBox('This tab is empty',
+            'Go back to the wizard and add components to it.'));
         }
         panels.appendChild(panel);
       });
 
       activeTab = CFG.tabs.length ? CFG.tabs[0].id : null;
       buildHeadActions();
+      renderProfile();
     }
+
+    /* ---- profil ---- */
+
+    function renderProfile() {
+      var foot = doc.getElementById('tb-side-foot');
+      if (!foot) return;
+      foot.innerHTML = '';
+      if (CFG.meta.personalization === false) return;
+      var p = profile.get();
+      var b = doc.createElement('button');
+      b.type = 'button';
+      b.className = 'tb-profile';
+      b.id = 'tb-profile-btn';
+      b.setAttribute('aria-label', 'Your profile');
+      b.appendChild(profile.avatar());
+      var body = div('tb-profile-body');
+      var nm = doc.createElement('span');
+      nm.className = 'tb-profile-name';
+      nm.textContent = p.name || 'Set up your profile';
+      var tm = doc.createElement('span');
+      tm.className = 'tb-profile-team';
+      tm.textContent = p.team || 'No team set';
+      body.appendChild(nm);
+      body.appendChild(tm);
+      b.appendChild(body);
+      b.addEventListener('click', profileDialog);
+      foot.appendChild(b);
+    }
+
+    function profileDialog() {
+      var p = profile.get();
+      var draft = { name: p.name, team: p.team, color: p.color, photo: p.photo };
+
+      var wrap = div('tb-stack');
+      var top = div('tb-profile-edit');
+      var preview = div('');
+      function drawPreview() {
+        preview.innerHTML = '';
+        var saved = { name: p.name, team: p.team, color: p.color, photo: p.photo };
+        profile.set(draft);
+        preview.appendChild(profile.avatar('tb-avatar-lg'));
+        profile.set(saved);
+      }
+      drawPreview();
+      top.appendChild(preview);
+
+      var photoBox = div('tb-stack');
+      photoBox.style.gap = '6px';
+      photoBox.appendChild(btn('Upload a photo', 'btn-secondary', function () {
+        var inp = doc.createElement('input');
+        inp.type = 'file';
+        inp.accept = 'image/*';
+        inp.addEventListener('change', function () {
+          if (!inp.files[0]) return;
+          profile.readPhoto(inp.files[0]).then(function (dataUrl) {
+            draft.photo = dataUrl;
+            drawPreview();
+            TBUI.toast('Photo added', 'success');
+          }).catch(function (err) {
+            TBUI.toast(err.message, 'danger', 5000);
+          });
+        });
+        inp.click();
+      }));
+      photoBox.appendChild(btn('Remove photo', 'btn-ghost', function () {
+        draft.photo = null;
+        drawPreview();
+      }));
+      var hint = div('tb-muted');
+      hint.style.fontSize = '11.5px';
+      hint.textContent = 'Photos are cropped square and shrunk to 96×96, so the data file stays small.';
+      photoBox.appendChild(hint);
+      top.appendChild(photoBox);
+      wrap.appendChild(top);
+
+      function field(labelText, control) {
+        var f = div('tb-field');
+        var l = doc.createElement('label');
+        l.textContent = labelText;
+        var id = 'pf' + Math.random().toString(36).slice(2, 7);
+        control.id = id;
+        l.htmlFor = id;
+        f.appendChild(l);
+        f.appendChild(control);
+        return f;
+      }
+      var nameI = doc.createElement('input');
+      nameI.className = 'tb-input';
+      nameI.value = draft.name;
+      nameI.placeholder = 'e.g. Anna Kowalska';
+      nameI.addEventListener('input', function () { draft.name = nameI.value; drawPreview(); });
+      wrap.appendChild(field('Your name', nameI));
+
+      var teamI = doc.createElement('input');
+      teamI.className = 'tb-input';
+      teamI.value = draft.team;
+      teamI.placeholder = 'e.g. Operations';
+      teamI.addEventListener('input', function () { draft.team = teamI.value; });
+      wrap.appendChild(field('Team', teamI));
+
+      var colors = div('tb-colors');
+      ['c1', 'c2', 'c3', 'c4', 'c5'].forEach(function (c) {
+        var b = doc.createElement('button');
+        b.type = 'button';
+        b.style.background = 'var(--' + c + ')';
+        b.setAttribute('aria-label', 'Avatar colour ' + c);
+        b.setAttribute('aria-pressed', draft.color === c ? 'true' : 'false');
+        b.addEventListener('click', function () {
+          draft.color = c;
+          var all = colors.querySelectorAll('button');
+          for (var i = 0; i < all.length; i++) all[i].setAttribute('aria-pressed', 'false');
+          b.setAttribute('aria-pressed', 'true');
+          drawPreview();
+        });
+        colors.appendChild(b);
+      });
+      var cf = div('tb-field');
+      var cl = doc.createElement('label');
+      cl.textContent = 'Avatar colour';
+      cf.appendChild(cl);
+      cf.appendChild(colors);
+      wrap.appendChild(cf);
+
+      TBUI.modal.show({
+        size: 'sm', title: 'Your profile',
+        sub: 'Used by the “assign to me” action and shown in the sidebar',
+        body: wrap,
+        actions: [
+          { label: 'Cancel', variant: 'ghost' },
+          {
+            label: 'Save profile', variant: 'primary',
+            onClick: function () {
+              profile.save(draft);
+              TBUI.toast('Profile saved', 'success');
+            }
+          }
+        ]
+      });
+    }
+
+    /* ---- topbar ---- */
 
     function buildHeadActions() {
       var box = doc.getElementById('tb-head-actions');
       box.innerHTML = '';
 
+      if ((CFG.alerts || []).length) {
+        var bell = doc.createElement('button');
+        bell.type = 'button';
+        bell.className = 'tb-bell';
+        bell.id = 'tb-bell';
+        bell.setAttribute('aria-label', 'Alerts');
+        bell.textContent = '🔔';
+        bell.addEventListener('click', openAlerts);
+        box.appendChild(bell);
+      }
+
       var save = doc.createElement('span');
       save.className = 'tb-save';
       save.id = 'tb-save';
       box.appendChild(save);
-      // store mógł ustawić stan przed zbudowaniem wskaźnika — odtwarzamy go
       store.setSaveState(store.state());
 
-      var saveBtn = btn('Zapisz', 'btn-primary', function () {
+      var saveBtn = btn('Save', 'btn-primary', function () {
         if (store.mode() !== 'auto') {
           if (!store.handle()) { store.pickFile().catch(noop); return; }
           store.reconnect().then(function (ok) { if (ok) store.saveNow(); });
           return;
         }
-        store.saveNow().then(function () { TBUI.toast('Zapisano', 'success'); });
+        store.saveNow().then(function () { TBUI.toast('Saved', 'success'); });
       });
-      saveBtn.title = 'Zapisz teraz (Ctrl+S)';
+      saveBtn.title = 'Save now (Ctrl+S)';
       box.appendChild(saveBtn);
-
-      if (CFG.meta.allowThemeSwitch) {
-        var themes = [].slice.call(doc.querySelectorAll('script[type="text/plain"][data-theme]'));
-        if (themes.length) {
-          var s = doc.createElement('select');
-          s.className = 'tb-select';
-          s.style.width = 'auto';
-          s.setAttribute('aria-label', 'Styl trackera');
-          var cur = doc.createElement('option');
-          cur.value = '';
-          cur.textContent = 'Styl: ' + (CFG.meta.theme || 'domyślny');
-          s.appendChild(cur);
-          themes.forEach(function (t) {
-            var o = doc.createElement('option');
-            o.value = t.getAttribute('data-theme');
-            o.textContent = 'Styl: ' + (t.getAttribute('data-theme-name') || o.value);
-            s.appendChild(o);
-          });
-          s.addEventListener('change', function () {
-            if (!s.value) return;
-            var node = doc.querySelector('script[type="text/plain"][data-theme="' + s.value + '"]');
-            if (!node) return;
-            // podmiana samego tekstu stylu — wykresy używają var(), więc
-            // przemalowują się bez re-renderu
-            doc.getElementById('tb-theme').textContent = node.textContent;
-            TBUI.toast('Zmieniono styl', 'success');
-          });
-          box.appendChild(s);
-        }
-      }
 
       var more = btn('⋯', 'btn-secondary', function (e) {
         var r = e.currentTarget.getBoundingClientRect();
         var items = [
-          { head: 'Dane' },
-          { label: 'Eksportuj cały tracker do Excela', icon: '🗂',
-            onClick: function () { io.exportXlsx({ dataset: null }, 'all', null); } },
-          { label: 'Zapisz kopię JSON', icon: '{ }', onClick: io.exportJson },
-          { label: 'Wczytaj dane z pliku JSON…', icon: '↥', onClick: pickJson },
+          { head: 'Data' },
+          {
+            label: 'Export everything to Excel', icon: '🗂',
+            onClick: function () { io.exportXlsx(null, 'all'); }
+          },
+          { label: 'Save a JSON backup', icon: '{ }', onClick: io.exportJson },
+          { label: 'Load data from a JSON file…', icon: '↥', onClick: pickJson },
           { sep: true },
-          { head: 'Plik danych' }
+          { head: 'Data file' }
         ];
         if (store.mode() === 'auto') {
-          items.push({ label: 'Zapisz teraz', icon: '💾', kbd: 'Ctrl+S',
-            onClick: function () { store.saveNow(); } });
-          items.push({ label: 'Wskaż inny plik…', icon: '📄',
-            onClick: function () { store.pickFile().catch(noop); } });
+          items.push({
+            label: 'Save now', icon: '💾', kbd: 'Ctrl+S',
+            onClick: function () { store.saveNow(); }
+          });
+          items.push({
+            label: 'Link a different file…', icon: '📄',
+            onClick: function () { store.pickFile().catch(noop); }
+          });
         } else {
-          items.push({ label: 'Połącz z plikiem danych…', icon: '🔗',
-            onClick: function () { store.pickFile().catch(noop); } });
+          items.push({
+            label: 'Link a data file…', icon: '🔗',
+            onClick: function () { store.pickFile().catch(noop); }
+          });
         }
-        items.push({ sep: true });
-        items.push({ label: 'Twoje imię (dla „przypisz do mnie")…', icon: '👤', onClick: askName });
+        if (CFG.meta.personalization !== false) {
+          items.push({ sep: true });
+          items.push({ label: 'Your profile…', icon: '👤', onClick: profileDialog });
+        }
         TBUI.menu.open(r.left, r.bottom + 4, items);
       });
-      more.setAttribute('aria-label', 'Więcej opcji');
+      more.setAttribute('aria-label', 'More options');
       box.appendChild(more);
     }
-
-    function noop() {}
 
     function pickJson() {
       var inp = doc.createElement('input');
@@ -2584,27 +2799,51 @@
       inp.click();
     }
 
-    function askName() {
-      var wrap = doc.createElement('div');
-      wrap.className = 'tb-field';
-      var lab = doc.createElement('label');
-      lab.textContent = 'Twoje imię i nazwisko';
-      var inp = doc.createElement('input');
-      inp.className = 'tb-input';
-      inp.value = store.userName() || '';
-      wrap.appendChild(lab);
-      wrap.appendChild(inp);
-      TBUI.modal.show({
-        size: 'sm', title: 'Kto pracuje na trackerze?',
-        sub: 'Używane przez akcje typu „przypisz do mnie"',
-        body: wrap,
-        actions: [
-          { label: 'Anuluj', variant: 'ghost' },
-          { label: 'Zapisz', variant: 'primary', onClick: function () {
-            store.setUserName(inp.value.trim());
-          } }
-        ]
+    /* ---- alerty ---- */
+
+    function refreshAlerts() {
+      var bell = doc.getElementById('tb-bell');
+      if (!bell) return;
+      var list = alerts.active();
+      var old = bell.querySelector('.tb-bell-count');
+      if (old) old.remove();
+      if (!list.length) {
+        bell.removeAttribute('data-tone');
+        bell.title = 'No alerts';
+        return;
+      }
+      bell.setAttribute('data-tone', alerts.worstTone(list));
+      bell.title = list.length + ' ' + plural(list.length, 'alert', 'alerts');
+      var c = doc.createElement('span');
+      c.className = 'tb-bell-count';
+      c.textContent = list.length;
+      bell.appendChild(c);
+    }
+
+    function openAlerts(e) {
+      var list = alerts.active();
+      var r = e.currentTarget.getBoundingClientRect();
+      var x = Math.max(8, r.right - 260);
+      if (!list.length) {
+        TBUI.menu.open(x, r.bottom + 4, [
+          { head: 'Alerts' },
+          { label: 'Nothing needs your attention', icon: '✓', disabled: true }
+        ]);
+        return;
+      }
+      var items = [{ head: list.length + ' ' + plural(list.length, 'alert', 'alerts') }];
+      list.forEach(function (a) {
+        items.push({
+          label: a.label, icon: '●',
+          onClick: function () {
+            if (!a.goToTab) return;
+            var trigger = doc.querySelector('[data-tb-tab="panel-' + a.goToTab + '"]');
+            if (trigger) TBUI.tabs.activate(trigger);
+          }
+        });
+        items.push({ head: a.text });
       });
+      TBUI.menu.open(x, r.bottom + 4, items);
     }
 
     /* ---- powiadomienia nad treścią ---- */
@@ -2615,8 +2854,8 @@
       box.innerHTML = '';
       if (PREVIEW) {
         var p = div('tb-banner tb-banner-accent');
-        p.innerHTML = '<i>👁</i><div class="tb-banner-body"><div class="tb-banner-title">Podgląd</div>' +
-          '<div class="tb-banner-text">To podgląd z danymi przykładowymi. Nic nie jest zapisywane.</div></div>';
+        p.innerHTML = '<i>👁</i><div class="tb-banner-body"><div class="tb-banner-title">Preview</div>' +
+          '<div class="tb-banner-text">Sample data, nothing is saved.</div></div>';
         box.appendChild(p);
         return;
       }
@@ -2625,45 +2864,44 @@
         var sb = div('tb-banner tb-banner-accent');
         var txt;
         if (sn.older) {
-          txt = 'Otwierasz starszą wersję struktury (' + sn.to + ' zamiast ' + sn.from +
-            '). Dane są bezpieczne, ale część kolumn albo zakładek może się nie pokazywać.';
+          txt = 'You opened an older structure (' + sn.to + ' instead of ' + sn.from +
+            '). Your data is safe, but some columns or tabs may not show up.';
         } else {
           var parts = [];
-          if (sn.added) parts.push('+' + sn.added + ' kolumn');
-          if (sn.removed) parts.push('−' + sn.removed + ' kolumn (dane zachowane)');
-          if (sn.tabs > 0) parts.push('+' + sn.tabs + ' zakładek');
-          if (sn.tabs < 0) parts.push(sn.tabs + ' zakładek');
-          txt = 'Struktura zaktualizowana do wersji ' + sn.to +
-            (parts.length ? ': ' + parts.join(', ') + '.' : '.') +
-            ' Twoje wiersze zostały nietknięte.';
+          if (sn.added) parts.push('+' + sn.added + ' columns');
+          if (sn.removed) parts.push('-' + sn.removed + ' columns (data kept)');
+          if (sn.tabs > 0) parts.push('+' + sn.tabs + ' tabs');
+          if (sn.tabs < 0) parts.push(sn.tabs + ' tabs');
+          txt = 'Structure updated to version ' + sn.to +
+            (parts.length ? ': ' + parts.join(', ') + '.' : '.') + ' Your rows were left untouched.';
         }
         sb.innerHTML = '<i>↻</i><div class="tb-banner-body">' +
-          '<div class="tb-banner-title">Zmieniła się struktura trackera</div>' +
+          '<div class="tb-banner-title">The tracker structure changed</div>' +
           '<div class="tb-banner-text">' + fmt.esc(txt) + '</div></div>';
         box.appendChild(sb);
       }
+
       var mode = store.mode();
       if (mode === 'auto' && !store.remembered()) {
         var nr = div('tb-banner tb-banner-warning');
         nr.innerHTML = '<i>⚠</i><div class="tb-banner-body">' +
-          '<div class="tb-banner-title">Zapisuję do pliku, ale nie zapamiętałem go na przyszłość</div>' +
-          '<div class="tb-banner-text">Przeglądarka nie pozwoliła zachować wskazania pliku. ' +
-          'Dane są zapisywane normalnie, ale po zamknięciu karty trzeba będzie wskazać plik ' +
-          'ponownie.</div></div>';
+          '<div class="tb-banner-title">Saving works, but the file was not remembered</div>' +
+          '<div class="tb-banner-text">The browser would not store the link to your file. ' +
+          'Data is being written normally, but you will have to pick the file again next time.' +
+          '</div></div>';
         box.appendChild(nr);
       }
       if (mode === 'prompt') {
         var b = div('tb-banner tb-banner-warning');
         b.innerHTML = '<i>🔗</i><div class="tb-banner-body">' +
-          '<div class="tb-banner-title">Połącz ponownie z plikiem danych</div>' +
-          '<div class="tb-banner-text">Przeglądarka wymaga jednego potwierdzenia na sesję. ' +
-          'Zapamiętany plik: <b>' + fmt.esc(store.fileName()) + '</b></div></div>';
+          '<div class="tb-banner-title">Reconnect to your data file</div>' +
+          '<div class="tb-banner-text">Browsers ask for this once per session. ' +
+          'Remembered file: <b>' + fmt.esc(store.fileName()) + '</b></div></div>';
         var act = div('tb-banner-actions');
-        act.appendChild(btn('Połącz z plikiem', 'btn-primary', function () {
-          // requestPermission woła się jako pierwsza rzecz w geście
+        act.appendChild(btn('Reconnect', 'btn-primary', function () {
           store.reconnect().then(function (ok) {
-            if (ok) TBUI.toast('Połączono — dane będą zapisywane automatycznie', 'success');
-            else TBUI.toast('Bez dostępu do pliku zmiany zostają tylko w przeglądarce', 'warning', 6000);
+            if (ok) TBUI.toast('Connected — changes save automatically', 'success');
+            else TBUI.toast('Without file access your changes stay in the browser only', 'warning', 6000);
           });
         }));
         b.appendChild(act);
@@ -2671,12 +2909,12 @@
       } else if (mode === 'none' || mode === 'denied') {
         var c = div('tb-banner tb-banner-warning');
         c.innerHTML = '<i>⚠</i><div class="tb-banner-body">' +
-          '<div class="tb-banner-title">Dane nie są zapisywane do pliku</div>' +
-          '<div class="tb-banner-text">Zmiany trzyma na razie sama przeglądarka. ' +
-          'Wskaż plik .json, żeby tracker zapisywał je na dysku — i nie zmieniaj potem nazwy ' +
-          'ani miejsca pliku tracker.html.</div></div>';
+          '<div class="tb-banner-title">Your data is not being written to a file</div>' +
+          '<div class="tb-banner-text">Changes live in the browser for now. Pick a .json file so the ' +
+          'tracker writes them to disk — and once you do, keep tracker.html where it is and ' +
+          'under the same name.</div></div>';
         var act2 = div('tb-banner-actions');
-        act2.appendChild(btn('Wybierz plik danych', 'btn-primary', function () {
+        act2.appendChild(btn('Choose a data file', 'btn-primary', function () {
           store.pickFile().catch(noop);
         }));
         c.appendChild(act2);
@@ -2688,25 +2926,24 @@
       var box = doc.getElementById('tb-notices');
       var b = div('tb-banner tb-banner-danger');
       b.innerHTML = '<i>⚠</i><div class="tb-banner-body">' +
-        '<div class="tb-banner-title">Plik danych jest nowszy niż kopia w przeglądarce</div>' +
-        '<div class="tb-banner-text">Plik zmieniono ' +
-        new Date(file.lastModified).toLocaleString(CFG.meta.locale || 'pl-PL') +
-        ' poza tą kartą. Wybierz, która wersja ma zostać — nic nie nadpiszę samo.</div></div>';
+        '<div class="tb-banner-title">The data file is newer than the browser copy</div>' +
+        '<div class="tb-banner-text">It changed outside this tab on ' +
+        fmt.date(new Date(file.lastModified).toISOString().slice(0, 10)) +
+        '. Pick which version wins — nothing is overwritten on its own.</div></div>';
       var act = div('tb-banner-actions');
-      act.appendChild(btn('Wczytaj z pliku', 'btn-primary', function () {
-        store.loadFileNow().then(function () { TBUI.toast('Wczytano dane z pliku', 'success'); });
+      act.appendChild(btn('Load from file', 'btn-primary', function () {
+        store.loadFileNow().then(function () { TBUI.toast('Loaded from file', 'success'); });
       }));
-      act.appendChild(btn('Zachowaj z przeglądarki', 'btn-secondary', function () {
-        store.keepLocal().then(function () { TBUI.toast('Nadpisano plik danymi z przeglądarki', 'success'); });
+      act.appendChild(btn('Keep browser copy', 'btn-secondary', function () {
+        store.keepLocal().then(function () { TBUI.toast('File overwritten with the browser copy', 'success'); });
       }));
-      act.appendChild(btn('Pobierz obie kopie', 'btn-ghost', function () {
+      act.appendChild(btn('Download both', 'btn-ghost', function () {
         io.exportJson();
         file.text().then(function (t) {
-          var blob = new Blob([t], { type: 'application/json' });
-          var url = URL.createObjectURL(blob);
+          var url = URL.createObjectURL(new Blob([t], { type: 'application/json' }));
           var a = doc.createElement('a');
           a.href = url;
-          a.download = 'z-pliku-' + fmt.todayISO() + '.json';
+          a.download = 'from-file-' + fmt.todayISO() + '.json';
           a.click();
           setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
         });
@@ -2716,7 +2953,15 @@
       store.setSaveState('dirty');
     }
 
-    /* ---- renderowanie komponentów ---- */
+    /* ---- renderowanie ---- */
+
+    function findComponent(cmpId) {
+      var found = null;
+      CFG.tabs.forEach(function (t) {
+        (t.components || []).forEach(function (c) { if (c.id === cmpId) found = c; });
+      });
+      return found;
+    }
 
     function renderComponent(cmp) {
       var host = cmpHost[cmp.id];
@@ -2724,15 +2969,14 @@
       var fn = render[cmp.type];
       if (!fn) {
         host.innerHTML = '';
-        host.appendChild(emptyBox('Nieznany typ komponentu: ' + cmp.type, ''));
+        host.appendChild(emptyBox('Unknown component type: ' + cmp.type, ''));
         return;
       }
       try {
         fn(host, cmp);
       } catch (err) {
         host.innerHTML = '';
-        host.appendChild(emptyBox('Nie udało się wyrenderować „' + (cmp.title || cmp.type) + '"',
-          err.message));
+        host.appendChild(emptyBox('Could not render “' + (cmp.title || cmp.type) + '”', err.message));
         if (global.console) console.error('[TB] render', cmp.type, cmp.id, err);
       }
     }
@@ -2748,18 +2992,16 @@
 
     function renderActive(force) {
       if (!activeTab) return;
-      // Renderujemy, gdy: wymuszono, zakładka jest brudna, albo nie była
-      // jeszcze ani raz pokazana. Brak flagi stale na nieodwiedzonej zakładce
-      // nie znaczy "nic do roboty" — znaczy "nigdy jej nie zbudowano".
+      // Zakładka nigdy niepokazana MUSI się wyrenderować, nawet bez flagi stale.
       if (!force && renderedTabs[activeTab] && !staleTabs[activeTab]) return;
       componentsOfTab(activeTab).forEach(renderComponent);
       renderedTabs[activeTab] = 1;
       delete staleTabs[activeTab];
+      refreshAlerts();
     }
 
     /* Mutacja oznacza zbiór jako brudny; przeliczenie leci raz na rAF
-       i dotyczy TYLKO komponentów aktywnej zakładki. Pozostałe dostają
-       flagę stale i odświeżą się przy przejściu na nie. */
+       i dotyczy TYLKO komponentów aktywnej zakładki. */
     function invalidate(dsId) {
       dirtyDatasets[dsId] = 1;
       if (rafId) return;
@@ -2778,20 +3020,12 @@
             staleTabs[cmpTab[cmpId]] = 1;
           }
         });
+        refreshAlerts();
       });
-    }
-
-    function findComponent(cmpId) {
-      var found = null;
-      CFG.tabs.forEach(function (t) {
-        (t.components || []).forEach(function (c) { if (c.id === cmpId) found = c; });
-      });
-      return found;
     }
 
     function onTabChange(e) {
-      var id = e.detail.id || '';
-      var tabId = id.replace(/^panel-/, '');
+      var tabId = String(e.detail.id || '').replace(/^panel-/, '');
       activeTab = tabId;
       var tab = CFG.tabs.filter(function (t) { return t.id === tabId; })[0];
       doc.getElementById('tb-title').textContent = tab ? (tab.label || '') : '';
@@ -2807,12 +3041,11 @@
       renderActive(true);
       renderNotices();
 
-      // Ctrl+S zapisuje, zamiast otwierać okno zapisu strony
       doc.addEventListener('keydown', function (e) {
         if (!(e.ctrlKey || e.metaKey) || e.key.toLowerCase() !== 's') return;
         e.preventDefault();
         if (store.mode() === 'auto') {
-          store.saveNow().then(function () { TBUI.toast('Zapisano', 'success'); });
+          store.saveNow().then(function () { TBUI.toast('Saved', 'success'); });
         } else if (store.handle()) {
           store.reconnect().then(function (ok) { if (ok) store.saveNow(); });
         } else {
@@ -2820,12 +3053,12 @@
         }
       });
 
-      // flush przy ukryciu karty — ostatni moment, w którym zapis się zdąży
       doc.addEventListener('visibilitychange', function () {
         if (doc.visibilityState === 'hidden' && store.mode() === 'auto') store.saveNow();
       });
       global.addEventListener('beforeunload', function (e) {
-        if (doc.getElementById('tb-save').getAttribute('data-state') === 'dirty') {
+        var s = doc.getElementById('tb-save');
+        if (s && s.getAttribute('data-state') === 'dirty') {
           e.preventDefault();
           e.returnValue = '';
         }
@@ -2834,7 +3067,8 @@
 
     return {
       init: init, invalidate: invalidate, renderActive: renderActive,
-      renderNotices: renderNotices, conflict: conflict,
+      renderNotices: renderNotices, renderProfile: renderProfile,
+      conflict: conflict, refreshAlerts: refreshAlerts,
       activeTab: function () { return activeTab; }
     };
   })();
@@ -2846,7 +3080,7 @@
   function gate(message) {
     var g = doc.createElement('div');
     g.className = 'tb-gate';
-    g.innerHTML = '<h1>Tracker działa w Chrome i Edge</h1><p>' + fmt.esc(message) + '</p>';
+    g.innerHTML = '<h1>This tracker runs in Chrome and Edge</h1><p>' + fmt.esc(message) + '</p>';
     doc.body.appendChild(g);
   }
 
@@ -2857,18 +3091,21 @@
       gate(e.message);
       return;
     }
-    TBCharts.config.locale = CFG.meta.locale || 'pl-PL';
+    TBCharts.config.locale = CFG.meta.locale || 'en-GB';
+    TBCharts.config.currency = CFG.meta.currency || 'PLN';
+    if (global.TBXlsx) TBXlsx.setCurrency(CFG.meta.currency || 'PLN');
+    if (CFG.meta.team) profile.set({ team: CFG.meta.team });
 
     if (!PREVIEW) {
       if (!global.indexedDB) {
-        gate('Ta przeglądarka nie udostępnia IndexedDB, więc tracker nie ma gdzie trzymać danych. ' +
-          'Otwórz plik w Chrome albo Edge.');
+        gate('This browser does not expose IndexedDB, so the tracker has nowhere to keep your ' +
+          'data. Open the file in Chrome or Edge.');
         return;
       }
       if (!global.showSaveFilePicker) {
-        gate('Ta przeglądarka nie obsługuje zapisu do pliku (File System Access API). ' +
-          'Tracker zapisywałby dane tylko w pamięci przeglądarki, więc nie uruchamiam go, ' +
-          'żeby nie stracić Twojej pracy. Otwórz plik w Chrome albo Edge.');
+        gate('This browser cannot write to files (File System Access API). The tracker would only ' +
+          'keep data inside the browser, so it will not start — that way you cannot lose your ' +
+          'work by accident. Open the file in Chrome or Edge.');
         return;
       }
     }
@@ -2877,11 +3114,9 @@
       shell.init();
     }).catch(function (err) {
       if (global.console) console.error('[TB] boot', err);
-      gate('Nie udało się uruchomić magazynu danych: ' + err.message);
+      gate('Could not start the local data store: ' + err.message);
     });
   }
 
-  // Runtime startuje przy readyState === 'loading', więc DOM shella już jest
-  // (jest wyżej w dokumencie), a nic poniżej nas nie potrzebuje.
   boot();
 })(window);

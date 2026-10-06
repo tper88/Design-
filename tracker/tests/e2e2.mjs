@@ -53,7 +53,7 @@ const tr = await ctx.newPage();
 watch(tr, 'tracker');
 await tr.goto('file://' + OUT + '/tracker.html');
 await tr.waitForSelector('#tb-nav a');
-await tr.locator('#tb-nav a', { hasText: 'Rejestr' }).click();
+await tr.locator('#tb-nav a', { hasText: 'Log' }).click();
 await tr.waitForSelector('.tb-table');
 
 /* Każdy kontekst Playwrighta to świeży profil, więc IndexedDB jest pusta —
@@ -64,10 +64,10 @@ await tr.evaluate(() => {
   const col = n => ds.columns.find(c => new RegExp(n, 'i').test(c.label)).id;
   const mk = (i, who, subj, stat, due) => {
     const d = {};
-    d[col('Zgłaszający')] = who;
-    d[col('Temat')] = subj;
-    d[col('Wpłynęło')] = '2026-09-1' + i;
-    d[col('Termin')] = due;
+    d[col('Requested by')] = who;
+    d[col('Subject')] = subj;
+    d[col('Received')] = '2026-09-1' + i;
+    d[col('Due')] = due;
     d[col('Status')] = stat;
     return { id: 'r_seed' + i, ds: ds.id, data: d, _c: Date.now(), _m: Date.now(), _d: 0 };
   };
@@ -90,9 +90,9 @@ await tr.locator('.tb-table tbody tr').first().click({ button: 'right' });
 await tr.waitForSelector('.tb-menu');
 ok(true, 'menu kontekstowe otwiera się na wierszu');
 const items = await tr.locator('.tb-menu .tb-menu-item').allTextContents();
-ok(items.some(t => t.includes('Zamknij zapytanie')), 'menu ma własną akcję z wizarda',
+ok(items.some(t => t.includes('Close request')), 'menu ma własną akcję z wizarda',
   JSON.stringify(items));
-ok(items.some(t => t.includes('Przypisz do mnie')), 'menu ma akcję „Przypisz do mnie"');
+ok(items.some(t => t.includes('Assign to me')), 'menu ma akcję „Przypisz do mnie"');
 ok(await tr.locator('.tb-menu .tb-menu-head').count() === 0,
   'bez zaznaczenia menu nie pokazuje nagłówka o liczbie wierszy');
 await tr.keyboard.press('Escape');
@@ -104,11 +104,11 @@ const firstRowStatusBefore = await tr.locator('.tb-table tbody tr').first()
   .locator('td').nth(4).textContent();
 await tr.locator('.tb-table tbody tr').first().click({ button: 'right' });
 await tr.waitForSelector('.tb-menu');
-await tr.locator('.tb-menu .tb-menu-item', { hasText: 'Zamknij zapytanie' }).click();
+await tr.locator('.tb-menu .tb-menu-item', { hasText: 'Close request' }).click();
 await tr.waitForTimeout(300);
 const firstRowStatusAfter = await tr.locator('.tb-table tbody tr').first()
   .locator('td').nth(4).textContent();
-ok(firstRowStatusAfter.includes('Zamknięte'),
+ok(firstRowStatusAfter.includes('Closed'),
   'akcja setField zmieniła status jednego wiersza', firstRowStatusBefore + ' → ' + firstRowStatusAfter);
 
 /* zaznaczenie 2 wierszy i akcja masowa */
@@ -123,12 +123,11 @@ await tr.locator('.tb-table tbody tr').nth(1).click({ button: 'right' });
 await tr.waitForSelector('.tb-menu');
 const head = await tr.locator('.tb-menu .tb-menu-head').first().textContent();
 ok(head.includes('2'), 'menu na wierszu W zaznaczeniu mówi o 2 wierszach', head);
-await tr.locator('.tb-menu .tb-menu-item', { hasText: 'Termin na dziś' }).click();
+await tr.locator('.tb-menu .tb-menu-item', { hasText: 'Due today' }).click();
 await tr.waitForTimeout(400);
-const today = new Date();
-const iso = today.getFullYear() + '.' + String(today.getMonth() + 1).padStart(2, '0') + '.' +
-  String(today.getDate()).padStart(2, '0');
-const dmy = iso.split('.').reverse().join('.');
+/* Oczekiwaną datę bierzemy z formatera trackera, żeby test nie zakładał
+   konkretnego locale — format jest teraz wybierany w kreatorze. */
+const dmy = await tr.evaluate(() => TB.fmt.date(TB.fmt.todayISO()));
 const dueCells = await tr.locator('.tb-table tbody tr').nth(1).locator('td').allTextContents();
 const dueCells2 = await tr.locator('.tb-table tbody tr').nth(2).locator('td').allTextContents();
 ok(dueCells.join(' ').includes(dmy) && dueCells2.join(' ').includes(dmy),
@@ -137,7 +136,7 @@ ok(dueCells.join(' ').includes(dmy) && dueCells2.join(' ').includes(dmy),
 
 /* ---------------------------------------- plik danych */
 section('FAZA 6 — plik danych, zapis i wskaźnik');
-await tr.locator('#tb-notices button', { hasText: 'Wybierz plik danych' }).click();
+await tr.locator('#tb-notices button', { hasText: 'Choose a data file' }).click();
 await tr.waitForTimeout(600);
 const st1 = await tr.locator('#tb-save').getAttribute('data-state');
 ok(st1 === 'saved', 'po wskazaniu pliku wskaźnik pokazuje "Zapisano"', st1);
@@ -161,8 +160,8 @@ await tr.evaluate(() => {
   const ds = cfg.datasets[0];
   const col = n => ds.columns.find(c => new RegExp(n, 'i').test(c.label)).id;
   const d = {};
-  d[col('Zgłaszający')] = 'Z PLIKU';
-  d[col('Temat')] = 'Rekord wczytany z pliku';
+  d[col('Requested by')] = 'Z PLIKU';
+  d[col('Subject')] = 'Rekord wczytany z pliku';
   window.__fs.content = JSON.stringify({
     $kind: 'tracker.data', trackerId: cfg.meta.trackerId, configRev: cfg.rev,
     savedAt: new Date().toISOString(),
@@ -180,7 +179,7 @@ const cActions = await tr.locator('#tb-notices .tb-banner-danger button').allTex
 ok(cActions.length === 3, 'pasek konfliktu daje 3 wyjścia', JSON.stringify(cActions));
 ok((await tr.locator('.tb-table tbody tr').count()) === 3,
   'przed decyzją dane NIE zostały nadpisane');
-await tr.locator('#tb-notices .tb-banner-danger button', { hasText: 'Wczytaj z pliku' }).click();
+await tr.locator('#tb-notices .tb-banner-danger button', { hasText: 'Load from file' }).click();
 await tr.waitForTimeout(700);
 const afterLoad = await tr.locator('.tb-table tbody tr').count();
 ok(afterLoad === 1, 'po wyborze „Wczytaj z pliku" jest 1 rekord z pliku', 'wierszy: ' + afterLoad);
@@ -202,12 +201,12 @@ await tr.evaluate(() => {
     })
   });
 });
-await tr.locator('.tb-toolbar button', { hasText: 'Eksport' }).click();
+await tr.locator('.tb-toolbar button', { hasText: 'Export' }).click();
 await tr.waitForSelector('.tb-menu');
 const expItems = await tr.locator('.tb-menu .tb-menu-item').allTextContents();
 ok(expItems.length >= 5, 'menu eksportu ma wszystkie zakresy', JSON.stringify(expItems));
-ok(expItems.some(t => t.includes('Cały tracker')), 'jest zakres „cały tracker — arkusz na zbiór"');
-await tr.locator('.tb-menu .tb-menu-item', { hasText: 'Aktualny widok' }).click();
+ok(expItems.some(t => t.includes('Everything')), 'jest zakres „cały tracker — arkusz na zbiór"');
+await tr.locator('.tb-menu .tb-menu-item', { hasText: 'Current view' }).click();
 await tr.waitForTimeout(800);
 const bytes = await tr.evaluate(() => window.__xlsx);
 ok(Array.isArray(bytes) && bytes.length > 1000, 'eksport wyprodukował plik',
@@ -215,9 +214,9 @@ ok(Array.isArray(bytes) && bytes.length > 1000, 'eksport wyprodukował plik',
 if (bytes) writeFileSync(OUT + '/export-view.xlsx', Buffer.from(bytes));
 
 /* cały tracker — wiele arkuszy */
-await tr.locator('.tb-toolbar button', { hasText: 'Eksport' }).click();
+await tr.locator('.tb-toolbar button', { hasText: 'Export' }).click();
 await tr.waitForSelector('.tb-menu');
-await tr.locator('.tb-menu .tb-menu-item', { hasText: 'Cały tracker' }).click();
+await tr.locator('.tb-menu .tb-menu-item', { hasText: 'Everything' }).click();
 await tr.waitForTimeout(800);
 const bytesAll = await tr.evaluate(() => window.__xlsx);
 if (bytesAll) writeFileSync(OUT + '/export-all.xlsx', Buffer.from(bytesAll));

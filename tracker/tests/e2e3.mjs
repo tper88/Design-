@@ -52,7 +52,7 @@ const wz = await ctx.newPage();
 watch(wz, 'wizard');
 await wz.goto('file://' + ROOT + '/dist/tracker-wizard.html');
 await wz.waitForSelector('#wz-start-cards .wz-tile');
-await wz.locator('.wz-tile', { hasText: 'Rejestr zapytań' }).first().click();
+await wz.locator('.wz-tile', { hasText: 'Request log' }).first().click();
 await wz.waitForSelector('#wz-step-1:not([hidden])');
 
 const cfgA = await wz.evaluate(() => TBWizard.state.cfg);
@@ -70,12 +70,12 @@ await tr.waitForSelector('#tb-nav a');
 const colIds = await tr.evaluate(() => {
   const ds = TB.config().datasets[0];
   const col = n => ds.columns.find(c => new RegExp(n, 'i').test(c.label)).id;
-  const ids = { req: col('Zgłaszający'), subj: col('Temat'), recv: col('Wpłynęło'),
-                due: col('Termin'), stat: col('Status'), asg: col('Opiekun'), res: col('Rozwiąz') };
+  const ids = { req: col('Requested by'), subj: col('Subject'), recv: col('Received'),
+                due: col('Due'), stat: col('Status'), own: col('Owner'), res: col('Resolution') };
   const mk = (i, who, subj, recv, stat) => {
     const d = {};
     d[ids.req] = who; d[ids.subj] = subj; d[ids.recv] = recv;
-    d[ids.due] = '2026-11-0' + i; d[ids.stat] = stat; d[ids.asg] = 'Zespół ' + i;
+    d[ids.due] = '2026-11-0' + i; d[ids.stat] = stat; d[ids.own] = 'Team ' + i;
     d[ids.res] = 'Rozwiązanie numer ' + i;
     return { id: 'r_x' + i, ds: ds.id, data: d, _c: Date.now(), _m: Date.now(), _d: 0 };
   };
@@ -85,39 +85,39 @@ const colIds = await tr.evaluate(() => {
   return ids;
 });
 await tr.waitForTimeout(300);
-await tr.locator('#tb-nav a', { hasText: 'Rejestr' }).click();
+await tr.locator('#tb-nav a', { hasText: 'Log' }).click();
 await tr.waitForSelector('.tb-table tbody tr');
 ok((await tr.locator('.tb-table tbody tr').count()) === 3, '3 wiersze w tabeli');
 
 /* ---- eksport typowany przez przeglądarkę ---- */
 section('FAZA 11 — eksport typowany i wiele arkuszy');
-await tr.locator('.tb-toolbar button', { hasText: 'Eksport' }).click();
+await tr.locator('.tb-toolbar button', { hasText: 'Export' }).click();
 await tr.waitForSelector('.tb-menu');
-await tr.locator('.tb-menu .tb-menu-item', { hasText: 'Cały zbiór' }).click();
+await tr.locator('.tb-menu .tb-menu-item', { hasText: 'Whole dataset' }).click();
 await tr.waitForTimeout(900);
 let bytes = await tr.evaluate(() => window.__xlsx);
 ok(Array.isArray(bytes) && bytes.length > 1000, 'eksport zbioru wyprodukował plik');
 writeFileSync(OUT + '/typed.xlsx', Buffer.from(bytes));
 
 /* karteczka + checklista → eksport całego trackera ma dawać 3 arkusze */
-await tr.locator('#tb-nav a', { hasText: 'Notatki' }).click();
+await tr.locator('#tb-nav a', { hasText: 'Notes' }).click();
 await tr.waitForTimeout(200);
-await tr.locator('button', { hasText: '+ Dodaj karteczkę' }).click();
+await tr.locator('button', { hasText: '+ Add note' }).click();
 await tr.waitForTimeout(200);
 const nt = tr.locator('.tb-note .tb-note-text').first();
 await nt.click(); await nt.type('Notatka testowa'); await tr.locator('#tb-title').click();
 await tr.waitForTimeout(300);
-await tr.locator('#tb-nav a', { hasText: 'Terminy' }).click();
+await tr.locator('#tb-nav a', { hasText: 'Dates' }).click();
 await tr.waitForTimeout(200);
 await tr.locator('.tb-check-add input').fill('Pozycja checklisty');
 await tr.locator('.tb-check-add input').press('Enter');
 await tr.waitForTimeout(300);
-await tr.locator('#tb-nav a', { hasText: 'Rejestr' }).click();
+await tr.locator('#tb-nav a', { hasText: 'Log' }).click();
 await tr.waitForTimeout(250);
 await tr.evaluate(() => { window.__xlsx = null; });
-await tr.locator('.tb-toolbar button', { hasText: 'Eksport' }).click();
+await tr.locator('.tb-toolbar button', { hasText: 'Export' }).click();
 await tr.waitForSelector('.tb-menu');
-await tr.locator('.tb-menu .tb-menu-item', { hasText: 'Cały tracker' }).click();
+await tr.locator('.tb-menu .tb-menu-item', { hasText: 'Everything' }).click();
 await tr.waitForTimeout(900);
 bytes = await tr.evaluate(() => window.__xlsx);
 ok(Array.isArray(bytes) && bytes.length > 1000, 'eksport całego trackera wyprodukował plik');
@@ -136,18 +136,18 @@ ok(cfgLoaded.rev === cfgA.rev + 1, 'wersja struktury podniesiona', cfgA.rev + ' 
 /* usuń kolumnę "Opiekun", dodaj kolumnę "Priorytet" */
 const removedColId = await wz.evaluate((ids) => {
   const ds = TBWizard.state.cfg.datasets[0];
-  ds.columns = ds.columns.filter(c => c.id !== ids.asg);
-  ds.columns.push({ id: 'c_newprio', label: 'Priorytet', type: 'text' });
+  ds.columns = ds.columns.filter(c => c.id !== ids.own);
+  ds.columns.push({ id: 'c_newprio', label: 'Priority', type: 'text' });
   TBWizard.state.cfg.tabs.forEach(t => (t.components || []).forEach(c => {
     if (c.opts && c.opts.columns) {
-      c.opts.columns = c.opts.columns.filter(x => x !== ids.asg).concat(['c_newprio']);
+      c.opts.columns = c.opts.columns.filter(x => x !== ids.own).concat(['c_newprio']);
     }
-    if (c.opts && c.opts.sources) c.opts.sources.forEach(s => { if (s.metaField === ids.asg) s.metaField = null; });
+    if (c.opts && c.opts.sources) c.opts.sources.forEach(s => { if (s.metaField === ids.own) s.metaField = null; });
     if (c.opts && c.opts.contextMenu) {
-      c.opts.contextMenu.actions = c.opts.contextMenu.actions.filter(a => a.field !== ids.asg);
+      c.opts.contextMenu.actions = c.opts.contextMenu.actions.filter(a => a.field !== ids.own);
     }
   }));
-  return ids.asg;
+  return ids.own;
 }, colIds);
 const problems2 = await wz.evaluate(() => TBWizard.validate());
 ok(problems2.length === 0, 'struktura po zmianach przechodzi walidację', JSON.stringify(problems2));
@@ -160,15 +160,15 @@ await tr.waitForTimeout(400);
 ok(await tr.locator('#tb-notices .tb-banner-accent').count() >= 1,
   'tracker informuje o zmianie struktury');
 const noteTxt = await tr.locator('#tb-notices .tb-banner-accent .tb-banner-text').first().textContent();
-ok(/\+1 kolumn/.test(noteTxt) && /1 kolumn \(dane zachowane\)/.test(noteTxt),
+ok(/\+1 columns/.test(noteTxt) && /1 columns \(data kept\)/.test(noteTxt),
   'komunikat wymienia +1 i −1 kolumnę', noteTxt);
-await tr.locator('#tb-nav a', { hasText: 'Rejestr' }).click();
+await tr.locator('#tb-nav a', { hasText: 'Log' }).click();
 await tr.waitForSelector('.tb-table tbody tr');
 ok((await tr.locator('.tb-table tbody tr').count()) === 3, '3 wiersze przetrwały przebudowę');
 let headers = await tr.locator('.tb-table thead th').allTextContents();
-ok(headers.some(h => h.includes('PRIORYTET')) || headers.some(h => /priorytet/i.test(h)),
+ok(headers.some(h => h.includes('PRIORITY')) || headers.some(h => /priority/i.test(h)),
   'nowa kolumna widoczna w tabeli', JSON.stringify(headers));
-ok(!headers.some(h => /opiekun/i.test(h)), 'usunięta kolumna zniknęła z tabeli');
+ok(!headers.some(h => /owner/i.test(h)), 'usunięta kolumna zniknęła z tabeli');
 const orphanStillInRecord = await tr.evaluate((rid) => {
   const recs = TB.data.byDs[TB.config().datasets[0].id] || [];
   return recs.some(r => r.data[rid] != null);
@@ -179,7 +179,7 @@ ok(orphanStillInRecord, 'dane usuniętej kolumny NIE zostały wymazane z rekord�
 section('FAZA 13 — przywrócenie kolumny przywraca dane');
 await wz.evaluate((rid) => {
   const ds = TBWizard.state.cfg.datasets[0];
-  ds.columns.push({ id: rid, label: 'Opiekun', type: 'text' });
+  ds.columns.push({ id: rid, label: 'Owner', type: 'text' });
   TBWizard.state.cfg.tabs.forEach(t => (t.components || []).forEach(c => {
     if (c.opts && c.opts.columns) c.opts.columns.push(rid);
   }));
@@ -189,12 +189,12 @@ html = await wz.evaluate(() => TBWizard.emit(TBWizard.state.cfg, false));
 writeFileSync(OUT + '/tracker.html', html);
 await tr.reload();
 await tr.waitForSelector('#tb-nav a');
-await tr.locator('#tb-nav a', { hasText: 'Rejestr' }).click();
+await tr.locator('#tb-nav a', { hasText: 'Log' }).click();
 await tr.waitForSelector('.tb-table tbody tr');
 headers = await tr.locator('.tb-table thead th').allTextContents();
-ok(headers.some(h => /opiekun/i.test(h)), 'kolumna wróciła do tabeli');
+ok(headers.some(h => /owner/i.test(h)), 'kolumna wróciła do tabeli');
 const cellTexts = await tr.locator('.tb-table tbody tr').first().locator('td').allTextContents();
-ok(cellTexts.some(t => /Zespół/.test(t)),
+ok(cellTexts.some(t => /Team/.test(t)),
   'WARTOŚCI w przywróconej kolumnie wróciły', JSON.stringify(cellTexts));
 
 await tr.close(); await wz.close(); await ctx.close();
@@ -207,7 +207,7 @@ const wz3 = await ctx3.newPage();
 watch(wz3, 'themes');
 await wz3.goto('file://' + ROOT + '/dist/tracker-wizard.html');
 await wz3.waitForSelector('#wz-start-cards .wz-tile');
-await wz3.locator('.wz-tile', { hasText: 'Rejestr zapytań' }).first().click();
+await wz3.locator('.wz-tile', { hasText: 'Request log' }).first().click();
 await wz3.waitForSelector('#wz-step-1:not([hidden])');
 const themeIds = await wz3.evaluate(() => TBWizard.emit && window.__themes ||
   JSON.parse(new TextDecoder().decode(Uint8Array.from(
@@ -280,36 +280,31 @@ for (const t of themeIds) {
   await p.close();
 }
 
-/* ---- przełącznik stylu w gotowym trackerze ---- */
-section('FAZA 15 — przełącznik stylu w trackerze');
-const hSwitch = await wz3.evaluate(() => {
-  TBWizard.state.cfg.meta.allowThemeSwitch = true;
+/* ---- styl jest wypalony w pliku: brak przełącznika ---- */
+section('FAZA 15 — styl wypalony w pliku, bez przełącznika');
+const hOne = await wz3.evaluate(() => {
   TBWizard.state.cfg.meta.theme = 'amber-dusk';
   return TBWizard.emit(TBWizard.state.cfg, true);
 });
-writeFileSync(OUT + '/switch.html', hSwitch);
+writeFileSync(OUT + '/single.html', hOne);
 const ps = await ctx3.newPage();
-watch(ps, 'switch');
-await ps.goto('file://' + OUT + '/switch.html');
+watch(ps, 'single');
+await ps.goto('file://' + OUT + '/single.html');
 await ps.waitForSelector('#tb-nav a');
 await ps.waitForTimeout(400);
-const islands = await ps.locator('script[type="text/plain"][data-theme]').count();
-ok(islands === 4, '4 nieaktywne motywy wklejone jako tekst', 'było ' + islands);
-const sel = ps.locator('#tb-head-actions select');
-ok(await sel.count() === 1, 'przełącznik stylu widoczny w topbarze');
-const before = await ps.evaluate(() =>
+ok(await ps.locator('script[type="text/plain"][data-theme]').count() === 0,
+  'plik NIE zawiera dodatkowych motywów — waży tylko tyle, ile trzeba');
+ok(await ps.locator('#tb-head-actions select').count() === 0,
+  'w topbarze nie ma przełącznika stylu');
+const c1now = await ps.evaluate(() =>
   getComputedStyle(document.documentElement).getPropertyValue('--c1').trim());
-const fillBefore = await ps.evaluate(() => {
-  const s = document.querySelector('.tb-chart svg stop');
-  return s ? s.getAttribute('style') : null;
+ok(c1now.toLowerCase() === '#f4a95e', 'wypalony motyw to Amber Dusk', c1now);
+const fill = await ps.evaluate(() => {
+  const s2 = document.querySelector('.tb-chart svg stop');
+  return s2 ? s2.getAttribute('style') : null;
 });
-await sel.selectOption('frosted-mono');
-await ps.waitForTimeout(400);
-const after = await ps.evaluate(() =>
-  getComputedStyle(document.documentElement).getPropertyValue('--c1').trim());
-ok(before !== after, 'zmiana stylu podmieniła token --c1', before + ' → ' + after);
-ok(fillBefore && fillBefore.includes('var(--c1)'),
-  'gradient słupka odwołuje się do var(--c1), więc przemalowuje się bez re-renderu', fillBefore);
+ok(fill && fill.includes('var(--c1)'),
+  'gradient słupka nadal odwołuje się do tokenu motywu', fill);
 await ps.close();
 
 section('Błędy konsoli');
