@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Amber Dusk — Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* ---------- Fonty ---------- */
+  --font-head: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* ---------- Scena (tło strony) ---------- */
+  --ad-scene-amber: #E3A05A;           /* Amber glow — Ciepła poświata w prawym górnym rogu sceny */
+  --ad-scene-rust: #9C5A2E;            /* Rust — Środek sceny, przejście */
+  --ad-scene-deep: #2A1E19;            /* Deep brown — Ciemne partie sceny po lewej */
+  --ad-scene-dusk: #4A4350;            /* Dusk — Chłodny fiolet u dołu sceny */
+
+  /* ---------- Powierzchnie (ciemne szkło) ---------- */
+  --ad-frame: rgba(22,19,20,.78);      /* App frame — Główna ramka aplikacji (z blur) */
+  --ad-sidebar: #0D0C0E;               /* Sidebar — Lewy panel nawigacji */
+  --ad-card: rgba(255,255,255,.045);   /* Card — Karty z danymi */
+  --ad-card-2: rgba(255,255,255,.08);  /* Card raised — Hover, pola, pigułki */
+  --ad-border: rgba(255,255,255,.09);  /* Border — Obwódka kart 1 px */
+  --ad-edge: rgba(255,255,255,.22);    /* Edge light — Jasna krawędź ramki aplikacji */
+
+  /* ---------- Tekst ---------- */
+  --ad-text: #F4EFEA;                  /* Text primary — Tytuły, liczby */
+  --ad-text-2: #C9C1BA;                /* Text secondary — Treść, etykiety */
+  --ad-muted: #8B8389;                 /* Muted — Osie, podpisy */
+  --ad-ink: #141214;                   /* Ink — Tekst na jasnych pigułkach */
+
+  /* ---------- Akcenty danych ---------- */
+  --ad-amber: #F4A95E;                 /* Amber — Seria 1, słupki ciepłe */
+  --ad-periwinkle: #8EA6F4;            /* Periwinkle — Seria 2, słupki zimne */
+  --ad-lilac: #B7A9F2;                 /* Lilac — Seria 3, słupki kumulacji */
+  --ad-yellow: #F2C94C;                /* Yellow — Seria 4, linia wykresu (świecąca) */
+  --ad-pink: #E870A8;                  /* Pink — Seria 5, kategorie */
+  --ad-peach: #F7C59C;                 /* Peach — Pigułka primary, akcent ciepły */
+  --ad-sky: #9CCBF6;                   /* Sky — Aktywny element sidebara */
+  --ad-violet: #8A6CF0;                /* Violet — Gradienty kart KPI */
+
+  /* ---------- Statusy ---------- */
+  --ad-positive: #3FC47A;              /* Positive — Wzrosty, sukces */
+  --ad-negative: #E5484D;              /* Negative — Spadki, błędy */
+  --ad-warning: #F2C94C;               /* Warning — Uwaga (współdzieli z yellow) */
+
+  /* ---------- Kolejność serii danych w wykresach ---------- */
+  --c1: var(--ad-amber);
+  --c2: var(--ad-periwinkle);
+  --c3: var(--ad-lilac);
+  --c4: var(--ad-yellow);
+  --c5: var(--ad-pink);
+
+  /* ---------- Gradienty ---------- */
+  --ad-grad-scene: radial-gradient(900px 600px at 85% 5%, #F0B46A 0%, rgba(240,180,106,0) 60%), radial-gradient(700px 500px at 60% 40%, #9C5A2E 0%, rgba(156,90,46,0) 65%), radial-gradient(800px 600px at 20% 100%, #4A4350 0%, rgba(74,67,80,0) 70%), linear-gradient(135deg, #2A1E19 0%, #5C3A26 45%, #B87842 75%, #6A5A60 100%); /* Tło strony pod szklaną aplikacją */
+  --ad-grad-kpi-1: linear-gradient(135deg, #A39A89 0%, #6C675F 100%); /* Karta KPI 1 */
+  --ad-grad-kpi-2: linear-gradient(135deg, #7391F2 0%, #8A6CF0 100%); /* Karta KPI 2 */
+  --ad-grad-kpi-3: linear-gradient(135deg, #8E5FDB 0%, #E870A8 100%); /* Karta KPI 3 */
+  --ad-grad-kpi-4: linear-gradient(135deg, #E870A8 0%, #F2866A 100%); /* Karta KPI 4 */
+  --ad-grad-kpi-5: linear-gradient(135deg, #F4A870 0%, #F7D3A0 100%); /* Karta KPI 5 (ciemny tekst) */
+  --ad-grad-bar-warm: linear-gradient(180deg, #F9D2A2 0%, #F4A95E 45%, rgba(244,169,94,.08) 100%); /* Słupki ciepłe, wygaszone u dołu */
+  --ad-grad-bar-cool: linear-gradient(180deg, #D3DEFF 0%, #8EA6F4 50%, rgba(142,166,244,.10) 100%); /* Słupki zimne, wygaszone u dołu */
+  --ad-grad-bar-dawn: linear-gradient(180deg, #F7C59C 0%, #B9C6F7 55%, #7E98EE 100%); /* Słupki porównawcze (brzoskwinia → błękit) */
+
+  /* ---------- Promienie ---------- */
+  --ad-r-frame: 26px; /* Ramka aplikacji */
+  --ad-r-card: 16px; /* Karty */
+  --ad-r-inner: 10px; /* Pola, aktywny element menu */
+  --ad-r-pill: 999px; /* Pigułki, przyciski */
+
+  /* ---------- Cienie ---------- */
+  --ad-shadow: 0 1px 0 rgba(255,255,255,.05) inset, 0 10px 30px rgba(0,0,0,.25); /* Karty */
+  --ad-shadow-frame: 0 40px 90px rgba(20,10,5,.55), 0 0 0 1px rgba(255,255,255,.18) inset; /* Ramka aplikacji */
+  --ad-glow: 0 0 18px rgba(242,201,76,.45); /* Poświata linii / aktywnych punktów */
+  --ad-blur: blur(28px) saturate(130%); /* Wartość do backdrop-filter */
+
+  /* ---------- Odstępy ---------- */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+
+  /* ---------- Aliasy semantyczne (używaj w komponentach) ---------- */
+  --page-bg: var(--ad-scene-deep);
+  --surface: rgba(24,21,22,.62);
+  --surface-2: var(--ad-card-2);
+  --border: var(--ad-border);
+  --divider: rgba(255,255,255,.07);
+  --text: var(--ad-text);
+  --text-2: var(--ad-text-2);
+  --muted: var(--ad-muted);
+  --accent: var(--ad-peach);
+  --hover: rgba(255,255,255,.08);
+  --toc-bg: rgba(20,18,20,.6);
+  --code-bg: rgba(10,9,10,.8);
+  --code-text: #F1E9E1;
+  --r-card: var(--ad-r-card);
+  --r-inner: var(--ad-r-inner);
+  --r-pill: var(--ad-r-pill);
+  --shadow: var(--ad-shadow);
+  --up: var(--ad-positive);
+  --down: var(--ad-negative);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-body);background:var(--page-bg);color:var(--text);-webkit-font-smoothing:antialiased;line-height:1.5;min-height:100vh}
+button{font:inherit}
+.wrap{max-width:1240px;margin:0 auto;padding:40px 20px 90px;position:relative;z-index:1}
+.hero{display:grid;gap:14px;padding:8px 0 4px}
+.hero h1{font-family:var(--font-head);font-size:clamp(36px,6.4vw,68px);font-weight:var(--hero-w,600);letter-spacing:-.025em;line-height:1.02}
+.hero .kicker{font-size:14px;color:var(--muted);font-weight:500}
+.hero p{color:var(--text-2);max-width:680px;font-size:16px}
+.hero .meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.toc{position:sticky;top:10px;z-index:20;display:flex;gap:4px;overflow-x:auto;padding:5px;margin:30px 0 0;background:var(--toc-bg);border:1px solid var(--border);border-radius:var(--r-pill);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);scrollbar-width:none;box-shadow:var(--shadow)}
+.toc::-webkit-scrollbar{display:none}
+.toc a{white-space:nowrap;padding:8px 14px;border-radius:var(--r-pill);font-size:13px;font-weight:500;color:var(--text-2);text-decoration:none}
+.toc a:hover,.toc a:focus-visible{background:var(--hover);color:var(--text);outline:none}
+section.block{margin-top:60px;scroll-margin-top:80px}
+.sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:18px;flex-wrap:wrap}
+.sec-head h2{font-family:var(--font-head);font-size:26px;font-weight:600;letter-spacing:-.015em}
+.sec-head span{color:var(--muted);font-size:13px}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);box-shadow:var(--shadow);padding:20px}
+.group-title{font-size:13px;font-weight:600;color:var(--text-2);margin:26px 0 10px}
+.group-title:first-child{margin-top:0}
+.swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:12px}
+.sw{padding:0;display:block;width:100%;font:inherit;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-inner);overflow:hidden;cursor:pointer;text-align:left;color:inherit;transition:transform .15s ease}
+.sw:hover{transform:translateY(-2px)}
+.sw:focus-visible,.btn:focus-visible,.copy:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.sw-color{height:86px;border-bottom:1px solid var(--border)}
+.sw-info{padding:10px 12px 12px}
+.sw-name{font-size:13px;font-weight:600;display:block}
+.sw-hex{font-family:var(--font-mono);font-size:11.5px;color:var(--text-2);display:block;word-break:break-all}
+.sw-var{font-family:var(--font-mono);font-size:11px;color:var(--muted);display:block}
+.sw-use{font-size:11.5px;color:var(--muted);margin-top:5px;line-height:1.35;display:block}
+.series{display:flex;height:46px;border-radius:var(--r-inner);overflow:hidden;margin-top:6px}
+.series div{flex:1;display:flex;align-items:flex-end;padding:6px 8px;font:500 11px var(--font-mono);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.25)}
+.grads{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px}
+.panel.grad{padding:0;overflow:hidden;cursor:pointer}
+.grad .g{height:120px}
+.grad .gi{padding:12px 14px}
+.grad code{display:block;font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-top:4px;word-break:break-all}
+.type-row{display:grid;grid-template-columns:180px 1fr;gap:18px;align-items:center;padding:16px 0;border-bottom:1px solid var(--divider)}
+.type-row:last-child{border-bottom:0}
+.type-meta b{display:block;font-size:13px}
+.type-meta span{font-family:var(--font-mono);font-size:11.5px;color:var(--muted)}
+.tok-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+.rad-row{display:flex;gap:14px;flex-wrap:wrap;margin-top:6px}
+.rad-row .rb{width:78px;height:64px;background:var(--surface-2);border:1.5px solid var(--accent)}
+.rad-row small,.sh small,.spc small{display:block;font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-top:6px}
+.sh{display:flex;gap:16px;flex-wrap:wrap}
+.sh .sb{width:120px;height:74px;background:var(--surface);border-radius:var(--r-inner)}
+.spc .s{height:10px;background:var(--accent);border-radius:3px;opacity:.8}
+.spc div.i{display:grid;grid-template-columns:70px 1fr;align-items:center;gap:10px;margin:7px 0}
+.comp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.comp-label{font-size:12.5px;color:var(--muted);font-weight:500;margin-bottom:14px}
+.flex{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.pb{margin:10px 0}
+.pb-h{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px}
+.chart{width:100%;height:auto;display:block;overflow:visible}
+.codebox{position:relative}
+pre{font-family:var(--font-mono);font-size:12.5px;line-height:1.65;white-space:pre-wrap;word-break:break-word;background:var(--code-bg);color:var(--code-text);border-radius:var(--r-inner);padding:22px;padding-top:56px;max-height:620px;overflow:auto}
+.code-actions{position:absolute;top:12px;right:12px;display:flex;gap:8px}
+.copy{border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.1);color:#fff;border-radius:999px;padding:7px 14px;font-size:12.5px;font-weight:500;cursor:pointer}
+.copy:hover{background:rgba(255,255,255,.2)}
+.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.rules h3{font-family:var(--font-head);font-size:16px;margin-bottom:10px}
+.rules ul{list-style:none;display:grid;gap:9px}
+.rules li{font-size:14px;color:var(--text-2);padding-left:22px;position:relative}
+.rules .do li::before{content:"✓";position:absolute;left:0;color:var(--up);font-weight:700}
+.rules .dont li::before{content:"✕";position:absolute;left:0;color:var(--down);font-weight:700}
+.toast{position:fixed;bottom:26px;left:50%;transform:translate(-50%,16px);opacity:0;pointer-events:none;background:#111;color:#fff;padding:10px 18px;border-radius:999px;font-size:13px;transition:.25s;z-index:99;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+footer{margin-top:70px;color:var(--muted);font-size:12.5px;text-align:center}
+@media (max-width:820px){
+  .dgrid{grid-template-columns:1fr !important}
+  .dgrid>*{grid-column:auto !important;grid-row:auto !important}
+  .type-row{grid-template-columns:1fr;gap:6px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important;scroll-behavior:auto !important}}
+
+:root{--hero-w:600;color-scheme:dark}
+body{background:var(--ad-scene-deep)}
+.panel,.sw,.toc{backdrop-filter:var(--ad-blur);-webkit-backdrop-filter:var(--ad-blur)}
+.sw{background:rgba(24,21,22,.62)}
+.sw-color{border-bottom-color:rgba(255,255,255,.08)}
+.toast{background:#F7C59C;color:#141214}
+.copy{border-color:rgba(255,255,255,.2)}
+.card{background:var(--ad-card);border:1px solid var(--ad-border);border-radius:var(--ad-r-card);box-shadow:var(--ad-shadow);padding:16px 18px;min-width:0;position:relative}
+.card-h{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}
+.card-t{font-size:14px;font-weight:600}
+.btn{font-weight:600;font-size:12.5px;border-radius:999px;padding:8px 16px;border:1px solid transparent;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--ad-peach);color:var(--ad-ink);box-shadow:0 6px 18px rgba(247,197,156,.25)}
+.btn-secondary{background:var(--ad-card-2);border-color:var(--ad-border);color:var(--text)}
+.btn-ghost{background:transparent;color:var(--text-2)}
+.btn-icon{width:34px;height:34px;border-radius:50%;background:var(--ad-card-2);border:1px solid var(--ad-border);color:var(--text);display:inline-grid;place-items:center;cursor:pointer;font-size:9px;letter-spacing:1px}
+.tabs{display:flex;gap:4px;flex-wrap:wrap}
+.tab{padding:7px 14px;border-radius:999px;font-size:12.5px;color:var(--text-2);font-weight:500}
+.tab.active{background:var(--ad-sky);color:var(--ad-ink);font-weight:600}
+.seg{display:inline-flex;background:rgba(0,0,0,.3);border:1px solid var(--ad-border);border-radius:999px;padding:3px}
+.seg span{padding:5px 12px;border-radius:999px;font-size:12px;color:var(--text-2)}
+.seg .on{background:var(--ad-card-2);color:var(--text);font-weight:600;box-shadow:inset 0 1px 0 rgba(255,255,255,.12)}
+.kpi-t{display:flex;justify-content:space-between;font-size:13.5px;font-weight:600;color:var(--text-2)}
+.kpi-t .arr{color:var(--ad-peach)}
+.kpi-v{font-size:32px;font-weight:600;letter-spacing:-.02em;margin-top:6px;display:flex;align-items:center;gap:10px;font-variant-numeric:tabular-nums}
+.kpi-s{font-size:12px;color:var(--muted)}
+.trend{font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:999px}
+.trend.up{background:rgba(63,196,122,.15);color:var(--ad-positive)}.trend.down{background:rgba(229,72,77,.15);color:#F2787C}
+.badge{background:var(--ad-peach);color:var(--ad-ink);font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px}
+.chip{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--text-2);background:var(--ad-card-2);border-radius:999px;padding:4px 10px}
+.chip i{width:8px;height:8px;border-radius:50%;background:var(--c);box-shadow:0 0 8px var(--c)}
+.bar{height:8px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;background:var(--c)}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.07);font-size:13px}
+.row:last-child{border-bottom:0}.row>span:first-child{flex:1}
+.input,.select{display:flex;align-items:center;justify-content:space-between;gap:8px;background:rgba(0,0,0,.28);border:1px solid var(--ad-border);border-radius:999px;padding:8px 14px;font-size:12.5px;color:var(--text-2)}
+.input{justify-content:flex-start;color:var(--muted)}
+.sec-head span{color:var(--text-2)}
+/* demo */
+.ad-frame{display:grid;grid-template-columns:210px 1fr;border-radius:var(--ad-r-frame);overflow:hidden;background:var(--ad-frame);backdrop-filter:var(--ad-blur);-webkit-backdrop-filter:var(--ad-blur);box-shadow:var(--ad-shadow-frame)}
+.ad-side{background:var(--ad-sidebar);padding:22px 14px;display:flex;flex-direction:column;gap:4px}
+.ad-logo{display:flex;align-items:center;gap:10px;font-weight:600;font-size:15px;margin:0 6px 34px}
+.ad-side a{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;color:var(--text-2);font-size:13px;text-decoration:none}
+.ad-side a.on{background:var(--ad-sky);color:var(--ad-ink);font-weight:600}
+.ad-side a span{width:16px;text-align:center;opacity:.85}
+.ad-main{padding:22px 22px 24px;min-width:0}
+.ad-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.ad-head h3{font-size:22px;font-weight:600}
+.av{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:700;color:#fff;flex:none;border:1.5px solid rgba(255,255,255,.5)}
+.dgrid{display:grid;gap:12px}
+.ad-k5{grid-template-columns:repeat(5,1fr);margin-bottom:12px}
+.kc{border-radius:16px;padding:14px;color:#fff;box-shadow:0 12px 28px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.3);min-width:0}
+.kc .top{display:flex;align-items:center;gap:8px;font-size:11.5px;font-weight:500;margin-bottom:18px}
+.kc b{font-size:18px;font-weight:600;letter-spacing:-.01em;display:block}
+.kc .sub{display:flex;justify-content:space-between;font-size:11px;opacity:.85;margin-top:4px}
+.kc.light{color:#2A1E19}
+.ad-g{grid-template-columns:1.6fr 1fr}
+.play{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.14);display:grid;place-items:center;font-size:13px;border:1px solid rgba(255,255,255,.2)}
+.lg2{display:grid;gap:9px;font-size:12px;color:var(--text-2);min-width:150px}
+.lg2 div{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.lg2 b{color:var(--text);font-weight:600}
+.lg2 i{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:7px;background:var(--c);box-shadow:0 0 8px var(--c)}
+.mini{display:inline-block;width:26px;height:9px;border-radius:99px;background:var(--c);vertical-align:middle;margin-right:6px}
+.split{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center}
+@media (max-width:1000px){.ad-k5{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:820px){.ad-frame{grid-template-columns:1fr}.ad-side{flex-direction:row;overflow-x:auto;padding:12px}.ad-logo{margin:0 10px 0 0}.split{grid-template-columns:1fr}}
+
+</style>
+</head>
+<body>
+<div aria-hidden="true" style="position:fixed;inset:0;z-index:0;pointer-events:none;background:var(--ad-grad-scene)">
+<div style="position:absolute;right:6%;top:-8%;width:40vw;height:40vw;border-radius:50%;background:#F7C27A;opacity:.35;filter:blur(90px)"></div>
+<div style="position:absolute;left:-10%;bottom:-20%;width:50vw;height:40vw;border-radius:50%;background:#3C3542;opacity:.7;filter:blur(80px)"></div></div>
+<div class="wrap">
+  <header class="hero">
+    <div class="kicker">Styl 5 z 5 · referencja: Smart Savings / Savance</div>
+    <h1>Amber Dusk</h1>
+    <p>Ciemne, przydymione szkło zawieszone na ciepłej scenie o zmierzchu: bursztyn, brzoskwinia, fiolet. Czarny sidebar, półprzezroczyste karty i rząd kolorowych kart KPI w gradientach od taupe przez fiolet i róż do brzoskwini. Słupki świecą gradientem i gasną ku dołowi. Dobry do finansów, oszczędności, portfeli i nocnych widoków.</p>
+  </header>
+  <nav class="toc">
+    <a href="#demo">Podgląd</a><a href="#colors">Kolory</a><a href="#gradients">Gradienty</a><a href="#type">Typografia</a><a href="#tokens">Promienie, cienie, odstępy</a><a href="#components">Komponenty</a><a href="#rules">Zasady</a><a href="#css">CSS tokens</a><a href="#prompt">Prompt</a>
+  </nav>
+
+  <section class="block" id="demo">
+    <div class="sec-head"><h2>Podgląd na żywo</h2><span>Przykładowy dashboard zbudowany wyłącznie z tokenów poniżej</span></div>
+    
+<div class="ad-frame">
+  <aside class="ad-side">
+    <div class="ad-logo"><span class="av" style="background:linear-gradient(135deg,#F4A95E,#8A6CF0)">S</span>Savance</div>
+    <a class="on" href="#demo"><span>◉</span>Oszczędności</a><a href="#demo"><span>▤</span>Przychody</a><a href="#demo"><span>▦</span>Dashboard</a>
+    <a href="#demo"><span>⇄</span>Wymiana</a><a href="#demo"><span>◈</span>Prognozy ▾</a><a href="#demo"><span>☍</span>Wydatki</a><a href="#demo"><span>⊕</span>Cele</a>
+  </aside>
+  <div class="ad-main">
+    <div class="ad-head"><h3>Dashboard</h3>
+      <div class="flex"><button class="btn btn-primary">Śledzenie przychodów</button><div class="input" style="min-width:210px">Automatyczne oszczędności <span style="margin-left:auto">⌕</span></div>
+        <span class="btn-icon" style="font-size:12px;letter-spacing:0">☼</span><div class="select" style="background:rgba(244,169,94,.18);border-color:rgba(244,169,94,.35);color:var(--ad-peach)">▣ Oszczędności ▾</div>
+        <span class="av" style="background:linear-gradient(135deg,#E870A8,#F4A95E)">TK</span></div></div>
+    <div class="dgrid ad-k5">
+      <div class="kc" style="background:var(--ad-grad-kpi-1)"><div class="top"><span class="av" style="background:#6C675F">AF</span>Fundusz</div><b>$2,000,000</b><div class="sub"><span>$7.8k miesięcznie</span><span>2.72%</span></div></div>
+      <div class="kc" style="background:var(--ad-grad-kpi-2)"><div class="top"><span class="av" style="background:#4B5FC0">PL</span>Plan</div><b>$150,000</b><div class="sub"><span>Codzienne wpłaty</span><span>▾</span></div></div>
+      <div class="kc" style="background:var(--ad-grad-kpi-3)"><div class="top"><span class="av" style="background:#7A4BC4">MW</span>Inwestycje</div><b>$1,000,000</b><div class="sub"><span>$22k w tym m-cu</span><span>6%</span></div></div>
+      <div class="kc" style="background:var(--ad-grad-kpi-4)"><div class="top"><span class="av" style="background:#C8507F">JS</span>Wakacje</div><b>$100,000</b><div class="sub"><span>Stopień realizacji</span><span>▾</span></div></div>
+      <div class="kc light" style="background:var(--ad-grad-kpi-5)"><div class="top"><span class="av" style="background:#D98748">OR</span>Oszczędności</div><b style="font-size:22px">$3,595</b><div class="sub"><span>$11,150 cel</span><span>/ mies.</span></div></div>
+    </div>
+    <div class="dgrid ad-g">
+      <div style="display:grid;gap:12px;min-width:0;align-content:start">
+        <div class="card"><div class="split"><div class="flex" style="gap:12px"><span style="font-size:40px;font-weight:600;letter-spacing:-.02em">$7,800</span><div><div class="card-t">Kluczowe oszczędności</div><div class="kpi-s">Bieżący miesiąc</div></div></div>
+          <div class="flex"><span class="play">▶</span><div><div class="kpi-s">Dostępne</div><b style="font-size:17px">$155,000</b></div></div></div></div>
+        <div class="card"><div class="split" style="align-items:start">
+          <div style="min-width:0"><div class="card-t">Oszczędności dzienne</div><div class="kpi-s" style="margin-bottom:6px">$1,000 odkładane automatycznie</div><svg viewBox="0 0 400 150" class="chart"><defs><linearGradient id="ab0" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#D3DEFF" stop-opacity="1"/><stop offset=".5" stop-color="#8EA6F4" stop-opacity="1"/><stop offset="1" stop-color="#8EA6F4" stop-opacity="0.08"/></linearGradient><linearGradient id="ab1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F9D2A2" stop-opacity="1"/><stop offset=".45" stop-color="#F4A95E" stop-opacity="1"/><stop offset="1" stop-color="#F4A95E" stop-opacity="0.06"/></linearGradient><linearGradient id="ab2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#DCD3FF" stop-opacity="1"/><stop offset=".5" stop-color="#B7A9F2" stop-opacity="0.95"/><stop offset="1" stop-color="#B7A9F2" stop-opacity="0.1"/></linearGradient><linearGradient id="ab3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F9D2A2" stop-opacity="1"/><stop offset=".45" stop-color="#F4A95E" stop-opacity="1"/><stop offset="1" stop-color="#F4A95E" stop-opacity="0.06"/></linearGradient></defs><rect x="39.0" y="74.4" width="10" height="53.6" rx="4" fill="url(#ab0)"/><rect x="59.0" y="34.1" width="10" height="93.9" rx="4" fill="url(#ab1)"/><rect x="79.0" y="87.8" width="10" height="40.2" rx="4" fill="url(#ab2)"/><rect x="99.0" y="54.2" width="10" height="73.8" rx="4" fill="url(#ab3)"/><rect x="119.0" y="44.9" width="10" height="83.1" rx="4" fill="url(#ab0)"/><rect x="139.0" y="63.6" width="10" height="64.4" rx="4" fill="url(#ab1)"/><rect x="159.0" y="50.2" width="10" height="77.8" rx="4" fill="url(#ab2)"/><rect x="179.0" y="31.5" width="10" height="96.5" rx="4" fill="url(#ab3)"/><rect x="199.0" y="67.7" width="10" height="60.3" rx="4" fill="url(#ab0)"/><rect x="219.0" y="20.7" width="10" height="107.3" rx="4" fill="url(#ab1)"/><rect x="239.0" y="77.0" width="10" height="51.0" rx="4" fill="url(#ab2)"/><rect x="259.0" y="47.5" width="10" height="80.5" rx="4" fill="url(#ab3)"/><rect x="279.0" y="58.3" width="10" height="69.7" rx="4" fill="url(#ab0)"/><rect x="299.0" y="39.5" width="10" height="88.5" rx="4" fill="url(#ab1)"/><rect x="319.0" y="71.7" width="10" height="56.3" rx="4" fill="url(#ab2)"/><rect x="339.0" y="50.2" width="10" height="77.8" rx="4" fill="url(#ab3)"/><rect x="359.0" y="81.1" width="10" height="46.9" rx="4" fill="url(#ab0)"/><rect x="379.0" y="61.0" width="10" height="67.0" rx="4" fill="url(#ab1)"/></svg></div>
+          <div class="lg2"><div><span>Średnio</span><b>+40.4%</b></div><div><span><i style="--c:#F4A95E"></i>Przychody</span><b>$0.05%</b></div><div><span><i style="--c:#F2C94C"></i>Dom</span><b>$13,500</b></div><div><span><i style="--c:#E870A8"></i>Rachunki</span><b>$15,000</b></div></div></div>
+          <div class="split" style="align-items:start;margin-top:10px;border-top:1px solid rgba(255,255,255,.07);padding-top:12px">
+          <div style="min-width:0"><svg viewBox="0 0 400 170" class="chart"><defs><linearGradient id="dw0" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F7C59C" stop-opacity="1"/><stop offset=".55" stop-color="#B9C6F7" stop-opacity="1"/><stop offset="1" stop-color="#7E98EE" stop-opacity="0.9"/></linearGradient></defs><line x1="34" x2="394" y1="148.0" y2="148.0" stroke="rgba(255,255,255,.06)"/><text x="28" y="152.0" text-anchor="end" font-size="10" fill="rgba(244,239,234,.45)">0</text><line x1="34" x2="394" y1="102.0" y2="102.0" stroke="rgba(255,255,255,.06)"/><text x="28" y="106.0" text-anchor="end" font-size="10" fill="rgba(244,239,234,.45)">10%</text><line x1="34" x2="394" y1="56.0" y2="56.0" stroke="rgba(255,255,255,.06)"/><text x="28" y="60.0" text-anchor="end" font-size="10" fill="rgba(244,239,234,.45)">20%</text><line x1="34" x2="394" y1="10.0" y2="10.0" stroke="rgba(255,255,255,.06)"/><text x="28" y="14.0" text-anchor="end" font-size="10" fill="rgba(244,239,234,.45)">30%</text><rect x="42.0" y="71.3" width="20" height="76.7" rx="5" fill="url(#dw0)"/><text x="52.0" y="165" text-anchor="middle" font-size="10" fill="rgba(244,239,234,.45)">Pn</text><rect x="78.0" y="117.3" width="20" height="30.7" rx="5" fill="url(#dw0)"/><rect x="114.0" y="148.0" width="20" height="0.0" rx="5" fill="url(#dw0)"/><rect x="150.0" y="64.4" width="20" height="83.6" rx="5" fill="url(#dw0)"/><text x="160.0" y="165" text-anchor="middle" font-size="10" fill="rgba(244,239,234,.45)">Wt</text><rect x="186.0" y="148.0" width="20" height="0.0" rx="5" fill="url(#dw0)"/><rect x="222.0" y="25.3" width="20" height="122.7" rx="5" fill="url(#dw0)"/><text x="232.0" y="165" text-anchor="middle" font-size="10" fill="rgba(244,239,234,.45)">Śr</text><rect x="258.0" y="148.0" width="20" height="0.0" rx="5" fill="url(#dw0)"/><rect x="294.0" y="47.6" width="20" height="100.4" rx="5" fill="url(#dw0)"/><text x="304.0" y="165" text-anchor="middle" font-size="10" fill="rgba(244,239,234,.45)">Cz</text><rect x="330.0" y="148.0" width="20" height="0.0" rx="5" fill="url(#dw0)"/><rect x="366.0" y="22.5" width="20" height="125.5" rx="5" fill="url(#dw0)"/><text x="376.0" y="165" text-anchor="middle" font-size="10" fill="rgba(244,239,234,.45)">Pt</text></svg></div>
+          <div class="lg2"><div style="color:var(--text)">Automatyczne oszczędności</div><div><span><i style="--c:#3FC47A"></i>Aktywne</span><b><span class="mini" style="--c:rgba(255,255,255,.35)"></span>45%</b></div><div><span><i style="--c:#8B8389"></i>Automat</span><b><span class="mini" style="--c:#E5484D"></span>1.0%</b></div><div><span><i style="--c:#8EA6F4"></i>Odłożone</span><b>4.0%</b></div><div><span><i style="--c:#F2C94C"></i>Nowe</span><b style="color:var(--ad-positive)">1.50%</b></div></div></div></div>
+      </div>
+      <div style="display:grid;gap:12px;min-width:0;align-content:start">
+        <div class="card"><div class="card-h"><div class="card-t">Kumulacja</div><span class="badge" style="background:rgba(247,197,156,.18);color:var(--ad-peach)">$ 450.0%</span></div>
+          <div class="kpi-s">Oszczędności wspólne <span style="float:right;color:var(--text)">$3.0%</span></div><svg viewBox="0 0 380 170" class="chart"><defs><linearGradient id="ac0" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#DCD3FF" stop-opacity="1"/><stop offset=".5" stop-color="#B7A9F2" stop-opacity="0.95"/><stop offset="1" stop-color="#B7A9F2" stop-opacity="0.1"/></linearGradient><linearGradient id="ac1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F9D2A2" stop-opacity="1"/><stop offset=".45" stop-color="#F4A95E" stop-opacity="1"/><stop offset="1" stop-color="#F4A95E" stop-opacity="0.06"/></linearGradient></defs><line x1="34" x2="374" y1="148.0" y2="148.0" stroke="rgba(255,255,255,.06)"/><text x="28" y="152.0" text-anchor="end" font-size="10" fill="rgba(244,239,234,.45)">0</text><line x1="34" x2="374" y1="102.0" y2="102.0" stroke="rgba(255,255,255,.06)"/><text x="28" y="106.0" text-anchor="end" font-size="10" fill="rgba(244,239,234,.45)">10%</text><line x1="34" x2="374" y1="56.0" y2="56.0" stroke="rgba(255,255,255,.06)"/><text x="28" y="60.0" text-anchor="end" font-size="10" fill="rgba(244,239,234,.45)">20%</text><line x1="34" x2="374" y1="10.0" y2="10.0" stroke="rgba(255,255,255,.06)"/><text x="28" y="14.0" text-anchor="end" font-size="10" fill="rgba(244,239,234,.45)">30%</text><rect x="41.1" y="112.2" width="12" height="35.8" rx="4" fill="url(#ac0)"/><text x="47.1" y="165" text-anchor="middle" font-size="10" fill="rgba(244,239,234,.45)">Sty</text><rect x="67.2" y="122.9" width="12" height="25.1" rx="4" fill="url(#ac1)"/><rect x="93.4" y="79.9" width="12" height="68.1" rx="4" fill="url(#ac0)"/><text x="99.4" y="165" text-anchor="middle" font-size="10" fill="rgba(244,239,234,.45)">Lut</text><rect x="119.5" y="101.4" width="12" height="46.6" rx="4" fill="url(#ac1)"/><rect x="145.7" y="69.1" width="12" height="78.9" rx="4" fill="url(#ac0)"/><text x="151.7" y="165" text-anchor="middle" font-size="10" fill="rgba(244,239,234,.45)">Mar</text><rect x="171.8" y="108.6" width="12" height="39.4" rx="4" fill="url(#ac1)"/><rect x="198.0" y="62.0" width="12" height="86.0" rx="4" fill="url(#ac0)"/><text x="204.0" y="165" text-anchor="middle" font-size="10" fill="rgba(244,239,234,.45)">Kwi</text><rect x="224.2" y="83.5" width="12" height="64.5" rx="4" fill="url(#ac1)"/><rect x="250.3" y="94.2" width="12" height="53.8" rx="4" fill="url(#ac0)"/><text x="256.3" y="165" text-anchor="middle" font-size="10" fill="rgba(244,239,234,.45)">Maj</text><rect x="276.5" y="40.5" width="12" height="107.5" rx="4" fill="url(#ac1)"/><rect x="302.6" y="105.0" width="12" height="43.0" rx="4" fill="url(#ac0)"/><text x="308.6" y="165" text-anchor="middle" font-size="10" fill="rgba(244,239,234,.45)">Cze</text><rect x="328.8" y="22.5" width="12" height="125.5" rx="4" fill="url(#ac1)"/><rect x="354.9" y="115.7" width="12" height="32.3" rx="4" fill="url(#ac0)"/><text x="360.9" y="165" text-anchor="middle" font-size="10" fill="rgba(244,239,234,.45)">Lip</text></svg></div>
+        <div class="card"><div class="card-h"><div class="card-t">Oszczędzanie miesięczne</div><span class="chip" style="white-space:nowrap">Zobacz wszystko</span></div>
+          <div class="kpi-s"><span style="color:#F2C94C">●</span> 50.0%</div><svg viewBox="0 0 380 170" class="chart"><defs><linearGradient id="pcf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F2C94C" stop-opacity=".22"/><stop offset="1" stop-color="#F2C94C" stop-opacity="0"/></linearGradient></defs><line x1="34" x2="370" y1="148.0" y2="148.0" stroke="rgba(255,255,255,.06)"/><text x="28" y="152.0" text-anchor="end" font-size="10" fill="rgba(244,239,234,.45)">0</text><line x1="34" x2="370" y1="102.7" y2="102.7" stroke="rgba(255,255,255,.06)"/><text x="28" y="106.7" text-anchor="end" font-size="10" fill="rgba(244,239,234,.45)">20%</text><line x1="34" x2="370" y1="57.3" y2="57.3" stroke="rgba(255,255,255,.06)"/><text x="28" y="61.3" text-anchor="end" font-size="10" fill="rgba(244,239,234,.45)">40%</text><line x1="34" x2="370" y1="12.0" y2="12.0" stroke="rgba(255,255,255,.06)"/><text x="28" y="16.0" text-anchor="end" font-size="10" fill="rgba(244,239,234,.45)">60%</text><polygon points="34.0,148 34.0,103.3 62.0,90.5 90.0,77.7 118.0,96.9 146.0,39.4 174.0,84.1 202.0,96.9 230.0,64.9 258.0,84.1 286.0,26.6 314.0,52.1 342.0,33.0 370.0,29.8 370.0,148" fill="url(#pcf)"/><polyline points="34.0,103.3 62.0,90.5 90.0,77.7 118.0,96.9 146.0,39.4 174.0,84.1 202.0,96.9 230.0,64.9 258.0,84.1 286.0,26.6 314.0,52.1 342.0,33.0 370.0,29.8" fill="none" stroke="#F2C94C" stroke-width="2" stroke-linejoin="round" style="filter:drop-shadow(0 0 6px rgba(242,201,76,.55))"/><circle cx="34.0" cy="103.3" r="3.2" fill="#F2C94C"/><circle cx="62.0" cy="90.5" r="3.2" fill="#F2C94C"/><circle cx="90.0" cy="77.7" r="3.2" fill="#F2C94C"/><circle cx="118.0" cy="96.9" r="3.2" fill="#F2C94C"/><circle cx="146.0" cy="39.4" r="3.2" fill="#F2C94C"/><circle cx="174.0" cy="84.1" r="3.2" fill="#F2C94C"/><circle cx="202.0" cy="96.9" r="3.2" fill="#F2C94C"/><circle cx="230.0" cy="64.9" r="3.2" fill="#F2C94C"/><circle cx="258.0" cy="84.1" r="3.2" fill="#F2C94C"/><circle cx="286.0" cy="26.6" r="3.2" fill="#F2C94C"/><circle cx="314.0" cy="52.1" r="3.2" fill="#F2C94C"/><circle cx="342.0" cy="33.0" r="3.2" fill="#F2C94C"/><circle cx="370.0" cy="29.8" r="3.2" fill="#F2C94C"/><text x="34.0" y="165" text-anchor="middle" font-size="10" fill="rgba(244,239,234,.45)">Sty</text><text x="90.0" y="165" text-anchor="middle" font-size="10" fill="rgba(244,239,234,.45)">Lut</text><text x="146.0" y="165" text-anchor="middle" font-size="10" fill="rgba(244,239,234,.45)">Mar</text><text x="202.0" y="165" text-anchor="middle" font-size="10" fill="rgba(244,239,234,.45)">Kwi</text><text x="258.0" y="165" text-anchor="middle" font-size="10" fill="rgba(244,239,234,.45)">Maj</text><text x="314.0" y="165" text-anchor="middle" font-size="10" fill="rgba(244,239,234,.45)">Cze</text><text x="370.0" y="165" text-anchor="middle" font-size="10" fill="rgba(244,239,234,.45)">Lip</text></svg></div>
+      </div>
+    </div>
+  </div>
+</div>
+  </section>
+
+  <section class="block" id="colors">
+    <div class="sec-head"><h2>Paleta kolorów</h2><span>Kliknij próbkę, żeby skopiować wartość</span></div>
+    <div class="panel"><div class="group-title">Scena (tło strony)</div><div class="swatches"><button class="sw" data-copy="#E3A05A"><div class="sw-color" style="background:linear-gradient(#E3A05A,#E3A05A),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Amber glow</span><span class="sw-hex">#E3A05A</span><span class="sw-var">--ad-scene-amber</span><span class="sw-use">Ciepła poświata w prawym górnym rogu sceny</span></div></button><button class="sw" data-copy="#9C5A2E"><div class="sw-color" style="background:linear-gradient(#9C5A2E,#9C5A2E),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Rust</span><span class="sw-hex">#9C5A2E</span><span class="sw-var">--ad-scene-rust</span><span class="sw-use">Środek sceny, przejście</span></div></button><button class="sw" data-copy="#2A1E19"><div class="sw-color" style="background:linear-gradient(#2A1E19,#2A1E19),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Deep brown</span><span class="sw-hex">#2A1E19</span><span class="sw-var">--ad-scene-deep</span><span class="sw-use">Ciemne partie sceny po lewej</span></div></button><button class="sw" data-copy="#4A4350"><div class="sw-color" style="background:linear-gradient(#4A4350,#4A4350),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Dusk</span><span class="sw-hex">#4A4350</span><span class="sw-var">--ad-scene-dusk</span><span class="sw-use">Chłodny fiolet u dołu sceny</span></div></button></div><div class="group-title">Powierzchnie (ciemne szkło)</div><div class="swatches"><button class="sw" data-copy="rgba(22,19,20,.78)"><div class="sw-color" style="background:linear-gradient(rgba(22,19,20,.78),rgba(22,19,20,.78)),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">App frame</span><span class="sw-hex">rgba(22,19,20,.78)</span><span class="sw-var">--ad-frame</span><span class="sw-use">Główna ramka aplikacji (z blur)</span></div></button><button class="sw" data-copy="#0D0C0E"><div class="sw-color" style="background:linear-gradient(#0D0C0E,#0D0C0E),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Sidebar</span><span class="sw-hex">#0D0C0E</span><span class="sw-var">--ad-sidebar</span><span class="sw-use">Lewy panel nawigacji</span></div></button><button class="sw" data-copy="rgba(255,255,255,.045)"><div class="sw-color" style="background:linear-gradient(rgba(255,255,255,.045),rgba(255,255,255,.045)),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Card</span><span class="sw-hex">rgba(255,255,255,.045)</span><span class="sw-var">--ad-card</span><span class="sw-use">Karty z danymi</span></div></button><button class="sw" data-copy="rgba(255,255,255,.08)"><div class="sw-color" style="background:linear-gradient(rgba(255,255,255,.08),rgba(255,255,255,.08)),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Card raised</span><span class="sw-hex">rgba(255,255,255,.08)</span><span class="sw-var">--ad-card-2</span><span class="sw-use">Hover, pola, pigułki</span></div></button><button class="sw" data-copy="rgba(255,255,255,.09)"><div class="sw-color" style="background:linear-gradient(rgba(255,255,255,.09),rgba(255,255,255,.09)),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Border</span><span class="sw-hex">rgba(255,255,255,.09)</span><span class="sw-var">--ad-border</span><span class="sw-use">Obwódka kart 1 px</span></div></button><button class="sw" data-copy="rgba(255,255,255,.22)"><div class="sw-color" style="background:linear-gradient(rgba(255,255,255,.22),rgba(255,255,255,.22)),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Edge light</span><span class="sw-hex">rgba(255,255,255,.22)</span><span class="sw-var">--ad-edge</span><span class="sw-use">Jasna krawędź ramki aplikacji</span></div></button></div><div class="group-title">Tekst</div><div class="swatches"><button class="sw" data-copy="#F4EFEA"><div class="sw-color" style="background:linear-gradient(#F4EFEA,#F4EFEA),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Text primary</span><span class="sw-hex">#F4EFEA</span><span class="sw-var">--ad-text</span><span class="sw-use">Tytuły, liczby</span></div></button><button class="sw" data-copy="#C9C1BA"><div class="sw-color" style="background:linear-gradient(#C9C1BA,#C9C1BA),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Text secondary</span><span class="sw-hex">#C9C1BA</span><span class="sw-var">--ad-text-2</span><span class="sw-use">Treść, etykiety</span></div></button><button class="sw" data-copy="#8B8389"><div class="sw-color" style="background:linear-gradient(#8B8389,#8B8389),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Muted</span><span class="sw-hex">#8B8389</span><span class="sw-var">--ad-muted</span><span class="sw-use">Osie, podpisy</span></div></button><button class="sw" data-copy="#141214"><div class="sw-color" style="background:linear-gradient(#141214,#141214),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Ink</span><span class="sw-hex">#141214</span><span class="sw-var">--ad-ink</span><span class="sw-use">Tekst na jasnych pigułkach</span></div></button></div><div class="group-title">Akcenty danych</div><div class="swatches"><button class="sw" data-copy="#F4A95E"><div class="sw-color" style="background:linear-gradient(#F4A95E,#F4A95E),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Amber</span><span class="sw-hex">#F4A95E</span><span class="sw-var">--ad-amber</span><span class="sw-use">Seria 1, słupki ciepłe</span></div></button><button class="sw" data-copy="#8EA6F4"><div class="sw-color" style="background:linear-gradient(#8EA6F4,#8EA6F4),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Periwinkle</span><span class="sw-hex">#8EA6F4</span><span class="sw-var">--ad-periwinkle</span><span class="sw-use">Seria 2, słupki zimne</span></div></button><button class="sw" data-copy="#B7A9F2"><div class="sw-color" style="background:linear-gradient(#B7A9F2,#B7A9F2),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Lilac</span><span class="sw-hex">#B7A9F2</span><span class="sw-var">--ad-lilac</span><span class="sw-use">Seria 3, słupki kumulacji</span></div></button><button class="sw" data-copy="#F2C94C"><div class="sw-color" style="background:linear-gradient(#F2C94C,#F2C94C),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Yellow</span><span class="sw-hex">#F2C94C</span><span class="sw-var">--ad-yellow</span><span class="sw-use">Seria 4, linia wykresu (świecąca)</span></div></button><button class="sw" data-copy="#E870A8"><div class="sw-color" style="background:linear-gradient(#E870A8,#E870A8),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Pink</span><span class="sw-hex">#E870A8</span><span class="sw-var">--ad-pink</span><span class="sw-use">Seria 5, kategorie</span></div></button><button class="sw" data-copy="#F7C59C"><div class="sw-color" style="background:linear-gradient(#F7C59C,#F7C59C),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Peach</span><span class="sw-hex">#F7C59C</span><span class="sw-var">--ad-peach</span><span class="sw-use">Pigułka primary, akcent ciepły</span></div></button><button class="sw" data-copy="#9CCBF6"><div class="sw-color" style="background:linear-gradient(#9CCBF6,#9CCBF6),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Sky</span><span class="sw-hex">#9CCBF6</span><span class="sw-var">--ad-sky</span><span class="sw-use">Aktywny element sidebara</span></div></button><button class="sw" data-copy="#8A6CF0"><div class="sw-color" style="background:linear-gradient(#8A6CF0,#8A6CF0),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Violet</span><span class="sw-hex">#8A6CF0</span><span class="sw-var">--ad-violet</span><span class="sw-use">Gradienty kart KPI</span></div></button></div><div class="group-title">Statusy</div><div class="swatches"><button class="sw" data-copy="#3FC47A"><div class="sw-color" style="background:linear-gradient(#3FC47A,#3FC47A),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Positive</span><span class="sw-hex">#3FC47A</span><span class="sw-var">--ad-positive</span><span class="sw-use">Wzrosty, sukces</span></div></button><button class="sw" data-copy="#E5484D"><div class="sw-color" style="background:linear-gradient(#E5484D,#E5484D),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Negative</span><span class="sw-hex">#E5484D</span><span class="sw-var">--ad-negative</span><span class="sw-use">Spadki, błędy</span></div></button><button class="sw" data-copy="#F2C94C"><div class="sw-color" style="background:linear-gradient(#F2C94C,#F2C94C),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Warning</span><span class="sw-hex">#F2C94C</span><span class="sw-var">--ad-warning</span><span class="sw-use">Uwaga (współdzieli z yellow)</span></div></button></div><div class="group-title">Kolejność serii danych (--c1 … --c5)</div><div class="series"><div style="background:var(--ad-amber)">c1</div><div style="background:var(--ad-periwinkle)">c2</div><div style="background:var(--ad-lilac)">c3</div><div style="background:var(--ad-yellow)">c4</div><div style="background:var(--ad-pink)">c5</div></div></div>
+  </section>
+
+  <section class="block" id="gradients">
+    <div class="sec-head"><h2>Gradienty i efekty</h2><span>Kliknij, żeby skopiować deklarację CSS</span></div>
+    <div class="grads"><button class="panel grad sw" data-copy="--ad-grad-scene: radial-gradient(900px 600px at 85% 5%, #F0B46A 0%, rgba(240,180,106,0) 60%), radial-gradient(700px 500px at 60% 40%, #9C5A2E 0%, rgba(156,90,46,0) 65%), radial-gradient(800px 600px at 20% 100%, #4A4350 0%, rgba(74,67,80,0) 70%), linear-gradient(135deg, #2A1E19 0%, #5C3A26 45%, #B87842 75%, #6A5A60 100%);"><div class="g" style="background:radial-gradient(900px 600px at 85% 5%, #F0B46A 0%, rgba(240,180,106,0) 60%), radial-gradient(700px 500px at 60% 40%, #9C5A2E 0%, rgba(156,90,46,0) 65%), radial-gradient(800px 600px at 20% 100%, #4A4350 0%, rgba(74,67,80,0) 70%), linear-gradient(135deg, #2A1E19 0%, #5C3A26 45%, #B87842 75%, #6A5A60 100%)"></div><div class="gi"><span class="sw-name">Scena</span><span class="sw-use">Tło strony pod szklaną aplikacją</span><code>--ad-grad-scene</code></div></button><button class="panel grad sw" data-copy="--ad-grad-kpi-1: linear-gradient(135deg, #A39A89 0%, #6C675F 100%);"><div class="g" style="background:linear-gradient(135deg, #A39A89 0%, #6C675F 100%)"></div><div class="gi"><span class="sw-name">KPI taupe</span><span class="sw-use">Karta KPI 1</span><code>--ad-grad-kpi-1</code></div></button><button class="panel grad sw" data-copy="--ad-grad-kpi-2: linear-gradient(135deg, #7391F2 0%, #8A6CF0 100%);"><div class="g" style="background:linear-gradient(135deg, #7391F2 0%, #8A6CF0 100%)"></div><div class="gi"><span class="sw-name">KPI blue-violet</span><span class="sw-use">Karta KPI 2</span><code>--ad-grad-kpi-2</code></div></button><button class="panel grad sw" data-copy="--ad-grad-kpi-3: linear-gradient(135deg, #8E5FDB 0%, #E870A8 100%);"><div class="g" style="background:linear-gradient(135deg, #8E5FDB 0%, #E870A8 100%)"></div><div class="gi"><span class="sw-name">KPI violet-pink</span><span class="sw-use">Karta KPI 3</span><code>--ad-grad-kpi-3</code></div></button><button class="panel grad sw" data-copy="--ad-grad-kpi-4: linear-gradient(135deg, #E870A8 0%, #F2866A 100%);"><div class="g" style="background:linear-gradient(135deg, #E870A8 0%, #F2866A 100%)"></div><div class="gi"><span class="sw-name">KPI pink-coral</span><span class="sw-use">Karta KPI 4</span><code>--ad-grad-kpi-4</code></div></button><button class="panel grad sw" data-copy="--ad-grad-kpi-5: linear-gradient(135deg, #F4A870 0%, #F7D3A0 100%);"><div class="g" style="background:linear-gradient(135deg, #F4A870 0%, #F7D3A0 100%)"></div><div class="gi"><span class="sw-name">KPI peach</span><span class="sw-use">Karta KPI 5 (ciemny tekst)</span><code>--ad-grad-kpi-5</code></div></button><button class="panel grad sw" data-copy="--ad-grad-bar-warm: linear-gradient(180deg, #F9D2A2 0%, #F4A95E 45%, rgba(244,169,94,.08) 100%);"><div class="g" style="background:linear-gradient(180deg, #F9D2A2 0%, #F4A95E 45%, rgba(244,169,94,.08) 100%)"></div><div class="gi"><span class="sw-name">Warm bar</span><span class="sw-use">Słupki ciepłe, wygaszone u dołu</span><code>--ad-grad-bar-warm</code></div></button><button class="panel grad sw" data-copy="--ad-grad-bar-cool: linear-gradient(180deg, #D3DEFF 0%, #8EA6F4 50%, rgba(142,166,244,.10) 100%);"><div class="g" style="background:linear-gradient(180deg, #D3DEFF 0%, #8EA6F4 50%, rgba(142,166,244,.10) 100%)"></div><div class="gi"><span class="sw-name">Cool bar</span><span class="sw-use">Słupki zimne, wygaszone u dołu</span><code>--ad-grad-bar-cool</code></div></button><button class="panel grad sw" data-copy="--ad-grad-bar-dawn: linear-gradient(180deg, #F7C59C 0%, #B9C6F7 55%, #7E98EE 100%);"><div class="g" style="background:linear-gradient(180deg, #F7C59C 0%, #B9C6F7 55%, #7E98EE 100%)"></div><div class="gi"><span class="sw-name">Dawn bar</span><span class="sw-use">Słupki porównawcze (brzoskwinia → błękit)</span><code>--ad-grad-bar-dawn</code></div></button></div>
+  </section>
+
+  <section class="block" id="type">
+    <div class="sec-head"><h2>Typografia</h2><span>Plus Jakarta Sans 400/500/600/700 dla całości · liczby 600 z lekko ujemnym trackingiem</span></div>
+    <div class="panel"><div class="type-row"><div class="type-meta"><b>Display · kwota</b><span>40 / 600 / -2%</span></div><div style="font-size:40px;font-weight:600;letter-spacing:-.02em">$7,800</div></div><div class="type-row"><div class="type-meta"><b>H1 · tytuł widoku</b><span>22 / 600</span></div><div style="font-size:22px;font-weight:600">Dashboard</div></div><div class="type-row"><div class="type-meta"><b>Kwota w KPI</b><span>18 / 600</span></div><div style="font-size:18px;font-weight:600">$2,000,000</div></div><div class="type-row"><div class="type-meta"><b>H2 · tytuł karty</b><span>14 / 600</span></div><div style="font-size:14px;font-weight:600">Kumulacja oszczędności</div></div><div class="type-row"><div class="type-meta"><b>Body</b><span>13 / 400 · text-2</span></div><div style="font-size:13px;color:var(--text-2)">Automatyczne oszczędzanie · Income</div></div><div class="type-row"><div class="type-meta"><b>Caption · oś</b><span>10.5 / 400 · muted</span></div><div style="font-size:10.5px;color:var(--muted)">Sty  Lut  Mar  Kwi  Maj  Cze</div></div></div>
+  </section>
+
+  <section class="block" id="tokens">
+    <div class="sec-head"><h2>Promienie, cienie, odstępy</h2><span>Hierarchia zaokrągleń i głębi</span></div>
+    <div class="tok-grid">
+      <div class="panel"><div class="comp-label">Border radius</div><div class="rad-row"><div><div class="rb" style="border-radius:26px"></div><small>--ad-r-frame<br>26px</small></div><div><div class="rb" style="border-radius:16px"></div><small>--ad-r-card<br>16px</small></div><div><div class="rb" style="border-radius:10px"></div><small>--ad-r-inner<br>10px</small></div><div><div class="rb" style="border-radius:999px"></div><small>--ad-r-pill<br>999px</small></div></div></div>
+      <div class="panel"><div class="comp-label">Cienie</div><div class="sh"><div><div class="sb" style="box-shadow:0 1px 0 rgba(255,255,255,.05) inset, 0 10px 30px rgba(0,0,0,.25)"></div><small>--ad-shadow</small></div><div><div class="sb" style="box-shadow:0 40px 90px rgba(20,10,5,.55), 0 0 0 1px rgba(255,255,255,.18) inset"></div><small>--ad-shadow-frame</small></div><div><div class="sb" style="box-shadow:0 0 18px rgba(242,201,76,.45)"></div><small>--ad-glow</small></div><div><div class="sb" style="box-shadow:blur(28px) saturate(130%)"></div><small>--ad-blur</small></div></div></div>
+      <div class="panel spc"><div class="comp-label">Skala odstępów (siatka 4 px)</div><div class="i"><small style="margin:0">--sp-1</small><div class="s" style="width:4px"></div></div><div class="i"><small style="margin:0">--sp-2</small><div class="s" style="width:8px"></div></div><div class="i"><small style="margin:0">--sp-3</small><div class="s" style="width:12px"></div></div><div class="i"><small style="margin:0">--sp-4</small><div class="s" style="width:16px"></div></div><div class="i"><small style="margin:0">--sp-5</small><div class="s" style="width:20px"></div></div><div class="i"><small style="margin:0">--sp-6</small><div class="s" style="width:24px"></div></div><div class="i"><small style="margin:0">--sp-8</small><div class="s" style="width:32px"></div></div></div>
+    </div>
+  </section>
+
+  <section class="block" id="components">
+    <div class="sec-head"><h2>Komponenty bazowe</h2><span>Te same klasy we wszystkich stylach — zmienia się tylko skórka</span></div>
+    
+<div class="comp-grid">
+  <div class="panel comp"><div class="comp-label">Przyciski</div>
+    <div class="flex">
+      <button class="btn btn-primary">+ Dodaj widget</button>
+      <button class="btn btn-secondary">Filtruj</button>
+      <button class="btn btn-ghost">Anuluj</button>
+      <button class="btn-icon" aria-label="Więcej">•••</button>
+    </div></div>
+  <div class="panel comp"><div class="comp-label">Nawigacja i przełączniki</div>
+    <div class="tabs"><span class="tab active">Przegląd</span><span class="tab">Płatności</span><span class="tab">Raporty</span></div>
+    <div style="height:14px"></div>
+    <div class="seg"><span class="on">Dzień</span><span>Tydzień</span><span>Miesiąc</span><span>Rok</span></div></div>
+  <div class="panel comp"><div class="comp-label">Karta KPI</div>
+    <div class="card kpi">
+      <div class="kpi-t">Aktywni użytkownicy <span class="arr">↗</span></div>
+      <div class="kpi-v">1.8k <span class="trend up">▲ 9%</span></div>
+      <div class="kpi-s">vs poprzedni miesiąc</div>
+    </div></div>
+  <div class="panel comp"><div class="comp-label">Paski postępu (kolory serii)</div>
+    <div class="pb"><div class="pb-h"><span>Seria 1</span><b>77%</b></div><div class="bar"><i style="width:77%;--c:var(--c1)"></i></div></div>
+    <div class="pb"><div class="pb-h"><span>Seria 2</span><b>63%</b></div><div class="bar"><i style="width:63%;--c:var(--c2)"></i></div></div>
+    <div class="pb"><div class="pb-h"><span>Seria 3</span><b>41%</b></div><div class="bar"><i style="width:41%;--c:var(--c3)"></i></div></div></div>
+  <div class="panel comp"><div class="comp-label">Trendy, badge, chipy</div>
+    <div class="flex">
+      <span class="trend up">▲ 12%</span><span class="trend down">▼ 4%</span>
+      <span class="badge">Nowe</span>
+      <span class="chip"><i style="--c:var(--c1)"></i>Marketing</span>
+      <span class="chip"><i style="--c:var(--c2)"></i>Sprzedaż</span>
+      <span class="chip"><i style="--c:var(--c3)"></i>Operacje</span>
+    </div></div>
+  <div class="panel comp"><div class="comp-label">Lista / wiersze tabeli</div>
+    <div class="row"><span>Leadership Essentials</span><b>1 264</b><span class="trend up">▲ 11%</span></div>
+    <div class="row"><span>Project Management</span><b>1 032</b><span class="trend up">▲ 8%</span></div>
+    <div class="row"><span>Data Analysis</span><b>856</b><span class="trend down">▼ 3%</span></div></div>
+  <div class="panel comp"><div class="comp-label">Input i select</div>
+    <div class="input">⌕ <span>Szukaj…</span></div>
+    <div style="height:10px"></div>
+    <div class="select"><span>▦ 1 sty – 31 sty 2026</span><span>▾</span></div></div>
+</div>
+
+  </section>
+
+  <section class="block" id="rules">
+    <div class="sec-head"><h2>Zasady stylu</h2><span>Co trzyma ten styl w ryzach</span></div>
+    <div class="rules">
+      <div class="panel do"><h3>Rób</h3><ul><li>Aplikacja to ciemne szkło na ciepłej, rozmytej scenie; scena zawsze widoczna wokół ramki.</li><li>Rząd 4–5 kart KPI, każda w innym gradiencie z sekwencji taupe → fiolet → róż → koral → brzoskwinia.</li><li>Słupki z gradientem pionowym, jasne u góry i gasnące do przezroczystości u dołu.</li><li>Linia wykresu żółta z poświatą (glow) i kropkami w każdym punkcie.</li><li>Czarny sidebar; aktywna pozycja jako jasna, błękitna pigułka z ciemnym tekstem.</li><li>Primary CTA jako jasna brzoskwiniowa pigułka z ciemnym tekstem.</li></ul></div>
+      <div class="panel dont"><h3>Unikaj</h3><ul><li>Białych kart i jasnego motywu — to styl nocny.</li><li>Płaskich słupków bez gradientu.</li><li>Chłodnego, niebieskiego tła sceny — scena ma być ciepła (bursztyn, rdza).</li><li>Więcej niż jednej linii żółtej na wykres; żółty jest akcentem.</li><li>Tekstu poniżej 10.5 px i kontrastu niższego niż --ad-muted na tle karty.</li></ul></div>
+    </div>
+  </section>
+
+  <section class="block" id="css">
+    <div class="sec-head"><h2>CSS design tokens</h2><span>Wklej do :root w nowym projekcie</span></div>
+    <div class="codebox"><div class="code-actions"><button class="copy" data-copy-target="tokcode">Kopiuj CSS</button></div><pre id="tokcode">:root {
+  /* ---------- Fonty ---------- */
+  --font-head: &#x27;Plus Jakarta Sans&#x27;, system-ui, sans-serif;
+  --font-body: &#x27;Plus Jakarta Sans&#x27;, system-ui, sans-serif;
+  --font-mono: &#x27;JetBrains Mono&#x27;, ui-monospace, monospace;
+
+  /* ---------- Scena (tło strony) ---------- */
+  --ad-scene-amber: #E3A05A;           /* Amber glow — Ciepła poświata w prawym górnym rogu sceny */
+  --ad-scene-rust: #9C5A2E;            /* Rust — Środek sceny, przejście */
+  --ad-scene-deep: #2A1E19;            /* Deep brown — Ciemne partie sceny po lewej */
+  --ad-scene-dusk: #4A4350;            /* Dusk — Chłodny fiolet u dołu sceny */
+
+  /* ---------- Powierzchnie (ciemne szkło) ---------- */
+  --ad-frame: rgba(22,19,20,.78);      /* App frame — Główna ramka aplikacji (z blur) */
+  --ad-sidebar: #0D0C0E;               /* Sidebar — Lewy panel nawigacji */
+  --ad-card: rgba(255,255,255,.045);   /* Card — Karty z danymi */
+  --ad-card-2: rgba(255,255,255,.08);  /* Card raised — Hover, pola, pigułki */
+  --ad-border: rgba(255,255,255,.09);  /* Border — Obwódka kart 1 px */
+  --ad-edge: rgba(255,255,255,.22);    /* Edge light — Jasna krawędź ramki aplikacji */
+
+  /* ---------- Tekst ---------- */
+  --ad-text: #F4EFEA;                  /* Text primary — Tytuły, liczby */
+  --ad-text-2: #C9C1BA;                /* Text secondary — Treść, etykiety */
+  --ad-muted: #8B8389;                 /* Muted — Osie, podpisy */
+  --ad-ink: #141214;                   /* Ink — Tekst na jasnych pigułkach */
+
+  /* ---------- Akcenty danych ---------- */
+  --ad-amber: #F4A95E;                 /* Amber — Seria 1, słupki ciepłe */
+  --ad-periwinkle: #8EA6F4;            /* Periwinkle — Seria 2, słupki zimne */
+  --ad-lilac: #B7A9F2;                 /* Lilac — Seria 3, słupki kumulacji */
+  --ad-yellow: #F2C94C;                /* Yellow — Seria 4, linia wykresu (świecąca) */
+  --ad-pink: #E870A8;                  /* Pink — Seria 5, kategorie */
+  --ad-peach: #F7C59C;                 /* Peach — Pigułka primary, akcent ciepły */
+  --ad-sky: #9CCBF6;                   /* Sky — Aktywny element sidebara */
+  --ad-violet: #8A6CF0;                /* Violet — Gradienty kart KPI */
+
+  /* ---------- Statusy ---------- */
+  --ad-positive: #3FC47A;              /* Positive — Wzrosty, sukces */
+  --ad-negative: #E5484D;              /* Negative — Spadki, błędy */
+  --ad-warning: #F2C94C;               /* Warning — Uwaga (współdzieli z yellow) */
+
+  /* ---------- Kolejność serii danych w wykresach ---------- */
+  --c1: var(--ad-amber);
+  --c2: var(--ad-periwinkle);
+  --c3: var(--ad-lilac);
+  --c4: var(--ad-yellow);
+  --c5: var(--ad-pink);
+
+  /* ---------- Gradienty ---------- */
+  --ad-grad-scene: radial-gradient(900px 600px at 85% 5%, #F0B46A 0%, rgba(240,180,106,0) 60%), radial-gradient(700px 500px at 60% 40%, #9C5A2E 0%, rgba(156,90,46,0) 65%), radial-gradient(800px 600px at 20% 100%, #4A4350 0%, rgba(74,67,80,0) 70%), linear-gradient(135deg, #2A1E19 0%, #5C3A26 45%, #B87842 75%, #6A5A60 100%); /* Tło strony pod szklaną aplikacją */
+  --ad-grad-kpi-1: linear-gradient(135deg, #A39A89 0%, #6C675F 100%); /* Karta KPI 1 */
+  --ad-grad-kpi-2: linear-gradient(135deg, #7391F2 0%, #8A6CF0 100%); /* Karta KPI 2 */
+  --ad-grad-kpi-3: linear-gradient(135deg, #8E5FDB 0%, #E870A8 100%); /* Karta KPI 3 */
+  --ad-grad-kpi-4: linear-gradient(135deg, #E870A8 0%, #F2866A 100%); /* Karta KPI 4 */
+  --ad-grad-kpi-5: linear-gradient(135deg, #F4A870 0%, #F7D3A0 100%); /* Karta KPI 5 (ciemny tekst) */
+  --ad-grad-bar-warm: linear-gradient(180deg, #F9D2A2 0%, #F4A95E 45%, rgba(244,169,94,.08) 100%); /* Słupki ciepłe, wygaszone u dołu */
+  --ad-grad-bar-cool: linear-gradient(180deg, #D3DEFF 0%, #8EA6F4 50%, rgba(142,166,244,.10) 100%); /* Słupki zimne, wygaszone u dołu */
+  --ad-grad-bar-dawn: linear-gradient(180deg, #F7C59C 0%, #B9C6F7 55%, #7E98EE 100%); /* Słupki porównawcze (brzoskwinia → błękit) */
+
+  /* ---------- Promienie ---------- */
+  --ad-r-frame: 26px; /* Ramka aplikacji */
+  --ad-r-card: 16px; /* Karty */
+  --ad-r-inner: 10px; /* Pola, aktywny element menu */
+  --ad-r-pill: 999px; /* Pigułki, przyciski */
+
+  /* ---------- Cienie ---------- */
+  --ad-shadow: 0 1px 0 rgba(255,255,255,.05) inset, 0 10px 30px rgba(0,0,0,.25); /* Karty */
+  --ad-shadow-frame: 0 40px 90px rgba(20,10,5,.55), 0 0 0 1px rgba(255,255,255,.18) inset; /* Ramka aplikacji */
+  --ad-glow: 0 0 18px rgba(242,201,76,.45); /* Poświata linii / aktywnych punktów */
+  --ad-blur: blur(28px) saturate(130%); /* Wartość do backdrop-filter */
+
+  /* ---------- Odstępy ---------- */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+
+  /* ---------- Aliasy semantyczne (używaj w komponentach) ---------- */
+  --page-bg: var(--ad-scene-deep);
+  --surface: rgba(24,21,22,.62);
+  --surface-2: var(--ad-card-2);
+  --border: var(--ad-border);
+  --divider: rgba(255,255,255,.07);
+  --text: var(--ad-text);
+  --text-2: var(--ad-text-2);
+  --muted: var(--ad-muted);
+  --accent: var(--ad-peach);
+  --hover: rgba(255,255,255,.08);
+  --toc-bg: rgba(20,18,20,.6);
+  --code-bg: rgba(10,9,10,.8);
+  --code-text: #F1E9E1;
+  --r-card: var(--ad-r-card);
+  --r-inner: var(--ad-r-inner);
+  --r-pill: var(--ad-r-pill);
+  --shadow: var(--ad-shadow);
+  --up: var(--ad-positive);
+  --down: var(--ad-negative);
+}</pre></div>
+  </section>
+
+  <section class="block" id="prompt">
+    <div class="sec-head"><h2>Prompt do nowego czatu</h2><span>Wklej w nowej rozmowie lub narzędziu — model odtworzy ten styl</span></div>
+    <div class="codebox"><div class="code-actions"><button class="copy" data-download="05-amber-dusk-glass-prompt.md">Pobierz .md</button><button class="copy" data-copy-target="promptcode">Kopiuj prompt</button></div><pre id="promptcode"># Styl: Amber Dusk
+
+Jesteś senior UI designerem i front-end developerem. Budujesz dashboardy jako pojedyncze pliki HTML (HTML + CSS w &lt;style&gt; + JS w &lt;script&gt;). Każdy dashboard, który wygenerujesz w tej rozmowie, ma wyglądać jak z jednej rodziny wizualnej „Amber Dusk”. Trzymaj się ściśle poniższego design systemu: nie dodawaj kolorów, fontów, promieni ani cieni spoza tokenów. Jeśli czegoś brakuje, wyprowadź to z istniejących tokenów (np. przezroczystość istniejącego koloru).
+
+## Charakter stylu
+Nocny, premium fintech. Ciemne przydymione szkło (backdrop-filter) zawieszone na ciepłej, rozmytej scenie o zmierzchu: bursztyn, rdza, brązowy, fiolet u dołu. Czarny sidebar, półprzezroczyste karty z cienką jasną obwódką. Kolor wnoszą: rząd gradientowych kart KPI (taupe → niebiesko-fioletowy → fioletowo-różowy → różowo-koralowy → brzoskwiniowy), świecące gradientowe słupki i żółta linia z poświatą.
+
+## Fonty
+&lt;link href=&quot;https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;
+Plus Jakarta Sans 400/500/600/700 dla całości · liczby 600 z lekko ujemnym trackingiem
+
+## Design tokens — wklej 1:1 do &lt;style&gt;
+:root {
+  /* ---------- Fonty ---------- */
+  --font-head: &#x27;Plus Jakarta Sans&#x27;, system-ui, sans-serif;
+  --font-body: &#x27;Plus Jakarta Sans&#x27;, system-ui, sans-serif;
+  --font-mono: &#x27;JetBrains Mono&#x27;, ui-monospace, monospace;
+
+  /* ---------- Scena (tło strony) ---------- */
+  --ad-scene-amber: #E3A05A;           /* Amber glow — Ciepła poświata w prawym górnym rogu sceny */
+  --ad-scene-rust: #9C5A2E;            /* Rust — Środek sceny, przejście */
+  --ad-scene-deep: #2A1E19;            /* Deep brown — Ciemne partie sceny po lewej */
+  --ad-scene-dusk: #4A4350;            /* Dusk — Chłodny fiolet u dołu sceny */
+
+  /* ---------- Powierzchnie (ciemne szkło) ---------- */
+  --ad-frame: rgba(22,19,20,.78);      /* App frame — Główna ramka aplikacji (z blur) */
+  --ad-sidebar: #0D0C0E;               /* Sidebar — Lewy panel nawigacji */
+  --ad-card: rgba(255,255,255,.045);   /* Card — Karty z danymi */
+  --ad-card-2: rgba(255,255,255,.08);  /* Card raised — Hover, pola, pigułki */
+  --ad-border: rgba(255,255,255,.09);  /* Border — Obwódka kart 1 px */
+  --ad-edge: rgba(255,255,255,.22);    /* Edge light — Jasna krawędź ramki aplikacji */
+
+  /* ---------- Tekst ---------- */
+  --ad-text: #F4EFEA;                  /* Text primary — Tytuły, liczby */
+  --ad-text-2: #C9C1BA;                /* Text secondary — Treść, etykiety */
+  --ad-muted: #8B8389;                 /* Muted — Osie, podpisy */
+  --ad-ink: #141214;                   /* Ink — Tekst na jasnych pigułkach */
+
+  /* ---------- Akcenty danych ---------- */
+  --ad-amber: #F4A95E;                 /* Amber — Seria 1, słupki ciepłe */
+  --ad-periwinkle: #8EA6F4;            /* Periwinkle — Seria 2, słupki zimne */
+  --ad-lilac: #B7A9F2;                 /* Lilac — Seria 3, słupki kumulacji */
+  --ad-yellow: #F2C94C;                /* Yellow — Seria 4, linia wykresu (świecąca) */
+  --ad-pink: #E870A8;                  /* Pink — Seria 5, kategorie */
+  --ad-peach: #F7C59C;                 /* Peach — Pigułka primary, akcent ciepły */
+  --ad-sky: #9CCBF6;                   /* Sky — Aktywny element sidebara */
+  --ad-violet: #8A6CF0;                /* Violet — Gradienty kart KPI */
+
+  /* ---------- Statusy ---------- */
+  --ad-positive: #3FC47A;              /* Positive — Wzrosty, sukces */
+  --ad-negative: #E5484D;              /* Negative — Spadki, błędy */
+  --ad-warning: #F2C94C;               /* Warning — Uwaga (współdzieli z yellow) */
+
+  /* ---------- Kolejność serii danych w wykresach ---------- */
+  --c1: var(--ad-amber);
+  --c2: var(--ad-periwinkle);
+  --c3: var(--ad-lilac);
+  --c4: var(--ad-yellow);
+  --c5: var(--ad-pink);
+
+  /* ---------- Gradienty ---------- */
+  --ad-grad-scene: radial-gradient(900px 600px at 85% 5%, #F0B46A 0%, rgba(240,180,106,0) 60%), radial-gradient(700px 500px at 60% 40%, #9C5A2E 0%, rgba(156,90,46,0) 65%), radial-gradient(800px 600px at 20% 100%, #4A4350 0%, rgba(74,67,80,0) 70%), linear-gradient(135deg, #2A1E19 0%, #5C3A26 45%, #B87842 75%, #6A5A60 100%); /* Tło strony pod szklaną aplikacją */
+  --ad-grad-kpi-1: linear-gradient(135deg, #A39A89 0%, #6C675F 100%); /* Karta KPI 1 */
+  --ad-grad-kpi-2: linear-gradient(135deg, #7391F2 0%, #8A6CF0 100%); /* Karta KPI 2 */
+  --ad-grad-kpi-3: linear-gradient(135deg, #8E5FDB 0%, #E870A8 100%); /* Karta KPI 3 */
+  --ad-grad-kpi-4: linear-gradient(135deg, #E870A8 0%, #F2866A 100%); /* Karta KPI 4 */
+  --ad-grad-kpi-5: linear-gradient(135deg, #F4A870 0%, #F7D3A0 100%); /* Karta KPI 5 (ciemny tekst) */
+  --ad-grad-bar-warm: linear-gradient(180deg, #F9D2A2 0%, #F4A95E 45%, rgba(244,169,94,.08) 100%); /* Słupki ciepłe, wygaszone u dołu */
+  --ad-grad-bar-cool: linear-gradient(180deg, #D3DEFF 0%, #8EA6F4 50%, rgba(142,166,244,.10) 100%); /* Słupki zimne, wygaszone u dołu */
+  --ad-grad-bar-dawn: linear-gradient(180deg, #F7C59C 0%, #B9C6F7 55%, #7E98EE 100%); /* Słupki porównawcze (brzoskwinia → błękit) */
+
+  /* ---------- Promienie ---------- */
+  --ad-r-frame: 26px; /* Ramka aplikacji */
+  --ad-r-card: 16px; /* Karty */
+  --ad-r-inner: 10px; /* Pola, aktywny element menu */
+  --ad-r-pill: 999px; /* Pigułki, przyciski */
+
+  /* ---------- Cienie ---------- */
+  --ad-shadow: 0 1px 0 rgba(255,255,255,.05) inset, 0 10px 30px rgba(0,0,0,.25); /* Karty */
+  --ad-shadow-frame: 0 40px 90px rgba(20,10,5,.55), 0 0 0 1px rgba(255,255,255,.18) inset; /* Ramka aplikacji */
+  --ad-glow: 0 0 18px rgba(242,201,76,.45); /* Poświata linii / aktywnych punktów */
+  --ad-blur: blur(28px) saturate(130%); /* Wartość do backdrop-filter */
+
+  /* ---------- Odstępy ---------- */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+
+  /* ---------- Aliasy semantyczne (używaj w komponentach) ---------- */
+  --page-bg: var(--ad-scene-deep);
+  --surface: rgba(24,21,22,.62);
+  --surface-2: var(--ad-card-2);
+  --border: var(--ad-border);
+  --divider: rgba(255,255,255,.07);
+  --text: var(--ad-text);
+  --text-2: var(--ad-text-2);
+  --muted: var(--ad-muted);
+  --accent: var(--ad-peach);
+  --hover: rgba(255,255,255,.08);
+  --toc-bg: rgba(20,18,20,.6);
+  --code-bg: rgba(10,9,10,.8);
+  --code-text: #F1E9E1;
+  --r-card: var(--ad-r-card);
+  --r-inner: var(--ad-r-inner);
+  --r-pill: var(--ad-r-pill);
+  --shadow: var(--ad-shadow);
+  --up: var(--ad-positive);
+  --down: var(--ad-negative);
+}
+
+## Layout
+- Tło strony: --ad-grad-scene + 2 duże rozmyte plamy światła (brzoskwiniowa u góry po prawej, fioletowa u dołu po lewej).
+- Aplikacja w szklanej ramce radius 26 px (--ad-frame + blur + --ad-shadow-frame), siatka 210 px sidebar / reszta.
+- Sidebar: avatar + nazwa produktu, pod spodem lista pozycji z ikoną; aktywna pozycja = błękitna pigułka (--ad-sky) z ciemnym tekstem.
+- Nagłówek: „Dashboard” 22/600 po lewej; po prawej brzoskwiniowa pigułka CTA, pole wyszukiwania w pigułce, ikona, bursztynowy select, avatar.
+- Rząd 5 kart KPI, pod nim siatka 1.6fr/1fr: lewa kolumna (baner z główną kwotą + duża karta z dwoma wykresami i legendą po prawej), prawa kolumna (2 mniejsze karty wykresów).
+
+## Komponenty
+- Karta: --ad-card, border 1 px --ad-border, radius 16 px, shadow --ad-shadow; tytuł 14/600, podpis 12 px muted.
+- Karta KPI: gradient --ad-grad-kpi-N, radius 16 px, avatar 30 px z białą obwódką + etykieta, kwota 18/600, pod spodem podpis i procent 11 px; ostatnia (brzoskwiniowa) ma ciemny tekst.
+- Baner kwoty: wielka liczba 40/600, obok tytuł i podpis, po prawej okrągły przycisk play (szkło) + druga wartość.
+- Legenda obok wykresu: kropka z poświatą (box-shadow w kolorze), etykieta text-2, wartość po prawej 600; mini-pigułki 26×9 jako wskaźniki.
+- Primary CTA: brzoskwiniowa pigułka z ciemnym tekstem; secondary: szkło --ad-card-2.
+- Trendy: pigułki z 15% tłem koloru statusu.
+
+## Wykresy
+- Słupki: wąskie (11–22 px), radius 4–5 px, pionowy gradient jasny u góry → nasycony → prawie przezroczysty u dołu (--ad-grad-bar-warm / -cool / lilac); mieszaj ciepłe i zimne naprzemiennie.
+- Słupki porównawcze: --ad-grad-bar-dawn (brzoskwinia → błękit), bez wygaszania.
+- Linia: łamana (bez wygładzania) 2 px --ad-yellow, drop-shadow glow, kropki r=3 w każdym punkcie, lekkie żółte wypełnienie 22% → 0.
+- Siatka pozioma rgba(255,255,255,.06), osie 10 px muted, bez ramek.
+- Kolory serii zawsze w kolejności --c1, --c2, --c3, --c4, --c5.
+- Liczby z font-variant-numeric: tabular-nums; separatory tysięcy zgodne z językiem treści.
+- Możesz używać Chart.js / ECharts / ApexCharts z CDN albo inline SVG — ale zawsze ostyluj je tokenami (kolory, fonty, siatka, tooltipy).
+
+## Zasady
+Rób:
+- Aplikacja to ciemne szkło na ciepłej, rozmytej scenie; scena zawsze widoczna wokół ramki.
+- Rząd 4–5 kart KPI, każda w innym gradiencie z sekwencji taupe → fiolet → róż → koral → brzoskwinia.
+- Słupki z gradientem pionowym, jasne u góry i gasnące do przezroczystości u dołu.
+- Linia wykresu żółta z poświatą (glow) i kropkami w każdym punkcie.
+- Czarny sidebar; aktywna pozycja jako jasna, błękitna pigułka z ciemnym tekstem.
+- Primary CTA jako jasna brzoskwiniowa pigułka z ciemnym tekstem.
+
+Unikaj:
+- Białych kart i jasnego motywu — to styl nocny.
+- Płaskich słupków bez gradientu.
+- Chłodnego, niebieskiego tła sceny — scena ma być ciepła (bursztyn, rdza).
+- Więcej niż jednej linii żółtej na wykres; żółty jest akcentem.
+- Tekstu poniżej 10.5 px i kontrastu niższego niż --ad-muted na tle karty.
+
+## Wymagania techniczne
+- Jeden samowystarczalny plik HTML; wszystkie kolory przez var(--…).
+- Responsywność: CSS grid; poniżej 820 px jedna kolumna, karty na pełną szerokość.
+- Widoczny focus dla klawiatury, kontrast tekstu min. 4.5:1, respektuj prefers-reduced-motion.
+- Zanim zaczniesz, dopytaj o dane / KPI, jeśli nie zostały podane — nie wymyślaj metryk biznesowych bez potwierdzenia.
+</pre></div>
+  </section>
+
+  <footer>Amber Dusk · design system wyekstrahowany z referencji · wszystkie wartości do użycia w generatorze dashboardów HTML</footer>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const toast=(m)=>{const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(window.__t);window.__t=setTimeout(()=>t.classList.remove('show'),1600)};
+async function copyText(txt,msg){try{await navigator.clipboard.writeText(txt)}catch(e){const a=document.createElement('textarea');a.value=txt;a.style.position='fixed';a.style.opacity='0';document.body.appendChild(a);a.select();try{document.execCommand('copy')}catch(_){}a.remove()}toast(msg)}
+document.querySelectorAll('[data-copy]').forEach(el=>el.addEventListener('click',()=>copyText(el.dataset.copy,'Skopiowano: '+el.dataset.copy.slice(0,48))));
+document.querySelectorAll('[data-copy-target]').forEach(b=>b.addEventListener('click',()=>copyText(document.getElementById(b.dataset.copyTarget).innerText,'Skopiowano do schowka')));
+document.querySelectorAll('[data-download]').forEach(b=>b.addEventListener('click',()=>{const blob=new Blob([document.getElementById('promptcode').innerText],{type:'text/markdown'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=b.dataset.download;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast('Pobieranie promptu')}));
+
+</script>
+</body>
+</html>

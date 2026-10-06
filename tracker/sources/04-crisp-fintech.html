@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Crisp Fintech — Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* ---------- Fonty ---------- */
+  --font-head: 'Geist', 'Inter', system-ui, sans-serif;
+  --font-body: 'Geist', 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* ---------- Neutralne i powierzchnie ---------- */
+  --zt-outer: #E3E3E6;                 /* Outer — Tło strony poza canvasem */
+  --zt-bg: #F4F4F5;                    /* Canvas — Tło aplikacji */
+  --zt-surface: #FFFFFF;               /* Surface — Karty */
+  --zt-surface-2: #F7F7F8;             /* Surface 2 — Pola, selecty, hover */
+  --zt-border: #EAEAEC;                /* Border — Ramki kart i pól */
+
+  /* ---------- Tekst i akcje ---------- */
+  --zt-ink: #111113;                   /* Ink — Aktywna pigułka nawigacji, primary CTA */
+  --zt-text: #0F0F11;                  /* Text primary — Tytuły, duże liczby */
+  --zt-text-2: #5B5C63;                /* Text secondary — Treść, etykiety */
+  --zt-muted: #A1A2A8;                 /* Muted — Osie, nieaktywne serie, podpisy */
+
+  /* ---------- Akcenty danych ---------- */
+  --zt-blue: #2F55F5;                  /* Electric blue — Seria 1, aktywny słupek, focus */
+  --zt-blue-300: #8FA4FF;              /* Blue 300 — Kreskowanie, słupki nieaktywne */
+  --zt-blue-100: #E6EBFF;              /* Blue 100 — Tło kreskowania, tła tooltipów */
+  --zt-green: #1FAE4B;                 /* Green — Seria 2, trendy dodatnie */
+  --zt-green-300: #86DDA2;             /* Green 300 — Kropki / kreskowanie zielone */
+  --zt-pink: #EE5FA7;                  /* Pink — Seria 3, retencja */
+  --zt-pink-100: #FCE4F0;              /* Pink 100 — Pionowe linie tła w wykresie retencji */
+  --zt-orange: #F4833D;                /* Orange — Logo, akcent w gradiencie insightu */
+  --zt-navy: #1B2766;                  /* Navy — Start gradientu insightu */
+
+  /* ---------- Statusy ---------- */
+  --zt-positive-bg: #E7F7EC;           /* Positive bg — Tło pigułki ▲ */
+  --zt-negative: #E5484D;              /* Negative — Trend ▼, błędy */
+  --zt-highlight: #FFE9C2;             /* Highlight — Zaznaczony fragment w polu AI */
+
+  /* ---------- Kolejność serii danych w wykresach ---------- */
+  --c1: var(--zt-blue);
+  --c2: var(--zt-green);
+  --c3: var(--zt-pink);
+  --c4: var(--zt-orange);
+  --c5: var(--zt-blue-300);
+
+  /* ---------- Gradienty ---------- */
+  --zt-hatch-blue: repeating-linear-gradient(135deg, #2F55F5 0 2px, #DCE3FF 2px 6px); /* Słupki / paski w stylu kreskowanym */
+  --zt-hatch-green: repeating-linear-gradient(135deg, #1FAE4B 0 2px, #D3F2DD 2px 6px); /* Pasek postępu kanału */
+  --zt-hatch-pink: repeating-linear-gradient(135deg, #EE5FA7 0 2px, #FBDDEB 2px 6px); /* Pasek postępu kanału */
+  --zt-grad-bar: linear-gradient(180deg, #4B6BFF 0%, #2440E0 100%); /* Wyróżniony (aktywny) słupek */
+  --zt-grad-insight: linear-gradient(135deg, #1B2766 0%, #3A4AA6 38%, #D9825A 76%, #F6C79E 100%); /* Karta z kluczowym wnioskiem */
+  --zt-grad-ai: linear-gradient(90deg, #EEF1FF 0%, #F8EEFF 100%); /* Pasek „co chcesz zbadać?” */
+
+  /* ---------- Promienie ---------- */
+  --zt-r-canvas: 24px; /* Canvas aplikacji */
+  --zt-r-card: 16px; /* Karty */
+  --zt-r-inner: 10px; /* Pola, tooltipy, słupki */
+  --zt-r-pill: 999px; /* Nawigacja, trendy */
+
+  /* ---------- Cienie ---------- */
+  --zt-shadow: 0 1px 0 rgba(15,15,17,.03); /* Karty (prawie płaskie) */
+  --zt-shadow-canvas: 0 24px 60px rgba(15,15,17,.10); /* Canvas aplikacji */
+  --zt-shadow-pop: 0 8px 24px rgba(15,15,17,.12); /* Tooltip, dropdown, pole AI */
+
+  /* ---------- Odstępy ---------- */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+
+  /* ---------- Aliasy semantyczne (używaj w komponentach) ---------- */
+  --page-bg: var(--zt-outer);
+  --surface: var(--zt-surface);
+  --surface-2: var(--zt-surface-2);
+  --border: var(--zt-border);
+  --divider: var(--zt-border);
+  --text: var(--zt-text);
+  --text-2: var(--zt-text-2);
+  --muted: var(--zt-muted);
+  --accent: var(--zt-blue);
+  --hover: #F2F2F4;
+  --toc-bg: rgba(255,255,255,.9);
+  --code-bg: #111113;
+  --code-text: #E8EAF2;
+  --r-card: var(--zt-r-card);
+  --r-inner: var(--zt-r-inner);
+  --r-pill: var(--zt-r-pill);
+  --shadow: var(--zt-shadow);
+  --up: var(--zt-green);
+  --down: var(--zt-negative);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-body);background:var(--page-bg);color:var(--text);-webkit-font-smoothing:antialiased;line-height:1.5;min-height:100vh}
+button{font:inherit}
+.wrap{max-width:1240px;margin:0 auto;padding:40px 20px 90px;position:relative;z-index:1}
+.hero{display:grid;gap:14px;padding:8px 0 4px}
+.hero h1{font-family:var(--font-head);font-size:clamp(36px,6.4vw,68px);font-weight:var(--hero-w,600);letter-spacing:-.025em;line-height:1.02}
+.hero .kicker{font-size:14px;color:var(--muted);font-weight:500}
+.hero p{color:var(--text-2);max-width:680px;font-size:16px}
+.hero .meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.toc{position:sticky;top:10px;z-index:20;display:flex;gap:4px;overflow-x:auto;padding:5px;margin:30px 0 0;background:var(--toc-bg);border:1px solid var(--border);border-radius:var(--r-pill);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);scrollbar-width:none;box-shadow:var(--shadow)}
+.toc::-webkit-scrollbar{display:none}
+.toc a{white-space:nowrap;padding:8px 14px;border-radius:var(--r-pill);font-size:13px;font-weight:500;color:var(--text-2);text-decoration:none}
+.toc a:hover,.toc a:focus-visible{background:var(--hover);color:var(--text);outline:none}
+section.block{margin-top:60px;scroll-margin-top:80px}
+.sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:18px;flex-wrap:wrap}
+.sec-head h2{font-family:var(--font-head);font-size:26px;font-weight:600;letter-spacing:-.015em}
+.sec-head span{color:var(--muted);font-size:13px}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);box-shadow:var(--shadow);padding:20px}
+.group-title{font-size:13px;font-weight:600;color:var(--text-2);margin:26px 0 10px}
+.group-title:first-child{margin-top:0}
+.swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:12px}
+.sw{padding:0;display:block;width:100%;font:inherit;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-inner);overflow:hidden;cursor:pointer;text-align:left;color:inherit;transition:transform .15s ease}
+.sw:hover{transform:translateY(-2px)}
+.sw:focus-visible,.btn:focus-visible,.copy:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.sw-color{height:86px;border-bottom:1px solid var(--border)}
+.sw-info{padding:10px 12px 12px}
+.sw-name{font-size:13px;font-weight:600;display:block}
+.sw-hex{font-family:var(--font-mono);font-size:11.5px;color:var(--text-2);display:block;word-break:break-all}
+.sw-var{font-family:var(--font-mono);font-size:11px;color:var(--muted);display:block}
+.sw-use{font-size:11.5px;color:var(--muted);margin-top:5px;line-height:1.35;display:block}
+.series{display:flex;height:46px;border-radius:var(--r-inner);overflow:hidden;margin-top:6px}
+.series div{flex:1;display:flex;align-items:flex-end;padding:6px 8px;font:500 11px var(--font-mono);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.25)}
+.grads{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px}
+.panel.grad{padding:0;overflow:hidden;cursor:pointer}
+.grad .g{height:120px}
+.grad .gi{padding:12px 14px}
+.grad code{display:block;font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-top:4px;word-break:break-all}
+.type-row{display:grid;grid-template-columns:180px 1fr;gap:18px;align-items:center;padding:16px 0;border-bottom:1px solid var(--divider)}
+.type-row:last-child{border-bottom:0}
+.type-meta b{display:block;font-size:13px}
+.type-meta span{font-family:var(--font-mono);font-size:11.5px;color:var(--muted)}
+.tok-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+.rad-row{display:flex;gap:14px;flex-wrap:wrap;margin-top:6px}
+.rad-row .rb{width:78px;height:64px;background:var(--surface-2);border:1.5px solid var(--accent)}
+.rad-row small,.sh small,.spc small{display:block;font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-top:6px}
+.sh{display:flex;gap:16px;flex-wrap:wrap}
+.sh .sb{width:120px;height:74px;background:var(--surface);border-radius:var(--r-inner)}
+.spc .s{height:10px;background:var(--accent);border-radius:3px;opacity:.8}
+.spc div.i{display:grid;grid-template-columns:70px 1fr;align-items:center;gap:10px;margin:7px 0}
+.comp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.comp-label{font-size:12.5px;color:var(--muted);font-weight:500;margin-bottom:14px}
+.flex{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.pb{margin:10px 0}
+.pb-h{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px}
+.chart{width:100%;height:auto;display:block;overflow:visible}
+.codebox{position:relative}
+pre{font-family:var(--font-mono);font-size:12.5px;line-height:1.65;white-space:pre-wrap;word-break:break-word;background:var(--code-bg);color:var(--code-text);border-radius:var(--r-inner);padding:22px;padding-top:56px;max-height:620px;overflow:auto}
+.code-actions{position:absolute;top:12px;right:12px;display:flex;gap:8px}
+.copy{border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.1);color:#fff;border-radius:999px;padding:7px 14px;font-size:12.5px;font-weight:500;cursor:pointer}
+.copy:hover{background:rgba(255,255,255,.2)}
+.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.rules h3{font-family:var(--font-head);font-size:16px;margin-bottom:10px}
+.rules ul{list-style:none;display:grid;gap:9px}
+.rules li{font-size:14px;color:var(--text-2);padding-left:22px;position:relative}
+.rules .do li::before{content:"✓";position:absolute;left:0;color:var(--up);font-weight:700}
+.rules .dont li::before{content:"✕";position:absolute;left:0;color:var(--down);font-weight:700}
+.toast{position:fixed;bottom:26px;left:50%;transform:translate(-50%,16px);opacity:0;pointer-events:none;background:#111;color:#fff;padding:10px 18px;border-radius:999px;font-size:13px;transition:.25s;z-index:99;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+footer{margin-top:70px;color:var(--muted);font-size:12.5px;text-align:center}
+@media (max-width:820px){
+  .dgrid{grid-template-columns:1fr !important}
+  .dgrid>*{grid-column:auto !important;grid-row:auto !important}
+  .type-row{grid-template-columns:1fr;gap:6px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important;scroll-behavior:auto !important}}
+
+:root{--hero-w:500}
+.hero h1{letter-spacing:-.04em}
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--r-card);box-shadow:var(--shadow);padding:16px 18px;min-width:0;position:relative}
+.card-h{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}
+.card-t{font-size:15px;font-weight:500}
+.btn{font-weight:500;font-size:13px;border-radius:999px;padding:8px 16px;border:1px solid transparent;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--zt-ink);color:#fff}
+.btn-secondary{background:#fff;border-color:var(--border);color:var(--text)}
+.btn-ghost{background:transparent;color:var(--text-2)}
+.btn-icon{width:30px;height:30px;border-radius:50%;border:1px solid var(--border);background:#fff;display:inline-grid;place-items:center;cursor:pointer;font-size:8px;letter-spacing:1px;color:var(--text-2)}
+.tabs{display:flex;gap:2px;flex-wrap:wrap}
+.tab{padding:7px 13px;font-size:12.5px;border-radius:999px;color:var(--text-2);font-weight:500}
+.tab.active{background:var(--zt-ink);color:#fff}
+.seg{display:inline-flex;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:3px}
+.seg span{padding:5px 12px;border-radius:999px;font-size:12px;color:var(--text-2)}
+.seg .on{background:#fff;color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.08);font-weight:500}
+.kpi-t{display:flex;justify-content:space-between;font-size:15px;font-weight:500}
+.kpi-t .arr{width:28px;height:28px;border:1px solid var(--border);border-radius:50%;display:grid;place-items:center;font-size:12px}
+.kpi-v{font-size:42px;font-weight:400;letter-spacing:-.035em;margin-top:6px;display:flex;align-items:center;gap:12px;font-variant-numeric:tabular-nums;line-height:1.1}
+.kpi-s{font-size:12px;color:var(--muted)}
+.trend{font-size:11.5px;font-weight:500;padding:3px 8px;border-radius:999px;letter-spacing:0;border:1px solid transparent}
+.trend.up{background:var(--zt-positive-bg);color:var(--zt-green)}.trend.down{background:#FDECEC;color:var(--zt-negative)}
+.badge{background:#fff;border:1px solid var(--border);font-size:11px;font-weight:500;padding:3px 9px;border-radius:999px;box-shadow:var(--zt-shadow-pop)}
+.chip{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--text-2);border:1px solid var(--border);border-radius:999px;padding:4px 10px}
+.chip i{width:8px;height:8px;border-radius:2px;background:var(--c)}
+.bar{height:10px;background:var(--surface-2);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;background:var(--c)}
+.bar.h i{background:repeating-linear-gradient(135deg,var(--c) 0 2px,transparent 2px 5px),color-mix(in srgb,var(--c) 18%,#fff)}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);font-size:13.5px}
+.row:last-child{border-bottom:0}.row>span:first-child{flex:1}
+.input,.select{display:flex;align-items:center;justify-content:space-between;gap:8px;background:#fff;border:1px solid var(--border);border-radius:10px;padding:8px 12px;font-size:12.5px;color:var(--text-2)}
+.input{justify-content:flex-start;color:var(--muted)}
+/* demo */
+.zt-canvas{background:var(--zt-bg);border-radius:var(--zt-r-canvas);padding:18px 20px 22px;box-shadow:var(--zt-shadow-canvas);border:1px solid #fff}
+.zt-nav{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.zt-logo{display:flex;align-items:center;gap:8px;font-size:17px;font-weight:500;letter-spacing:-.02em}
+.zt-logo i{width:20px;height:20px;border-radius:5px;background:linear-gradient(135deg,#F7A74A,#F4833D);position:relative}
+.zt-logo i::after{content:"";position:absolute;inset:5px 5px 5px 9px;background:#fff;border-radius:1px;transform:skewX(-20deg)}
+.zt-head{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:10px;margin-bottom:14px}
+.zt-head h3{font-size:36px;font-weight:500;letter-spacing:-.035em;line-height:1}
+.dgrid{display:grid;gap:12px}
+.zt-g1{grid-template-columns:2fr 1fr;margin-bottom:12px}
+.zt-g2{grid-template-columns:1fr 1.2fr 1fr}
+.funnel{display:grid;grid-template-columns:repeat(5,1fr);height:170px;align-items:end;border-bottom:1px solid var(--border);position:relative;margin-top:44px}
+.funnel .c{position:relative;height:100%;display:flex;flex-direction:column;justify-content:flex-end;border-left:1px dashed var(--border);padding:0 6px}
+.funnel .c:first-child{border-left:0}
+.funnel .lbl{position:absolute;top:-30px;left:8px;font-size:11px;color:var(--muted);line-height:1.2}
+.funnel .lbl b{display:block;font-size:17px;font-weight:400;color:var(--muted);letter-spacing:-.02em}
+.funnel .c.on .lbl{color:var(--text)}.funnel .c.on .lbl b{color:var(--text)}
+.fb{border-radius:4px 4px 0 0;background:var(--zt-hatch-blue);opacity:.9;position:relative}
+.fb::before{content:"";position:absolute;left:30%;right:30%;top:-5px;height:4px;border-radius:3px;background:var(--zt-blue-300)}
+.c.on .fb{background:var(--zt-grad-bar);opacity:1;box-shadow:0 -10px 30px rgba(47,85,245,.25)}
+.zt-tip{position:absolute;left:50%;top:44%;transform:translateX(-10%);background:#fff;border:1px solid var(--border);border-radius:8px;padding:5px 9px;font-size:11px;box-shadow:var(--zt-shadow-pop);white-space:nowrap;z-index:2}
+.ai{margin-top:12px;border-radius:12px;background:var(--zt-grad-ai);border:1px solid #E3E4FB;padding:10px 12px;box-shadow:var(--zt-shadow-pop)}
+.ai small{display:flex;justify-content:space-between;font-size:11.5px;color:var(--text-2)}
+.ai div{background:#fff;border-radius:8px;padding:8px 10px;margin-top:8px;font-size:12.5px}
+.ai mark{background:var(--zt-highlight);border-radius:4px;padding:1px 4px;color:inherit}
+.big{font-size:44px;font-weight:400;letter-spacing:-.035em;font-variant-numeric:tabular-nums;line-height:1.1}
+.ch{display:flex;justify-content:space-between;font-size:12.5px;color:var(--text-2);margin:14px 0 6px}
+.ch b{font-weight:500;color:var(--text)}
+.peak{position:absolute;font-size:10.5px;background:#fff;border:1px solid var(--border);border-radius:6px;padding:2px 7px;box-shadow:var(--zt-shadow-pop);color:var(--text-2)}
+.insight{border-radius:var(--r-card);background:var(--zt-grad-insight);color:#fff;padding:18px;position:relative;overflow:hidden;min-height:220px;display:flex;flex-direction:column;justify-content:flex-end}
+.insight::before{content:"";position:absolute;right:-30px;top:-20px;width:200px;height:200px;border-radius:40px;border:2px solid rgba(255,255,255,.35);transform:rotate(28deg)}
+.insight .tagi{position:absolute;top:14px;left:14px;font-size:11px;background:rgba(255,255,255,.18);padding:4px 10px;border-radius:999px;backdrop-filter:blur(6px)}
+.insight .big{color:#fff;font-size:48px}
+.insight p{font-size:13px;opacity:.9;margin-top:6px;max-width:300px}
+.dotsline{display:flex;gap:6px;margin-top:14px}.dotsline i{height:3px;flex:1;border-radius:3px;background:rgba(255,255,255,.35)}.dotsline i:first-child{background:#fff}
+.two{display:flex;justify-content:space-between;align-items:flex-end;gap:10px}
+
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="kicker">Styl 4 z 4 · referencja: Zentra Overview</div>
+    <h1>Crisp Fintech</h1>
+    <p>Ostry, nowoczesny fintech/SaaS. Białe karty na chłodnoszarym tle, lekkie, duże liczby i jeden rozpoznawalny motyw: kreskowane (hatch) wypełnienia w elektrycznym błękicie, zieleni i różu. Do tego pole AI „co chcesz zbadać?” i karta insightu z gradientem granat → pomarańcz.</p>
+  </header>
+  <nav class="toc">
+    <a href="#demo">Podgląd</a><a href="#colors">Kolory</a><a href="#gradients">Gradienty</a><a href="#type">Typografia</a><a href="#tokens">Promienie, cienie, odstępy</a><a href="#components">Komponenty</a><a href="#rules">Zasady</a><a href="#css">CSS tokens</a><a href="#prompt">Prompt</a>
+  </nav>
+
+  <section class="block" id="demo">
+    <div class="sec-head"><h2>Podgląd na żywo</h2><span>Przykładowy dashboard zbudowany wyłącznie z tokenów poniżej</span></div>
+    
+<div class="zt-canvas">
+  <div class="zt-nav"><div class="zt-logo"><i></i>zentra</div>
+    <div class="tabs"><span class="tab active">Home</span><span class="tab">Payments</span><span class="tab">Balances</span><span class="tab">Customers</span><span class="tab">Products</span><span class="tab">Reports</span></div>
+    <div class="flex"><span class="btn-icon" style="font-size:13px;letter-spacing:0">⌕</span><span class="btn-icon" style="font-size:12px;letter-spacing:0">🔔</span><span class="btn-icon" style="background:linear-gradient(135deg,#8FA4FF,#F4833D);color:#fff;font-size:11px;letter-spacing:0;border:0">TK</span></div></div>
+  <div class="zt-head"><h3>Overview</h3>
+    <div class="flex" style="gap:6px"><div class="select">▦ 1 sty – 31 lip</div><span class="kpi-s">vs</span><div class="select">▦ 1 sie – 31 gru</div><div class="select">Dziennie ▾</div><button class="btn btn-secondary" style="padding:7px 12px;font-size:12px">Dodaj widget +</button></div></div>
+  <div class="dgrid zt-g1">
+    <div class="card"><div class="card-h"><div class="card-t">Płatności</div><span class="btn-icon">•••</span></div>
+      <div class="funnel"><div class="c"><div class="lbl">Initiated<b>65.2k</b></div><div class="fb" style="height:92%"></div></div><div class="c"><div class="lbl">Authorized<b>54.8k</b></div><div class="fb" style="height:76%"></div></div><div class="c on"><div class="lbl">Successful<b>48.6k</b></div><div class="fb" style="height:40%"></div><div class=zt-tip>48.6k transakcji · konwersja 89% · spadek −11%</div></div><div class="c"><div class="lbl">Payouts<b>38.3k</b></div><div class="fb" style="height:18%"></div></div><div class="c"><div class="lbl">Completed<b>32.9k</b></div><div class="fb" style="height:10%"></div></div></div>
+      <div class="ai"><small><span>✦ Co chcesz zbadać dalej?</span><span>⌃</span></small><div>Chcę wiedzieć, co spowodowało spadek z autoryzowanych do <mark>/udanych płatności</mark>▍</div></div></div>
+    <div class="card"><div class="card-h"><div class="card-t">Gross Volume</div><span class="btn-icon">•••</span></div>
+      <div class="flex" style="gap:10px;margin:10px 0 18px"><div class="big" style="font-size:50px">$41,540</div><span class="trend up">▲ 15%</span></div>
+      <div class="ch"><span>Płatności online</span><b>$26,800</b></div><div class="bar h"><i style="width:74%;--c:#1FAE4B"></i></div>
+      <div class="ch"><span>Subskrypcje</span><b>$10,400</b></div><div class="bar h"><i style="width:48%;--c:#2F55F5"></i></div>
+      <div class="ch"><span>Sprzedaż stacjonarna</span><b>$4,340</b></div><div class="bar h"><i style="width:26%;--c:#EE5FA7"></i></div></div>
+  </div>
+  <div class="dgrid zt-g2">
+    <div class="card"><div class="card-h"><div class="card-t">Retencja</div><span class="btn-icon">•••</span></div><div style="position:relative"><span class="peak" style="left:44%;top:2px">42%</span><svg viewBox="0 0 260 170" class="chart"><line x1="3.0" x2="3.0" y1="78.1" y2="148" stroke="#FBD0E5" stroke-width="1.2"/><line x1="8.2" x2="8.2" y1="78.1" y2="148" stroke="#FBD0E5" stroke-width="1.2"/><line x1="13.4" x2="13.4" y1="78.1" y2="148" stroke="#FBD0E5" stroke-width="1.2"/><line x1="18.7" x2="18.7" y1="78.1" y2="148" stroke="#FBD0E5" stroke-width="1.2"/><line x1="24.7" x2="24.7" y1="62.2" y2="148" stroke="#FBD0E5" stroke-width="1.2"/><line x1="29.9" x2="29.9" y1="62.2" y2="148" stroke="#FBD0E5" stroke-width="1.2"/><line x1="35.1" x2="35.1" y1="62.2" y2="148" stroke="#FBD0E5" stroke-width="1.2"/><line x1="40.3" x2="40.3" y1="62.2" y2="148" stroke="#FBD0E5" stroke-width="1.2"/><line x1="46.3" x2="46.3" y1="72.8" y2="148" stroke="#FBD0E5" stroke-width="1.2"/><line x1="51.6" x2="51.6" y1="72.8" y2="148" stroke="#FBD0E5" stroke-width="1.2"/><line x1="56.8" x2="56.8" y1="72.8" y2="148" stroke="#FBD0E5" stroke-width="1.2"/><line x1="62.0" x2="62.0" y1="72.8" y2="148" stroke="#FBD0E5" stroke-width="1.2"/><line x1="68.0" x2="68.0" y1="46.4" y2="148" stroke="#FBD0E5" stroke-width="1.2"/><line x1="73.2" x2="73.2" y1="46.4" y2="148" stroke="#FBD0E5" stroke-width="1.2"/><line x1="78.4" x2="78.4" y1="46.4" y2="148" stroke="#FBD0E5" stroke-width="1.2"/><line x1="83.7" x2="83.7" y1="46.4" y2="148" stroke="#FBD0E5" stroke-width="1.2"/><line x1="89.7" x2="89.7" y1="56.9" y2="148" stroke="#FBD0E5" stroke-width="1.2"/><line x1="94.9" x2="94.9" y1="56.9" y2="148" stroke="#FBD0E5" stroke-width="1.2"/><line x1="100.1" x2="100.1" y1="56.9" y2="148" stroke="#FBD0E5" stroke-width="1.2"/><line x1="105.3" x2="105.3" y1="56.9" y2="148" stroke="#FBD0E5" stroke-width="1.2"/><line x1="111.3" x2="111.3" y1="35.8" y2="148" stroke="#FBD0E5" stroke-width="1.2"/><line x1="116.6" x2="116.6" y1="35.8" y2="148" stroke="#FBD0E5" stroke-width="1.2"/><line x1="121.8" x2="121.8" y1="35.8" y2="148" stroke="#FBD0E5" stroke-width="1.2"/><line x1="127.0" x2="127.0" y1="35.8" y2="148" stroke="#FBD0E5" stroke-width="1.2"/><line x1="133.0" x2="133.0" y1="41.1" y2="148" stroke="#FBD0E5" stroke-width="1.2"/><line x1="138.2" x2="138.2" y1="41.1" y2="148" stroke="#FBD0E5" stroke-width="1.2"/><line x1="143.4" x2="143.4" y1="41.1" y2="148" stroke="#FBD0E5" stroke-width="1.2"/><line x1="148.7" x2="148.7" y1="41.1" y2="148" stroke="#FBD0E5" stroke-width="1.2"/><line x1="154.7" x2="154.7" y1="51.7" y2="148" stroke="#FBD0E5" stroke-width="1.2"/><line x1="159.9" x2="159.9" y1="51.7" y2="148" stroke="#FBD0E5" stroke-width="1.2"/><line x1="165.1" x2="165.1" y1="51.7" y2="148" stroke="#FBD0E5" stroke-width="1.2"/><line x1="170.3" x2="170.3" y1="51.7" y2="148" stroke="#FBD0E5" stroke-width="1.2"/><line x1="176.3" x2="176.3" y1="72.8" y2="148" stroke="#FBD0E5" stroke-width="1.2"/><line x1="181.6" x2="181.6" y1="72.8" y2="148" stroke="#FBD0E5" stroke-width="1.2"/><line x1="186.8" x2="186.8" y1="72.8" y2="148" stroke="#FBD0E5" stroke-width="1.2"/><line x1="192.0" x2="192.0" y1="72.8" y2="148" stroke="#FBD0E5" stroke-width="1.2"/><line x1="198.0" x2="198.0" y1="62.2" y2="148" stroke="#FBD0E5" stroke-width="1.2"/><line x1="203.2" x2="203.2" y1="62.2" y2="148" stroke="#FBD0E5" stroke-width="1.2"/><line x1="208.4" x2="208.4" y1="62.2" y2="148" stroke="#FBD0E5" stroke-width="1.2"/><line x1="213.7" x2="213.7" y1="62.2" y2="148" stroke="#FBD0E5" stroke-width="1.2"/><line x1="219.7" x2="219.7" y1="78.1" y2="148" stroke="#FBD0E5" stroke-width="1.2"/><line x1="224.9" x2="224.9" y1="78.1" y2="148" stroke="#FBD0E5" stroke-width="1.2"/><line x1="230.1" x2="230.1" y1="78.1" y2="148" stroke="#FBD0E5" stroke-width="1.2"/><line x1="235.3" x2="235.3" y1="78.1" y2="148" stroke="#FBD0E5" stroke-width="1.2"/><line x1="241.3" x2="241.3" y1="70.1" y2="148" stroke="#FBD0E5" stroke-width="1.2"/><line x1="246.6" x2="246.6" y1="70.1" y2="148" stroke="#FBD0E5" stroke-width="1.2"/><line x1="251.8" x2="251.8" y1="70.1" y2="148" stroke="#FBD0E5" stroke-width="1.2"/><line x1="257.0" x2="257.0" y1="70.1" y2="148" stroke="#FBD0E5" stroke-width="1.2"/><path d="M0,74.1 H21.7 V58.2 H43.3 V68.8 H65.0 V42.4 H86.7 V52.9 H108.3 V31.8 H130.0 V37.1 H151.7 V47.7 H173.3 V68.8 H195.0 V58.2 H216.7 V74.1 H238.3 V66.1 H260.0" fill="none" stroke="#EE5FA7" stroke-width="2"/><text x="10.8" y="165" text-anchor="middle" font-size="10.5" fill="#A1A2A8">Sty</text><text x="54.2" y="165" text-anchor="middle" font-size="10.5" fill="#A1A2A8">Lut</text><text x="97.5" y="165" text-anchor="middle" font-size="10.5" fill="#A1A2A8">Mar</text><text x="140.8" y="165" text-anchor="middle" font-size="10.5" fill="#A1A2A8">Kwi</text><text x="184.2" y="165" text-anchor="middle" font-size="10.5" fill="#A1A2A8">Maj</text><text x="227.5" y="165" text-anchor="middle" font-size="10.5" fill="#A1A2A8">Cze</text></svg></div></div>
+    <div style="display:grid;gap:12px">
+      <div class="card"><div class="card-h"><div class="card-t">Transakcje</div><span class="btn-icon">•••</span></div>
+        <div class="two"><div class="big">106k</div><div style="position:relative;flex:1;max-width:150px"><span class="peak" style="left:30%;top:-18px">Szczyt: śr</span><svg viewBox="0 0 150 72" class="chart"><circle cx="16.5" cy="66.9" r="3.1" fill="#1FAE4B" opacity="0.42"/><circle cx="16.5" cy="57.9" r="3.1" fill="#1FAE4B" opacity="0.42"/><circle cx="25.5" cy="66.9" r="3.1" fill="#1FAE4B" opacity="0.49"/><circle cx="25.5" cy="57.9" r="3.1" fill="#1FAE4B" opacity="0.49"/><circle cx="25.5" cy="48.9" r="3.1" fill="#1FAE4B" opacity="0.49"/><circle cx="34.5" cy="66.9" r="3.1" fill="#1FAE4B" opacity="0.49"/><circle cx="34.5" cy="57.9" r="3.1" fill="#1FAE4B" opacity="0.49"/><circle cx="34.5" cy="48.9" r="3.1" fill="#1FAE4B" opacity="0.49"/><circle cx="43.5" cy="66.9" r="3.1" fill="#1FAE4B" opacity="0.57"/><circle cx="43.5" cy="57.9" r="3.1" fill="#1FAE4B" opacity="0.57"/><circle cx="43.5" cy="48.9" r="3.1" fill="#1FAE4B" opacity="0.57"/><circle cx="43.5" cy="39.9" r="3.1" fill="#1FAE4B" opacity="0.57"/><circle cx="52.5" cy="66.9" r="3.1" fill="#1FAE4B" opacity="0.64"/><circle cx="52.5" cy="57.9" r="3.1" fill="#1FAE4B" opacity="0.64"/><circle cx="52.5" cy="48.9" r="3.1" fill="#1FAE4B" opacity="0.64"/><circle cx="52.5" cy="39.9" r="3.1" fill="#1FAE4B" opacity="0.64"/><circle cx="52.5" cy="30.9" r="3.1" fill="#1FAE4B" opacity="0.64"/><circle cx="61.5" cy="66.9" r="3.1" fill="#1FAE4B" opacity="1.00"/><circle cx="61.5" cy="57.9" r="3.1" fill="#1FAE4B" opacity="1.00"/><circle cx="61.5" cy="48.9" r="3.1" fill="#1FAE4B" opacity="1.00"/><circle cx="61.5" cy="39.9" r="3.1" fill="#1FAE4B" opacity="1.00"/><circle cx="61.5" cy="30.9" r="3.1" fill="#1FAE4B" opacity="1.00"/><circle cx="61.5" cy="21.9" r="3.1" fill="#1FAE4B" opacity="1.00"/><circle cx="61.5" cy="12.9" r="3.1" fill="#1FAE4B" opacity="1.00"/><circle cx="70.5" cy="66.9" r="3.1" fill="#1FAE4B" opacity="0.71"/><circle cx="70.5" cy="57.9" r="3.1" fill="#1FAE4B" opacity="0.71"/><circle cx="70.5" cy="48.9" r="3.1" fill="#1FAE4B" opacity="0.71"/><circle cx="70.5" cy="39.9" r="3.1" fill="#1FAE4B" opacity="0.71"/><circle cx="70.5" cy="30.9" r="3.1" fill="#1FAE4B" opacity="0.71"/><circle cx="70.5" cy="21.9" r="3.1" fill="#1FAE4B" opacity="0.71"/><circle cx="79.5" cy="66.9" r="3.1" fill="#1FAE4B" opacity="0.64"/><circle cx="79.5" cy="57.9" r="3.1" fill="#1FAE4B" opacity="0.64"/><circle cx="79.5" cy="48.9" r="3.1" fill="#1FAE4B" opacity="0.64"/><circle cx="79.5" cy="39.9" r="3.1" fill="#1FAE4B" opacity="0.64"/><circle cx="79.5" cy="30.9" r="3.1" fill="#1FAE4B" opacity="0.64"/><circle cx="88.5" cy="66.9" r="3.1" fill="#1FAE4B" opacity="0.57"/><circle cx="88.5" cy="57.9" r="3.1" fill="#1FAE4B" opacity="0.57"/><circle cx="88.5" cy="48.9" r="3.1" fill="#1FAE4B" opacity="0.57"/><circle cx="88.5" cy="39.9" r="3.1" fill="#1FAE4B" opacity="0.57"/><circle cx="97.5" cy="66.9" r="3.1" fill="#1FAE4B" opacity="0.49"/><circle cx="97.5" cy="57.9" r="3.1" fill="#1FAE4B" opacity="0.49"/><circle cx="97.5" cy="48.9" r="3.1" fill="#1FAE4B" opacity="0.49"/><circle cx="106.5" cy="66.9" r="3.1" fill="#1FAE4B" opacity="0.49"/><circle cx="106.5" cy="57.9" r="3.1" fill="#1FAE4B" opacity="0.49"/><circle cx="106.5" cy="48.9" r="3.1" fill="#1FAE4B" opacity="0.49"/><circle cx="115.5" cy="66.9" r="3.1" fill="#1FAE4B" opacity="0.42"/><circle cx="115.5" cy="57.9" r="3.1" fill="#1FAE4B" opacity="0.42"/><circle cx="124.5" cy="66.9" r="3.1" fill="#1FAE4B" opacity="0.42"/><circle cx="124.5" cy="57.9" r="3.1" fill="#1FAE4B" opacity="0.42"/><circle cx="133.5" cy="66.9" r="3.1" fill="#1FAE4B" opacity="0.35"/></svg></div><div style="text-align:right"><div class="kpi-s">vs poprz. okres</div><b style="font-weight:500">+34,002</b></div></div></div>
+      <div class="card"><div class="card-h"><div class="card-t">Klienci</div><span class="btn-icon">•••</span></div>
+        <div class="two"><div class="big">1,284</div><div style="position:relative;flex:1;max-width:150px"><span class="peak" style="left:36%;top:-18px">Szczyt: czw</span><svg viewBox="0 0 150 72" class="chart"><circle cx="16.5" cy="66.9" r="3.1" fill="#2F55F5" opacity="0.35"/><circle cx="25.5" cy="66.9" r="3.1" fill="#2F55F5" opacity="0.42"/><circle cx="25.5" cy="57.9" r="3.1" fill="#2F55F5" opacity="0.42"/><circle cx="34.5" cy="66.9" r="3.1" fill="#2F55F5" opacity="0.49"/><circle cx="34.5" cy="57.9" r="3.1" fill="#2F55F5" opacity="0.49"/><circle cx="34.5" cy="48.9" r="3.1" fill="#2F55F5" opacity="0.49"/><circle cx="43.5" cy="66.9" r="3.1" fill="#2F55F5" opacity="0.49"/><circle cx="43.5" cy="57.9" r="3.1" fill="#2F55F5" opacity="0.49"/><circle cx="43.5" cy="48.9" r="3.1" fill="#2F55F5" opacity="0.49"/><circle cx="52.5" cy="66.9" r="3.1" fill="#2F55F5" opacity="0.57"/><circle cx="52.5" cy="57.9" r="3.1" fill="#2F55F5" opacity="0.57"/><circle cx="52.5" cy="48.9" r="3.1" fill="#2F55F5" opacity="0.57"/><circle cx="52.5" cy="39.9" r="3.1" fill="#2F55F5" opacity="0.57"/><circle cx="61.5" cy="66.9" r="3.1" fill="#2F55F5" opacity="0.71"/><circle cx="61.5" cy="57.9" r="3.1" fill="#2F55F5" opacity="0.71"/><circle cx="61.5" cy="48.9" r="3.1" fill="#2F55F5" opacity="0.71"/><circle cx="61.5" cy="39.9" r="3.1" fill="#2F55F5" opacity="0.71"/><circle cx="61.5" cy="30.9" r="3.1" fill="#2F55F5" opacity="0.71"/><circle cx="61.5" cy="21.9" r="3.1" fill="#2F55F5" opacity="0.71"/><circle cx="70.5" cy="66.9" r="3.1" fill="#2F55F5" opacity="1.00"/><circle cx="70.5" cy="57.9" r="3.1" fill="#2F55F5" opacity="1.00"/><circle cx="70.5" cy="48.9" r="3.1" fill="#2F55F5" opacity="1.00"/><circle cx="70.5" cy="39.9" r="3.1" fill="#2F55F5" opacity="1.00"/><circle cx="70.5" cy="30.9" r="3.1" fill="#2F55F5" opacity="1.00"/><circle cx="70.5" cy="21.9" r="3.1" fill="#2F55F5" opacity="1.00"/><circle cx="70.5" cy="12.9" r="3.1" fill="#2F55F5" opacity="1.00"/><circle cx="79.5" cy="66.9" r="3.1" fill="#2F55F5" opacity="0.64"/><circle cx="79.5" cy="57.9" r="3.1" fill="#2F55F5" opacity="0.64"/><circle cx="79.5" cy="48.9" r="3.1" fill="#2F55F5" opacity="0.64"/><circle cx="79.5" cy="39.9" r="3.1" fill="#2F55F5" opacity="0.64"/><circle cx="79.5" cy="30.9" r="3.1" fill="#2F55F5" opacity="0.64"/><circle cx="88.5" cy="66.9" r="3.1" fill="#2F55F5" opacity="0.57"/><circle cx="88.5" cy="57.9" r="3.1" fill="#2F55F5" opacity="0.57"/><circle cx="88.5" cy="48.9" r="3.1" fill="#2F55F5" opacity="0.57"/><circle cx="88.5" cy="39.9" r="3.1" fill="#2F55F5" opacity="0.57"/><circle cx="97.5" cy="66.9" r="3.1" fill="#2F55F5" opacity="0.49"/><circle cx="97.5" cy="57.9" r="3.1" fill="#2F55F5" opacity="0.49"/><circle cx="97.5" cy="48.9" r="3.1" fill="#2F55F5" opacity="0.49"/><circle cx="106.5" cy="66.9" r="3.1" fill="#2F55F5" opacity="0.42"/><circle cx="106.5" cy="57.9" r="3.1" fill="#2F55F5" opacity="0.42"/><circle cx="115.5" cy="66.9" r="3.1" fill="#2F55F5" opacity="0.42"/><circle cx="115.5" cy="57.9" r="3.1" fill="#2F55F5" opacity="0.42"/><circle cx="124.5" cy="66.9" r="3.1" fill="#2F55F5" opacity="0.35"/><circle cx="133.5" cy="66.9" r="3.1" fill="#2F55F5" opacity="0.35"/></svg></div><div style="text-align:right"><div class="kpi-s">vs poprz. okres</div><b style="font-weight:500">+320</b></div></div></div>
+    </div>
+    <div class="insight"><span class="tagi">💡 Insight</span><div class="big">75%</div><b style="font-weight:500;font-size:15px;margin-top:4px">Wskaźnik autoryzacji wzrósł o 4% tydzień do tygodnia.</b><p>Poprawa zmniejszyła liczbę nieudanych transakcji o 950 i może odzyskać ok. $12,400.</p><div class="dotsline"><i></i><i></i><i></i></div></div>
+  </div>
+</div>
+  </section>
+
+  <section class="block" id="colors">
+    <div class="sec-head"><h2>Paleta kolorów</h2><span>Kliknij próbkę, żeby skopiować wartość</span></div>
+    <div class="panel"><div class="group-title">Neutralne i powierzchnie</div><div class="swatches"><button class="sw" data-copy="#E3E3E6"><div class="sw-color" style="background:linear-gradient(#E3E3E6,#E3E3E6),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Outer</span><span class="sw-hex">#E3E3E6</span><span class="sw-var">--zt-outer</span><span class="sw-use">Tło strony poza canvasem</span></div></button><button class="sw" data-copy="#F4F4F5"><div class="sw-color" style="background:linear-gradient(#F4F4F5,#F4F4F5),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Canvas</span><span class="sw-hex">#F4F4F5</span><span class="sw-var">--zt-bg</span><span class="sw-use">Tło aplikacji</span></div></button><button class="sw" data-copy="#FFFFFF"><div class="sw-color" style="background:linear-gradient(#FFFFFF,#FFFFFF),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Surface</span><span class="sw-hex">#FFFFFF</span><span class="sw-var">--zt-surface</span><span class="sw-use">Karty</span></div></button><button class="sw" data-copy="#F7F7F8"><div class="sw-color" style="background:linear-gradient(#F7F7F8,#F7F7F8),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Surface 2</span><span class="sw-hex">#F7F7F8</span><span class="sw-var">--zt-surface-2</span><span class="sw-use">Pola, selecty, hover</span></div></button><button class="sw" data-copy="#EAEAEC"><div class="sw-color" style="background:linear-gradient(#EAEAEC,#EAEAEC),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Border</span><span class="sw-hex">#EAEAEC</span><span class="sw-var">--zt-border</span><span class="sw-use">Ramki kart i pól</span></div></button></div><div class="group-title">Tekst i akcje</div><div class="swatches"><button class="sw" data-copy="#111113"><div class="sw-color" style="background:linear-gradient(#111113,#111113),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Ink</span><span class="sw-hex">#111113</span><span class="sw-var">--zt-ink</span><span class="sw-use">Aktywna pigułka nawigacji, primary CTA</span></div></button><button class="sw" data-copy="#0F0F11"><div class="sw-color" style="background:linear-gradient(#0F0F11,#0F0F11),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Text primary</span><span class="sw-hex">#0F0F11</span><span class="sw-var">--zt-text</span><span class="sw-use">Tytuły, duże liczby</span></div></button><button class="sw" data-copy="#5B5C63"><div class="sw-color" style="background:linear-gradient(#5B5C63,#5B5C63),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Text secondary</span><span class="sw-hex">#5B5C63</span><span class="sw-var">--zt-text-2</span><span class="sw-use">Treść, etykiety</span></div></button><button class="sw" data-copy="#A1A2A8"><div class="sw-color" style="background:linear-gradient(#A1A2A8,#A1A2A8),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Muted</span><span class="sw-hex">#A1A2A8</span><span class="sw-var">--zt-muted</span><span class="sw-use">Osie, nieaktywne serie, podpisy</span></div></button></div><div class="group-title">Akcenty danych</div><div class="swatches"><button class="sw" data-copy="#2F55F5"><div class="sw-color" style="background:linear-gradient(#2F55F5,#2F55F5),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Electric blue</span><span class="sw-hex">#2F55F5</span><span class="sw-var">--zt-blue</span><span class="sw-use">Seria 1, aktywny słupek, focus</span></div></button><button class="sw" data-copy="#8FA4FF"><div class="sw-color" style="background:linear-gradient(#8FA4FF,#8FA4FF),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Blue 300</span><span class="sw-hex">#8FA4FF</span><span class="sw-var">--zt-blue-300</span><span class="sw-use">Kreskowanie, słupki nieaktywne</span></div></button><button class="sw" data-copy="#E6EBFF"><div class="sw-color" style="background:linear-gradient(#E6EBFF,#E6EBFF),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Blue 100</span><span class="sw-hex">#E6EBFF</span><span class="sw-var">--zt-blue-100</span><span class="sw-use">Tło kreskowania, tła tooltipów</span></div></button><button class="sw" data-copy="#1FAE4B"><div class="sw-color" style="background:linear-gradient(#1FAE4B,#1FAE4B),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Green</span><span class="sw-hex">#1FAE4B</span><span class="sw-var">--zt-green</span><span class="sw-use">Seria 2, trendy dodatnie</span></div></button><button class="sw" data-copy="#86DDA2"><div class="sw-color" style="background:linear-gradient(#86DDA2,#86DDA2),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Green 300</span><span class="sw-hex">#86DDA2</span><span class="sw-var">--zt-green-300</span><span class="sw-use">Kropki / kreskowanie zielone</span></div></button><button class="sw" data-copy="#EE5FA7"><div class="sw-color" style="background:linear-gradient(#EE5FA7,#EE5FA7),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Pink</span><span class="sw-hex">#EE5FA7</span><span class="sw-var">--zt-pink</span><span class="sw-use">Seria 3, retencja</span></div></button><button class="sw" data-copy="#FCE4F0"><div class="sw-color" style="background:linear-gradient(#FCE4F0,#FCE4F0),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Pink 100</span><span class="sw-hex">#FCE4F0</span><span class="sw-var">--zt-pink-100</span><span class="sw-use">Pionowe linie tła w wykresie retencji</span></div></button><button class="sw" data-copy="#F4833D"><div class="sw-color" style="background:linear-gradient(#F4833D,#F4833D),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Orange</span><span class="sw-hex">#F4833D</span><span class="sw-var">--zt-orange</span><span class="sw-use">Logo, akcent w gradiencie insightu</span></div></button><button class="sw" data-copy="#1B2766"><div class="sw-color" style="background:linear-gradient(#1B2766,#1B2766),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Navy</span><span class="sw-hex">#1B2766</span><span class="sw-var">--zt-navy</span><span class="sw-use">Start gradientu insightu</span></div></button></div><div class="group-title">Statusy</div><div class="swatches"><button class="sw" data-copy="#E7F7EC"><div class="sw-color" style="background:linear-gradient(#E7F7EC,#E7F7EC),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Positive bg</span><span class="sw-hex">#E7F7EC</span><span class="sw-var">--zt-positive-bg</span><span class="sw-use">Tło pigułki ▲</span></div></button><button class="sw" data-copy="#E5484D"><div class="sw-color" style="background:linear-gradient(#E5484D,#E5484D),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Negative</span><span class="sw-hex">#E5484D</span><span class="sw-var">--zt-negative</span><span class="sw-use">Trend ▼, błędy</span></div></button><button class="sw" data-copy="#FFE9C2"><div class="sw-color" style="background:linear-gradient(#FFE9C2,#FFE9C2),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Highlight</span><span class="sw-hex">#FFE9C2</span><span class="sw-var">--zt-highlight</span><span class="sw-use">Zaznaczony fragment w polu AI</span></div></button></div><div class="group-title">Kolejność serii danych (--c1 … --c5)</div><div class="series"><div style="background:var(--zt-blue)">c1</div><div style="background:var(--zt-green)">c2</div><div style="background:var(--zt-pink)">c3</div><div style="background:var(--zt-orange)">c4</div><div style="background:var(--zt-blue-300)">c5</div></div></div>
+  </section>
+
+  <section class="block" id="gradients">
+    <div class="sec-head"><h2>Gradienty i efekty</h2><span>Kliknij, żeby skopiować deklarację CSS</span></div>
+    <div class="grads"><button class="panel grad sw" data-copy="--zt-hatch-blue: repeating-linear-gradient(135deg, #2F55F5 0 2px, #DCE3FF 2px 6px);"><div class="g" style="background:repeating-linear-gradient(135deg, #2F55F5 0 2px, #DCE3FF 2px 6px)"></div><div class="gi"><span class="sw-name">Hatch blue</span><span class="sw-use">Słupki / paski w stylu kreskowanym</span><code>--zt-hatch-blue</code></div></button><button class="panel grad sw" data-copy="--zt-hatch-green: repeating-linear-gradient(135deg, #1FAE4B 0 2px, #D3F2DD 2px 6px);"><div class="g" style="background:repeating-linear-gradient(135deg, #1FAE4B 0 2px, #D3F2DD 2px 6px)"></div><div class="gi"><span class="sw-name">Hatch green</span><span class="sw-use">Pasek postępu kanału</span><code>--zt-hatch-green</code></div></button><button class="panel grad sw" data-copy="--zt-hatch-pink: repeating-linear-gradient(135deg, #EE5FA7 0 2px, #FBDDEB 2px 6px);"><div class="g" style="background:repeating-linear-gradient(135deg, #EE5FA7 0 2px, #FBDDEB 2px 6px)"></div><div class="gi"><span class="sw-name">Hatch pink</span><span class="sw-use">Pasek postępu kanału</span><code>--zt-hatch-pink</code></div></button><button class="panel grad sw" data-copy="--zt-grad-bar: linear-gradient(180deg, #4B6BFF 0%, #2440E0 100%);"><div class="g" style="background:linear-gradient(180deg, #4B6BFF 0%, #2440E0 100%)"></div><div class="gi"><span class="sw-name">Solid bar</span><span class="sw-use">Wyróżniony (aktywny) słupek</span><code>--zt-grad-bar</code></div></button><button class="panel grad sw" data-copy="--zt-grad-insight: linear-gradient(135deg, #1B2766 0%, #3A4AA6 38%, #D9825A 76%, #F6C79E 100%);"><div class="g" style="background:linear-gradient(135deg, #1B2766 0%, #3A4AA6 38%, #D9825A 76%, #F6C79E 100%)"></div><div class="gi"><span class="sw-name">Insight</span><span class="sw-use">Karta z kluczowym wnioskiem</span><code>--zt-grad-insight</code></div></button><button class="panel grad sw" data-copy="--zt-grad-ai: linear-gradient(90deg, #EEF1FF 0%, #F8EEFF 100%);"><div class="g" style="background:linear-gradient(90deg, #EEF1FF 0%, #F8EEFF 100%)"></div><div class="gi"><span class="sw-name">AI bar</span><span class="sw-use">Pasek „co chcesz zbadać?”</span><code>--zt-grad-ai</code></div></button></div>
+  </section>
+
+  <section class="block" id="type">
+    <div class="sec-head"><h2>Typografia</h2><span>Geist 300–600 (fallback Inter) · liczby duże i lekkie: 400 z ujemnym trackingiem</span></div>
+    <div class="panel"><div class="type-row"><div class="type-meta"><b>Display · wartość</b><span>46 / 400 / -3.5%</span></div><div style="font-size:46px;font-weight:400;letter-spacing:-.035em">$41,540</div></div><div class="type-row"><div class="type-meta"><b>H1 · tytuł widoku</b><span>34 / 500 / -3%</span></div><div style="font-size:34px;font-weight:500;letter-spacing:-.03em">Overview</div></div><div class="type-row"><div class="type-meta"><b>H2 · tytuł karty</b><span>15 / 500</span></div><div style="font-size:15px;font-weight:500">Gross Volume</div></div><div class="type-row"><div class="type-meta"><b>Body</b><span>13.5 / 400</span></div><div style="font-size:13.5px;color:var(--text-2)">Online Payments · $26,800</div></div><div class="type-row"><div class="type-meta"><b>Label</b><span>12 / 400 · muted</span></div><div style="font-size:12px;color:var(--muted)">vs last period</div></div><div class="type-row"><div class="type-meta"><b>Micro · oś</b><span>10.5 / 400 · muted</span></div><div style="font-size:10.5px;color:var(--muted)">Jan  Feb  Mar  Apr  May  Jun</div></div></div>
+  </section>
+
+  <section class="block" id="tokens">
+    <div class="sec-head"><h2>Promienie, cienie, odstępy</h2><span>Hierarchia zaokrągleń i głębi</span></div>
+    <div class="tok-grid">
+      <div class="panel"><div class="comp-label">Border radius</div><div class="rad-row"><div><div class="rb" style="border-radius:24px"></div><small>--zt-r-canvas<br>24px</small></div><div><div class="rb" style="border-radius:16px"></div><small>--zt-r-card<br>16px</small></div><div><div class="rb" style="border-radius:10px"></div><small>--zt-r-inner<br>10px</small></div><div><div class="rb" style="border-radius:999px"></div><small>--zt-r-pill<br>999px</small></div></div></div>
+      <div class="panel"><div class="comp-label">Cienie</div><div class="sh"><div><div class="sb" style="box-shadow:0 1px 0 rgba(15,15,17,.03)"></div><small>--zt-shadow</small></div><div><div class="sb" style="box-shadow:0 24px 60px rgba(15,15,17,.10)"></div><small>--zt-shadow-canvas</small></div><div><div class="sb" style="box-shadow:0 8px 24px rgba(15,15,17,.12)"></div><small>--zt-shadow-pop</small></div></div></div>
+      <div class="panel spc"><div class="comp-label">Skala odstępów (siatka 4 px)</div><div class="i"><small style="margin:0">--sp-1</small><div class="s" style="width:4px"></div></div><div class="i"><small style="margin:0">--sp-2</small><div class="s" style="width:8px"></div></div><div class="i"><small style="margin:0">--sp-3</small><div class="s" style="width:12px"></div></div><div class="i"><small style="margin:0">--sp-4</small><div class="s" style="width:16px"></div></div><div class="i"><small style="margin:0">--sp-5</small><div class="s" style="width:20px"></div></div><div class="i"><small style="margin:0">--sp-6</small><div class="s" style="width:24px"></div></div><div class="i"><small style="margin:0">--sp-8</small><div class="s" style="width:32px"></div></div></div>
+    </div>
+  </section>
+
+  <section class="block" id="components">
+    <div class="sec-head"><h2>Komponenty bazowe</h2><span>Te same klasy we wszystkich 4 stylach — zmienia się tylko skórka</span></div>
+    
+<div class="comp-grid">
+  <div class="panel comp"><div class="comp-label">Przyciski</div>
+    <div class="flex">
+      <button class="btn btn-primary">+ Dodaj widget</button>
+      <button class="btn btn-secondary">Filtruj</button>
+      <button class="btn btn-ghost">Anuluj</button>
+      <button class="btn-icon" aria-label="Więcej">•••</button>
+    </div></div>
+  <div class="panel comp"><div class="comp-label">Nawigacja i przełączniki</div>
+    <div class="tabs"><span class="tab active">Przegląd</span><span class="tab">Płatności</span><span class="tab">Raporty</span></div>
+    <div style="height:14px"></div>
+    <div class="seg"><span class="on">Dzień</span><span>Tydzień</span><span>Miesiąc</span><span>Rok</span></div></div>
+  <div class="panel comp"><div class="comp-label">Karta KPI</div>
+    <div class="card kpi">
+      <div class="kpi-t">Aktywni użytkownicy <span class="arr">↗</span></div>
+      <div class="kpi-v">1.8k <span class="trend up">▲ 9%</span></div>
+      <div class="kpi-s">vs poprzedni miesiąc</div>
+    </div></div>
+  <div class="panel comp"><div class="comp-label">Paski postępu (kolory serii)</div>
+    <div class="pb"><div class="pb-h"><span>Seria 1</span><b>77%</b></div><div class="bar"><i style="width:77%;--c:var(--c1)"></i></div></div>
+    <div class="pb"><div class="pb-h"><span>Seria 2</span><b>63%</b></div><div class="bar"><i style="width:63%;--c:var(--c2)"></i></div></div>
+    <div class="pb"><div class="pb-h"><span>Seria 3</span><b>41%</b></div><div class="bar"><i style="width:41%;--c:var(--c3)"></i></div></div></div>
+  <div class="panel comp"><div class="comp-label">Trendy, badge, chipy</div>
+    <div class="flex">
+      <span class="trend up">▲ 12%</span><span class="trend down">▼ 4%</span>
+      <span class="badge">Nowe</span>
+      <span class="chip"><i style="--c:var(--c1)"></i>Marketing</span>
+      <span class="chip"><i style="--c:var(--c2)"></i>Sprzedaż</span>
+      <span class="chip"><i style="--c:var(--c3)"></i>Operacje</span>
+    </div></div>
+  <div class="panel comp"><div class="comp-label">Lista / wiersze tabeli</div>
+    <div class="row"><span>Leadership Essentials</span><b>1 264</b><span class="trend up">▲ 11%</span></div>
+    <div class="row"><span>Project Management</span><b>1 032</b><span class="trend up">▲ 8%</span></div>
+    <div class="row"><span>Data Analysis</span><b>856</b><span class="trend down">▼ 3%</span></div></div>
+  <div class="panel comp"><div class="comp-label">Input i select</div>
+    <div class="input">⌕ <span>Szukaj…</span></div>
+    <div style="height:10px"></div>
+    <div class="select"><span>▦ 1 sty – 31 sty 2026</span><span>▾</span></div></div>
+</div>
+
+  </section>
+
+  <section class="block" id="rules">
+    <div class="sec-head"><h2>Zasady stylu</h2><span>Co trzyma ten styl w ryzach</span></div>
+    <div class="rules">
+      <div class="panel do"><h3>Rób</h3><ul><li>Kreskowanie (hatch) jako znak rozpoznawczy: słupki, paski, wypełnienia.</li><li>Jeden słupek / segment wyróżniony pełnym kolorem, reszta kreskowana lub wyblakła.</li><li>Duże liczby lekkie (400) z mocno ujemnym trackingiem.</li><li>Karty prawie płaskie: biel + ramka 1 px, cień praktycznie zerowy.</li><li>Pole AI z sugestią i podświetlonym fragmentem (--zt-highlight).</li><li>Maksymalnie jedna karta z gradientem na ekran (insight).</li></ul></div>
+      <div class="panel dont"><h3>Unikaj</h3><ul><li>Pogrubionych liczb 600+ — tracą lekkość.</li><li>Więcej niż 3 kolorów akcentów w jednym widoku.</li><li>Dużych cieni pod kartami.</li><li>Wypełnień kreskowanych na małych elementach (< 8 px) — robi się szum.</li><li>Gradientów w tle strony — tło jest chłodnoszare i spokojne.</li></ul></div>
+    </div>
+  </section>
+
+  <section class="block" id="css">
+    <div class="sec-head"><h2>CSS design tokens</h2><span>Wklej do :root w nowym projekcie</span></div>
+    <div class="codebox"><div class="code-actions"><button class="copy" data-copy-target="tokcode">Kopiuj CSS</button></div><pre id="tokcode">:root {
+  /* ---------- Fonty ---------- */
+  --font-head: &#x27;Geist&#x27;, &#x27;Inter&#x27;, system-ui, sans-serif;
+  --font-body: &#x27;Geist&#x27;, &#x27;Inter&#x27;, system-ui, sans-serif;
+  --font-mono: &#x27;JetBrains Mono&#x27;, ui-monospace, monospace;
+
+  /* ---------- Neutralne i powierzchnie ---------- */
+  --zt-outer: #E3E3E6;                 /* Outer — Tło strony poza canvasem */
+  --zt-bg: #F4F4F5;                    /* Canvas — Tło aplikacji */
+  --zt-surface: #FFFFFF;               /* Surface — Karty */
+  --zt-surface-2: #F7F7F8;             /* Surface 2 — Pola, selecty, hover */
+  --zt-border: #EAEAEC;                /* Border — Ramki kart i pól */
+
+  /* ---------- Tekst i akcje ---------- */
+  --zt-ink: #111113;                   /* Ink — Aktywna pigułka nawigacji, primary CTA */
+  --zt-text: #0F0F11;                  /* Text primary — Tytuły, duże liczby */
+  --zt-text-2: #5B5C63;                /* Text secondary — Treść, etykiety */
+  --zt-muted: #A1A2A8;                 /* Muted — Osie, nieaktywne serie, podpisy */
+
+  /* ---------- Akcenty danych ---------- */
+  --zt-blue: #2F55F5;                  /* Electric blue — Seria 1, aktywny słupek, focus */
+  --zt-blue-300: #8FA4FF;              /* Blue 300 — Kreskowanie, słupki nieaktywne */
+  --zt-blue-100: #E6EBFF;              /* Blue 100 — Tło kreskowania, tła tooltipów */
+  --zt-green: #1FAE4B;                 /* Green — Seria 2, trendy dodatnie */
+  --zt-green-300: #86DDA2;             /* Green 300 — Kropki / kreskowanie zielone */
+  --zt-pink: #EE5FA7;                  /* Pink — Seria 3, retencja */
+  --zt-pink-100: #FCE4F0;              /* Pink 100 — Pionowe linie tła w wykresie retencji */
+  --zt-orange: #F4833D;                /* Orange — Logo, akcent w gradiencie insightu */
+  --zt-navy: #1B2766;                  /* Navy — Start gradientu insightu */
+
+  /* ---------- Statusy ---------- */
+  --zt-positive-bg: #E7F7EC;           /* Positive bg — Tło pigułki ▲ */
+  --zt-negative: #E5484D;              /* Negative — Trend ▼, błędy */
+  --zt-highlight: #FFE9C2;             /* Highlight — Zaznaczony fragment w polu AI */
+
+  /* ---------- Kolejność serii danych w wykresach ---------- */
+  --c1: var(--zt-blue);
+  --c2: var(--zt-green);
+  --c3: var(--zt-pink);
+  --c4: var(--zt-orange);
+  --c5: var(--zt-blue-300);
+
+  /* ---------- Gradienty ---------- */
+  --zt-hatch-blue: repeating-linear-gradient(135deg, #2F55F5 0 2px, #DCE3FF 2px 6px); /* Słupki / paski w stylu kreskowanym */
+  --zt-hatch-green: repeating-linear-gradient(135deg, #1FAE4B 0 2px, #D3F2DD 2px 6px); /* Pasek postępu kanału */
+  --zt-hatch-pink: repeating-linear-gradient(135deg, #EE5FA7 0 2px, #FBDDEB 2px 6px); /* Pasek postępu kanału */
+  --zt-grad-bar: linear-gradient(180deg, #4B6BFF 0%, #2440E0 100%); /* Wyróżniony (aktywny) słupek */
+  --zt-grad-insight: linear-gradient(135deg, #1B2766 0%, #3A4AA6 38%, #D9825A 76%, #F6C79E 100%); /* Karta z kluczowym wnioskiem */
+  --zt-grad-ai: linear-gradient(90deg, #EEF1FF 0%, #F8EEFF 100%); /* Pasek „co chcesz zbadać?” */
+
+  /* ---------- Promienie ---------- */
+  --zt-r-canvas: 24px; /* Canvas aplikacji */
+  --zt-r-card: 16px; /* Karty */
+  --zt-r-inner: 10px; /* Pola, tooltipy, słupki */
+  --zt-r-pill: 999px; /* Nawigacja, trendy */
+
+  /* ---------- Cienie ---------- */
+  --zt-shadow: 0 1px 0 rgba(15,15,17,.03); /* Karty (prawie płaskie) */
+  --zt-shadow-canvas: 0 24px 60px rgba(15,15,17,.10); /* Canvas aplikacji */
+  --zt-shadow-pop: 0 8px 24px rgba(15,15,17,.12); /* Tooltip, dropdown, pole AI */
+
+  /* ---------- Odstępy ---------- */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+
+  /* ---------- Aliasy semantyczne (używaj w komponentach) ---------- */
+  --page-bg: var(--zt-outer);
+  --surface: var(--zt-surface);
+  --surface-2: var(--zt-surface-2);
+  --border: var(--zt-border);
+  --divider: var(--zt-border);
+  --text: var(--zt-text);
+  --text-2: var(--zt-text-2);
+  --muted: var(--zt-muted);
+  --accent: var(--zt-blue);
+  --hover: #F2F2F4;
+  --toc-bg: rgba(255,255,255,.9);
+  --code-bg: #111113;
+  --code-text: #E8EAF2;
+  --r-card: var(--zt-r-card);
+  --r-inner: var(--zt-r-inner);
+  --r-pill: var(--zt-r-pill);
+  --shadow: var(--zt-shadow);
+  --up: var(--zt-green);
+  --down: var(--zt-negative);
+}</pre></div>
+  </section>
+
+  <section class="block" id="prompt">
+    <div class="sec-head"><h2>Prompt do nowego czatu</h2><span>Wklej w nowej rozmowie lub narzędziu — model odtworzy ten styl</span></div>
+    <div class="codebox"><div class="code-actions"><button class="copy" data-download="04-zentra-crisp-fintech-prompt.md">Pobierz .md</button><button class="copy" data-copy-target="promptcode">Kopiuj prompt</button></div><pre id="promptcode"># Styl: Crisp Fintech
+
+Jesteś senior UI designerem i front-end developerem. Budujesz dashboardy jako pojedyncze pliki HTML (HTML + CSS w &lt;style&gt; + JS w &lt;script&gt;). Każdy dashboard, który wygenerujesz w tej rozmowie, ma wyglądać jak z jednej rodziny wizualnej „Crisp Fintech”. Trzymaj się ściśle poniższego design systemu: nie dodawaj kolorów, fontów, promieni ani cieni spoza tokenów. Jeśli czegoś brakuje, wyprowadź to z istniejących tokenów (np. przezroczystość istniejącego koloru).
+
+## Charakter stylu
+Ostry, nowoczesny fintech / SaaS analytics. Chłodnoszare tło, białe prawie płaskie karty, duże, lekkie liczby. Znak rozpoznawczy: kreskowane (hatch 135°) wypełnienia w elektrycznym błękicie, zieleni i różu, przy czym jeden element jest wyróżniony pełnym kolorem. Do tego wbudowane pole AI i jedna karta insightu z gradientem granat → pomarańcz → brzoskwinia.
+
+## Fonty
+&lt;link href=&quot;https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;
+Geist 300–600 (fallback Inter) · liczby duże i lekkie: 400 z ujemnym trackingiem
+
+## Design tokens — wklej 1:1 do &lt;style&gt;
+:root {
+  /* ---------- Fonty ---------- */
+  --font-head: &#x27;Geist&#x27;, &#x27;Inter&#x27;, system-ui, sans-serif;
+  --font-body: &#x27;Geist&#x27;, &#x27;Inter&#x27;, system-ui, sans-serif;
+  --font-mono: &#x27;JetBrains Mono&#x27;, ui-monospace, monospace;
+
+  /* ---------- Neutralne i powierzchnie ---------- */
+  --zt-outer: #E3E3E6;                 /* Outer — Tło strony poza canvasem */
+  --zt-bg: #F4F4F5;                    /* Canvas — Tło aplikacji */
+  --zt-surface: #FFFFFF;               /* Surface — Karty */
+  --zt-surface-2: #F7F7F8;             /* Surface 2 — Pola, selecty, hover */
+  --zt-border: #EAEAEC;                /* Border — Ramki kart i pól */
+
+  /* ---------- Tekst i akcje ---------- */
+  --zt-ink: #111113;                   /* Ink — Aktywna pigułka nawigacji, primary CTA */
+  --zt-text: #0F0F11;                  /* Text primary — Tytuły, duże liczby */
+  --zt-text-2: #5B5C63;                /* Text secondary — Treść, etykiety */
+  --zt-muted: #A1A2A8;                 /* Muted — Osie, nieaktywne serie, podpisy */
+
+  /* ---------- Akcenty danych ---------- */
+  --zt-blue: #2F55F5;                  /* Electric blue — Seria 1, aktywny słupek, focus */
+  --zt-blue-300: #8FA4FF;              /* Blue 300 — Kreskowanie, słupki nieaktywne */
+  --zt-blue-100: #E6EBFF;              /* Blue 100 — Tło kreskowania, tła tooltipów */
+  --zt-green: #1FAE4B;                 /* Green — Seria 2, trendy dodatnie */
+  --zt-green-300: #86DDA2;             /* Green 300 — Kropki / kreskowanie zielone */
+  --zt-pink: #EE5FA7;                  /* Pink — Seria 3, retencja */
+  --zt-pink-100: #FCE4F0;              /* Pink 100 — Pionowe linie tła w wykresie retencji */
+  --zt-orange: #F4833D;                /* Orange — Logo, akcent w gradiencie insightu */
+  --zt-navy: #1B2766;                  /* Navy — Start gradientu insightu */
+
+  /* ---------- Statusy ---------- */
+  --zt-positive-bg: #E7F7EC;           /* Positive bg — Tło pigułki ▲ */
+  --zt-negative: #E5484D;              /* Negative — Trend ▼, błędy */
+  --zt-highlight: #FFE9C2;             /* Highlight — Zaznaczony fragment w polu AI */
+
+  /* ---------- Kolejność serii danych w wykresach ---------- */
+  --c1: var(--zt-blue);
+  --c2: var(--zt-green);
+  --c3: var(--zt-pink);
+  --c4: var(--zt-orange);
+  --c5: var(--zt-blue-300);
+
+  /* ---------- Gradienty ---------- */
+  --zt-hatch-blue: repeating-linear-gradient(135deg, #2F55F5 0 2px, #DCE3FF 2px 6px); /* Słupki / paski w stylu kreskowanym */
+  --zt-hatch-green: repeating-linear-gradient(135deg, #1FAE4B 0 2px, #D3F2DD 2px 6px); /* Pasek postępu kanału */
+  --zt-hatch-pink: repeating-linear-gradient(135deg, #EE5FA7 0 2px, #FBDDEB 2px 6px); /* Pasek postępu kanału */
+  --zt-grad-bar: linear-gradient(180deg, #4B6BFF 0%, #2440E0 100%); /* Wyróżniony (aktywny) słupek */
+  --zt-grad-insight: linear-gradient(135deg, #1B2766 0%, #3A4AA6 38%, #D9825A 76%, #F6C79E 100%); /* Karta z kluczowym wnioskiem */
+  --zt-grad-ai: linear-gradient(90deg, #EEF1FF 0%, #F8EEFF 100%); /* Pasek „co chcesz zbadać?” */
+
+  /* ---------- Promienie ---------- */
+  --zt-r-canvas: 24px; /* Canvas aplikacji */
+  --zt-r-card: 16px; /* Karty */
+  --zt-r-inner: 10px; /* Pola, tooltipy, słupki */
+  --zt-r-pill: 999px; /* Nawigacja, trendy */
+
+  /* ---------- Cienie ---------- */
+  --zt-shadow: 0 1px 0 rgba(15,15,17,.03); /* Karty (prawie płaskie) */
+  --zt-shadow-canvas: 0 24px 60px rgba(15,15,17,.10); /* Canvas aplikacji */
+  --zt-shadow-pop: 0 8px 24px rgba(15,15,17,.12); /* Tooltip, dropdown, pole AI */
+
+  /* ---------- Odstępy ---------- */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+
+  /* ---------- Aliasy semantyczne (używaj w komponentach) ---------- */
+  --page-bg: var(--zt-outer);
+  --surface: var(--zt-surface);
+  --surface-2: var(--zt-surface-2);
+  --border: var(--zt-border);
+  --divider: var(--zt-border);
+  --text: var(--zt-text);
+  --text-2: var(--zt-text-2);
+  --muted: var(--zt-muted);
+  --accent: var(--zt-blue);
+  --hover: #F2F2F4;
+  --toc-bg: rgba(255,255,255,.9);
+  --code-bg: #111113;
+  --code-text: #E8EAF2;
+  --r-card: var(--zt-r-card);
+  --r-inner: var(--zt-r-inner);
+  --r-pill: var(--zt-r-pill);
+  --shadow: var(--zt-shadow);
+  --up: var(--zt-green);
+  --down: var(--zt-negative);
+}
+
+## Layout
+- Strona --zt-outer, w środku canvas --zt-bg radius 24 px z dużym miękkim cieniem.
+- Nawigacja: logo (pomarańczowy kwadrat + nazwa małymi literami) po lewej, pigułkowe menu (aktywna czarna) na środku, okrągłe ikony search/bell/avatar po prawej.
+- Nagłówek: „Overview” 34–36/500 tracking -3%; po prawej zakres dat „vs” zakres dat, granulacja, „Dodaj widget +”.
+- Siatka: rząd 2fr/1fr (główny wykres + wartość z breakdownem), rząd 1fr/1.2fr/1fr (mniejsze wykresy + karta insightu).
+
+## Komponenty
+- Karta: biel, border 1 px --zt-border, radius 16 px, cień praktycznie zerowy; w nagłówku tytuł 15/500 i okrągły przycisk „•••”.
+- Duże wartości 42–50 px weight 400, tracking -0.035em; trend jako mała pigułka (zielone tło + zielony tekst).
+- Breakdown: etykieta po lewej, kwota po prawej, pod spodem pasek 10 px z wypełnieniem kreskowanym w kolorze kanału.
+- Pole AI: gradient --zt-grad-ai, ikonka ✦, placeholder-pytanie, białe pole z tekstem i podświetlonym fragmentem (--zt-highlight).
+- Tooltip / peak label: biała mini-pigułka z ramką i cieniem --zt-shadow-pop.
+- Karta insightu: --zt-grad-insight, biały tekst, wielka wartość, 1-zdaniowy wniosek + opis, subtelny obrys geometryczny w rogu, wskaźnik stron (paski).
+
+## Wykresy
+- Słupki lejka: pełna szerokość kolumny, kolumny oddzielone przerywaną linią; nieaktywne kreskowane (--zt-hatch-blue), aktywna pełna --zt-grad-bar z niebieską poświatą; nad każdą kolumną etykieta + wartość (aktywna ciemna, reszta muted).
+- Retencja: różowa linia schodkowa (step) 2 px na tle cienkich pionowych linii --zt-pink-100.
+- Dot-matrix: kolumny kropek (r≈3 px, krok 9 px), przezroczystość rośnie z wysokością, kolumna szczytu w pełnym kolorze + etykieta „Szczyt: śr”.
+- Osie 10.5 px muted, bez ramek, siatka tylko gdy konieczna.
+- Kolory serii zawsze w kolejności --c1, --c2, --c3, --c4, --c5.
+- Liczby z font-variant-numeric: tabular-nums; separatory tysięcy zgodne z językiem treści.
+- Możesz używać Chart.js / ECharts / ApexCharts z CDN albo inline SVG — ale zawsze ostyluj je tokenami (kolory, fonty, siatka, tooltipy).
+
+## Zasady
+Rób:
+- Kreskowanie (hatch) jako znak rozpoznawczy: słupki, paski, wypełnienia.
+- Jeden słupek / segment wyróżniony pełnym kolorem, reszta kreskowana lub wyblakła.
+- Duże liczby lekkie (400) z mocno ujemnym trackingiem.
+- Karty prawie płaskie: biel + ramka 1 px, cień praktycznie zerowy.
+- Pole AI z sugestią i podświetlonym fragmentem (--zt-highlight).
+- Maksymalnie jedna karta z gradientem na ekran (insight).
+
+Unikaj:
+- Pogrubionych liczb 600+ — tracą lekkość.
+- Więcej niż 3 kolorów akcentów w jednym widoku.
+- Dużych cieni pod kartami.
+- Wypełnień kreskowanych na małych elementach (&lt; 8 px) — robi się szum.
+- Gradientów w tle strony — tło jest chłodnoszare i spokojne.
+
+## Wymagania techniczne
+- Jeden samowystarczalny plik HTML; wszystkie kolory przez var(--…).
+- Responsywność: CSS grid; poniżej 820 px jedna kolumna, karty na pełną szerokość.
+- Widoczny focus dla klawiatury, kontrast tekstu min. 4.5:1, respektuj prefers-reduced-motion.
+- Zanim zaczniesz, dopytaj o dane / KPI, jeśli nie zostały podane — nie wymyślaj metryk biznesowych bez potwierdzenia.
+</pre></div>
+  </section>
+
+  <footer>Crisp Fintech · design system wyekstrahowany z referencji · wszystkie wartości do użycia w generatorze dashboardów HTML</footer>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const toast=(m)=>{const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(window.__t);window.__t=setTimeout(()=>t.classList.remove('show'),1600)};
+async function copyText(txt,msg){try{await navigator.clipboard.writeText(txt)}catch(e){const a=document.createElement('textarea');a.value=txt;a.style.position='fixed';a.style.opacity='0';document.body.appendChild(a);a.select();try{document.execCommand('copy')}catch(_){}a.remove()}toast(msg)}
+document.querySelectorAll('[data-copy]').forEach(el=>el.addEventListener('click',()=>copyText(el.dataset.copy,'Skopiowano: '+el.dataset.copy.slice(0,48))));
+document.querySelectorAll('[data-copy-target]').forEach(b=>b.addEventListener('click',()=>copyText(document.getElementById(b.dataset.copyTarget).innerText,'Skopiowano do schowka')));
+document.querySelectorAll('[data-download]').forEach(b=>b.addEventListener('click',()=>{const blob=new Blob([document.getElementById('promptcode').innerText],{type:'text/markdown'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=b.dataset.download;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast('Pobieranie promptu')}));
+
+</script>
+</body>
+</html>

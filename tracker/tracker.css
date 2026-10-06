@@ -1,0 +1,892 @@
+/* ==========================================================================
+   TRACKER.CSS — neutralna warstwa komponentów trackera.
+
+   Stoi WYŁĄCZNIE na wspólnym kontrakcie 34 tokenów, które definiuje każdy
+   z 5 motywów (--page-bg --surface --surface-2 --text --text-2 --muted
+   --border --divider --accent --hover --up --down --c1..--c5 --shadow
+   --r-card --r-inner --r-pill --sp-1..--sp-6 --sp-8 --font-head --font-body
+   --font-mono --code-bg --code-text --toc-bg).
+
+   Podział odpowiedzialności:
+   - LAYOUT shella (tb-frame/tb-side/tb-main/tb-head) jest TUTAJ, bo jeden
+     szkielet HTML musi działać we wszystkich motywach.
+   - MALOWANIE shella dokłada motyw w swojej sekcji „skóra shella".
+   - Komponenty, które motywy mają własne (.card .btn .chip .badge .kpi-*
+     .tab .tabs .seg .pb .bar .trend .toast .chart .row .flex), NIE są tu
+     przedefiniowane — markup używa ich wprost, żeby każdy styl zachował
+     swój charakter.
+   - Tutaj są tylko komponenty, których motywy NIE mają: tabela, modal,
+     drawer, menu kontekstowe, checklista, karteczki, agenda, paginacja,
+     dropzone, empty, skeleton, pola formularza, zaznaczanie wierszy.
+
+   Prefiks tb-. Zakładany target: Chrome i Edge (używamy color-mix i <dialog>).
+   ========================================================================== */
+
+/* ---------------------------------------------------------------- tokeny własne */
+:root {
+  /* Tony statusu. Kontrakt daje tylko --up/--down, więc warn/info mają
+     wartości domyślne — motyw może je nadpisać. */
+  --tb-ok: var(--up);
+  --tb-bad: var(--down);
+  --tb-warn: #D99A2B;
+  --tb-info: #5B93CC;
+  --tb-neutral: var(--muted);
+
+  /* Wykresy: tło toru, crosshair, wnętrze kropki linii, serie tła. */
+  --tb-chart-track: color-mix(in srgb, var(--text) 8%, transparent);
+  --tb-chart-crosshair: color-mix(in srgb, var(--text) 28%, transparent);
+  --tb-chart-dot-bg: var(--surface);
+  --tb-chart-muted: color-mix(in srgb, var(--text) 18%, transparent);
+
+  /* Powierzchnia dla elementów UNOSZĄCYCH SIĘ nad treścią. --surface bywa
+     półprzezroczystym szkłem (Amber Dusk, Frosted Mono) — świetne dla karty
+     leżącej na tle, nieczytelne dla menu nad tabelą. Podkładamy nieprzezroczyste
+     --page-bg pod warstwę --surface, zachowując kolor motywu. */
+  --tb-solid: linear-gradient(var(--surface), var(--surface)), var(--page-bg);
+
+  --tb-side-w: 220px;
+  --tb-max-w: 1320px;
+  --tb-gap: var(--sp-4);
+}
+
+/* ---------------------------------------------------------------- baza */
+.tb-body {
+  margin: 0;
+  font-family: var(--font-body);
+  background: var(--page-bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+.tb-body *,
+.tb-body *::before,
+.tb-body *::after { box-sizing: border-box; }
+.tb-body [hidden] { display: none !important; }
+.tb-body :focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+.tb-num { font-variant-numeric: tabular-nums; }
+.tb-muted { color: var(--muted); }
+.tb-dim { color: var(--text-2); }
+.tb-sr {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+.tb-spacer { flex: 1 1 auto; }
+
+/* ---------------------------------------------------------------- shell */
+.tb-page { padding: var(--sp-6) var(--sp-4); }
+.tb-frame {
+  display: grid;
+  grid-template-columns: var(--tb-side-w) minmax(0, 1fr);
+  max-width: var(--tb-max-w);
+  margin-inline: auto;
+  border-radius: var(--r-card);
+  overflow: hidden;
+  min-height: 70vh;
+}
+.tb-side {
+  padding: var(--sp-5) var(--sp-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+  min-width: 0;
+}
+.tb-brand {
+  display: flex; align-items: center; gap: var(--sp-2);
+  font-family: var(--font-head); font-weight: 600; font-size: 15px;
+  padding-inline: var(--sp-2);
+  min-width: 0;
+}
+.tb-brand span {
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.tb-nav { display: flex; flex-direction: column; gap: 2px; }
+.tb-nav a {
+  display: flex; align-items: center; gap: var(--sp-3);
+  padding: 9px 12px;
+  border-radius: var(--r-inner);
+  color: var(--text-2);
+  font-size: 13px;
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.tb-nav a:hover { background: var(--hover); color: var(--text); }
+.tb-nav a.is-active { background: var(--accent); color: #fff; font-weight: 600; }
+.tb-nav a i { flex: none; width: 16px; text-align: center; font-style: normal; opacity: .85; }
+
+.tb-main {
+  padding: var(--sp-5);
+  min-width: 0;
+  display: flex; flex-direction: column; gap: var(--tb-gap);
+}
+.tb-head {
+  display: flex; align-items: center; gap: var(--sp-3);
+  flex-wrap: wrap;
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-inner);
+}
+.tb-title { font-family: var(--font-head); font-size: 20px; font-weight: 600; margin: 0; }
+.tb-head .tb-spacer { min-width: var(--sp-2); }
+
+/* Reset dla kontrolek, które motywy stylują jako <span>: .tab i .seg span.
+   Bez tego <button class="tab"> dostaje domyślne tło i obwódkę przeglądarki. */
+.tb-body button.tab,
+.tb-body .seg button,
+.tb-body .tabs button {
+  font: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  color: inherit;
+}
+.tb-body .tab, .tb-body .seg span, .tb-body .seg button { cursor: pointer; }
+.tb-body .tabs { margin: 0; padding: 0; list-style: none; }
+
+/* ---------------------------------------------------------------- siatki */
+.tb-grid { display: grid; gap: var(--tb-gap); }
+.tb-grid-1 { grid-template-columns: minmax(0, 1fr); }
+.tb-grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.tb-grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.tb-grid-main { grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); }
+.tb-grid-kpi { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+.tb-stack { display: flex; flex-direction: column; gap: var(--tb-gap); min-width: 0; }
+.tb-flexrow { display: flex; align-items: center; gap: var(--sp-3); flex-wrap: wrap; }
+.tb-span-2 { grid-column: span 2; }
+.tb-span-full { grid-column: 1 / -1; }
+
+@media (max-width: 1100px) {
+  .tb-grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 960px) {
+  .tb-frame { grid-template-columns: minmax(0, 1fr); }
+  .tb-side { flex-direction: row; align-items: center; gap: var(--sp-3); overflow-x: auto; }
+  .tb-nav { flex-direction: row; }
+  .tb-grid-main { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 680px) {
+  .tb-page { padding: var(--sp-3) var(--sp-2); }
+  .tb-main { padding: var(--sp-4) var(--sp-3); }
+  .tb-grid-2, .tb-grid-3 { grid-template-columns: minmax(0, 1fr); }
+  .tb-span-2 { grid-column: auto; }
+}
+
+/* ---------------------------------------------------------------- wykresy */
+.tb-chart { position: relative; width: 100%; min-width: 0; }
+.tb-chart .tb-axis text { fill: var(--muted); font-size: 10px; }
+.tb-chart .tb-gridline { stroke: var(--divider); stroke-width: 1; }
+.tb-chart .tb-hit { fill: transparent; }
+.tb-chart-donut { display: flex; align-items: center; gap: var(--sp-4); flex-wrap: wrap; }
+.tb-chart-donut > svg { width: 160px; flex: none; }
+.tb-donut-center { fill: var(--text); font-size: 17px; font-weight: 700; }
+.tb-donut-sub { fill: var(--muted); font-size: 10px; }
+.tb-spark { width: 100%; height: 36px; display: block; }
+
+.tb-tooltip {
+  position: absolute; z-index: 5; pointer-events: none;
+  transform: translate(-50%, -120%);
+  background: var(--tb-solid);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  color: var(--text);
+  border-radius: var(--r-inner);
+  padding: 7px 10px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.tb-tip-head { color: var(--muted); font-size: 11px; margin-bottom: 4px; }
+.tb-tip-row { display: flex; gap: var(--sp-2); align-items: center; }
+.tb-tip-row b { margin-left: auto; font-variant-numeric: tabular-nums; }
+.tb-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex: none;
+  background: var(--tb-dot, var(--c1));
+}
+.tb-legend { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; flex: 1 1 140px; }
+.tb-legend-row {
+  display: flex; align-items: center; gap: var(--sp-2);
+  font-size: 12px; color: var(--text-2);
+}
+.tb-legend-row b { margin-left: auto; color: var(--text); font-variant-numeric: tabular-nums; }
+
+/* ---------------------------------------------------------------- pola formularza
+   Motywy mają .input/.select, ale to ATRAPY (divy z display:flex i color:muted),
+   więc prawdziwe kontrolki dostają własne klasy. */
+.tb-field { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.tb-field > label { font-size: 12px; color: var(--text-2); font-weight: 500; }
+.tb-field .tb-err { font-size: 11.5px; color: var(--tb-bad); }
+
+.tb-input, .tb-select, .tb-textarea {
+  width: 100%;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-inner);
+  padding: 8px 10px;
+  min-height: 34px;
+}
+.tb-textarea { min-height: 90px; resize: vertical; line-height: 1.5; }
+.tb-input::placeholder, .tb-textarea::placeholder { color: var(--muted); }
+.tb-input:focus, .tb-select:focus, .tb-textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
+}
+.tb-input[aria-invalid="true"], .tb-select[aria-invalid="true"] { border-color: var(--tb-bad); }
+.tb-select { cursor: pointer; }
+.tb-input:disabled, .tb-select:disabled, .tb-textarea:disabled { opacity: .55; cursor: not-allowed; }
+.tb-input-sm { min-height: 28px; padding: 4px 8px; font-size: 12.5px; }
+
+.tb-check {
+  appearance: none;
+  width: 17px; height: 17px; flex: none;
+  border: 1.5px solid var(--border);
+  border-radius: 5px;
+  background: var(--surface);
+  cursor: pointer;
+  display: grid; place-content: center;
+}
+.tb-check:checked { background: var(--accent); border-color: var(--accent); }
+.tb-check:checked::after {
+  content: ""; width: 9px; height: 5px;
+  border: 2px solid #fff; border-top: 0; border-right: 0;
+  transform: rotate(-45deg) translateY(-1px);
+}
+.tb-check:indeterminate { background: var(--accent); border-color: var(--accent); }
+.tb-check:indeterminate::after {
+  content: ""; width: 9px; height: 0; border-top: 2px solid #fff; transform: none;
+}
+
+/* toggle / switch */
+.tb-switch { display: inline-flex; align-items: center; gap: var(--sp-2); cursor: pointer; font-size: 13px; }
+.tb-switch input { appearance: none; margin: 0; width: 36px; height: 20px; flex: none;
+  background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px;
+  position: relative; cursor: pointer; transition: background .15s; }
+.tb-switch input::after {
+  content: ""; position: absolute; top: 2px; left: 2px;
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--text-2); transition: transform .15s, background .15s;
+}
+.tb-switch input:checked { background: var(--accent); border-color: var(--accent); }
+.tb-switch input:checked::after { transform: translateX(16px); background: #fff; }
+
+/* ---------------------------------------------------------------- tagi statusu
+   Tekst zostaje w var(--text), a ton nadaje tint i obwódka. Gdyby tekst miał
+   kolor tonu, na jasnych motywach wyszłoby ~1,9:1 kontrastu. */
+.tb-tag {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11.5px; font-weight: 600;
+  padding: 3px 9px;
+  border-radius: var(--r-pill);
+  color: var(--text);
+  background: color-mix(in srgb, var(--tb-neutral) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--tb-neutral) 42%, transparent);
+  white-space: nowrap;
+}
+.tb-tag::before {
+  content: ""; width: 6px; height: 6px; border-radius: 50%; flex: none;
+  background: var(--tb-neutral);
+}
+.tb-tag-success { background: color-mix(in srgb, var(--tb-ok) 16%, transparent);
+  border-color: color-mix(in srgb, var(--tb-ok) 45%, transparent); }
+.tb-tag-success::before { background: var(--tb-ok); }
+.tb-tag-danger { background: color-mix(in srgb, var(--tb-bad) 16%, transparent);
+  border-color: color-mix(in srgb, var(--tb-bad) 45%, transparent); }
+.tb-tag-danger::before { background: var(--tb-bad); }
+.tb-tag-warning { background: color-mix(in srgb, var(--tb-warn) 18%, transparent);
+  border-color: color-mix(in srgb, var(--tb-warn) 48%, transparent); }
+.tb-tag-warning::before { background: var(--tb-warn); }
+.tb-tag-info { background: color-mix(in srgb, var(--tb-info) 16%, transparent);
+  border-color: color-mix(in srgb, var(--tb-info) 45%, transparent); }
+.tb-tag-info::before { background: var(--tb-info); }
+.tb-tag-plain::before { display: none; }
+
+/* ---------------------------------------------------------------- banner */
+.tb-banner {
+  display: flex; align-items: flex-start; gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-card);
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+}
+.tb-banner i { font-style: normal; font-size: 18px; line-height: 1.2; flex: none; }
+.tb-banner-body { min-width: 0; flex: 1; }
+.tb-banner-title { font-weight: 600; font-size: 14px; }
+.tb-banner-text { font-size: 13px; color: var(--text-2); margin-top: 2px; }
+.tb-banner-actions { display: flex; gap: var(--sp-2); flex-wrap: wrap; align-items: center; }
+.tb-banner-accent { border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface)); }
+.tb-banner-success { border-color: color-mix(in srgb, var(--tb-ok) 45%, transparent);
+  background: color-mix(in srgb, var(--tb-ok) 12%, var(--surface)); }
+.tb-banner-warning { border-color: color-mix(in srgb, var(--tb-warn) 48%, transparent);
+  background: color-mix(in srgb, var(--tb-warn) 14%, var(--surface)); }
+.tb-banner-danger { border-color: color-mix(in srgb, var(--tb-bad) 48%, transparent);
+  background: color-mix(in srgb, var(--tb-bad) 12%, var(--surface)); }
+
+/* ---------------------------------------------------------------- pasek narzędzi */
+.tb-toolbar {
+  display: flex; align-items: center; gap: var(--sp-2);
+  flex-wrap: wrap;
+  margin-bottom: var(--sp-3);
+}
+.tb-search { position: relative; flex: 0 1 240px; min-width: 150px; }
+.tb-search .tb-input { padding-left: 30px; }
+.tb-search::before {
+  content: "⌕"; position: absolute; left: 10px; top: 50%;
+  transform: translateY(-50%); color: var(--muted); font-size: 15px; pointer-events: none;
+}
+.tb-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.tb-chip-btn {
+  font: inherit; font-size: 12px; font-weight: 500;
+  padding: 4px 11px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-2);
+  cursor: pointer;
+}
+.tb-chip-btn:hover { background: var(--hover); color: var(--text); }
+.tb-chip-btn[aria-pressed="true"] {
+  background: var(--accent); border-color: var(--accent); color: #fff;
+}
+.tb-count { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* ---------------------------------------------------------------- tabela */
+.tb-table-wrap {
+  border: 1px solid var(--border);
+  border-radius: var(--r-inner);
+  overflow: auto;
+  max-height: 70vh;
+}
+.tb-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; }
+.tb-table th, .tb-table td {
+  padding: 8px 10px;
+  text-align: left;
+  border-bottom: 1px solid var(--divider);
+  vertical-align: middle;
+}
+.tb-table thead th {
+  position: sticky; top: 0; z-index: 2;
+  background: var(--tb-solid);
+  color: var(--text-2);
+  font-size: 11.5px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: .04em;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--border);
+}
+.tb-table tfoot td {
+  position: sticky; bottom: 0;
+  background: var(--tb-solid);
+  font-weight: 600;
+  border-top: 1px solid var(--border);
+  border-bottom: 0;
+}
+.tb-table tbody tr:hover { background: var(--hover); }
+.tb-table tbody tr.is-selected { background: color-mix(in srgb, var(--accent) 14%, transparent); }
+.tb-table tbody tr:last-child td { border-bottom: 0; }
+.tb-table .is-num { text-align: right; font-variant-numeric: tabular-nums; }
+.tb-table th[data-sortable] { cursor: pointer; user-select: none; }
+.tb-table th[data-sortable]:hover { color: var(--text); }
+.tb-table th[data-sortable]::after {
+  content: "↕"; margin-left: 5px; opacity: .35; font-size: 10px;
+}
+.tb-table th[aria-sort="ascending"]::after { content: "↑"; opacity: 1; }
+.tb-table th[aria-sort="descending"]::after { content: "↓"; opacity: 1; }
+.tb-table .tb-col-sel { width: 34px; text-align: center; padding-right: 0; }
+.tb-table .tb-col-sel .tb-check { margin: 0 auto; display: block; }
+.tb-table td.tb-cell-edit { padding: 2px 4px; }
+.tb-table td.tb-cell-edit .tb-input,
+.tb-table td.tb-cell-edit .tb-select {
+  min-height: 28px; padding: 3px 7px; font-size: 13px; border-radius: 6px;
+}
+.tb-table td.is-clip { max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tb-cell-warn {
+  text-decoration: underline dotted var(--tb-warn);
+  text-underline-offset: 3px;
+  cursor: help;
+}
+.tb-row-click { cursor: pointer; }
+
+/* paginacja */
+.tb-pager {
+  display: flex; align-items: center; gap: var(--sp-2);
+  margin-top: var(--sp-3); flex-wrap: wrap;
+  font-size: 12.5px; color: var(--text-2);
+}
+.tb-pager .tb-pg {
+  font: inherit; min-width: 28px; height: 28px; padding: 0 7px;
+  border-radius: 7px; border: 1px solid var(--border);
+  background: transparent; color: var(--text-2); cursor: pointer;
+}
+.tb-pager .tb-pg:hover:not(:disabled) { background: var(--hover); color: var(--text); }
+.tb-pager .tb-pg[aria-current="page"] {
+  background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600;
+}
+.tb-pager .tb-pg:disabled { opacity: .4; cursor: not-allowed; }
+
+/* ---------------------------------------------------------------- listy */
+.tb-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.tb-list-item {
+  display: flex; align-items: center; gap: var(--sp-3);
+  padding: 9px 0;
+  border-bottom: 1px solid var(--divider);
+  font-size: 13px;
+  min-width: 0;
+}
+.tb-list-item:last-child { border-bottom: 0; }
+.tb-rank {
+  width: 20px; height: 20px; flex: none;
+  border-radius: 6px; background: var(--surface-2);
+  display: grid; place-items: center;
+  font-size: 11px; font-weight: 700; color: var(--text-2);
+}
+.tb-list-body { flex: 1; min-width: 0; }
+.tb-list-title { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tb-list-meta { display: block; font-size: 11.5px; color: var(--muted); }
+.tb-list-value { font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* ---------------------------------------------------------------- pasek postępu
+   Motywy mają .bar jako tor; wypełnienie dokładamy my. */
+.tb-bar-fill { height: 100%; border-radius: 99px; background: var(--accent); }
+.tb-bar-fill-ok { background: var(--tb-ok); }
+.tb-bar-fill-warn { background: var(--tb-warn); }
+.tb-bar-fill-bad { background: var(--tb-bad); }
+.tb-bar-meta {
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-size: 12px; color: var(--text-2); margin-bottom: 5px;
+}
+.tb-bar-meta b { color: var(--text); font-variant-numeric: tabular-nums; }
+
+/* ---------------------------------------------------------------- checklista */
+.tb-checklist { display: flex; flex-direction: column; gap: 2px; }
+.tb-check-group {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .05em; color: var(--muted);
+  margin: var(--sp-3) 0 var(--sp-1);
+}
+.tb-check-group:first-child { margin-top: 0; }
+.tb-check-item {
+  display: flex; align-items: center; gap: var(--sp-3);
+  padding: 7px 8px;
+  border-radius: var(--r-inner);
+  font-size: 13px;
+}
+.tb-check-item:hover { background: var(--hover); }
+.tb-check-item.is-done .tb-check-text { color: var(--muted); text-decoration: line-through; }
+.tb-check-text {
+  flex: 1; min-width: 0; cursor: text;
+  overflow: hidden; text-overflow: ellipsis;
+}
+.tb-check-due { font-size: 11.5px; color: var(--muted); white-space: nowrap; }
+.tb-check-item.is-overdue .tb-check-due { color: var(--tb-bad); font-weight: 600; }
+.tb-check-add {
+  display: flex; gap: var(--sp-2); align-items: center; margin-top: var(--sp-3);
+}
+
+/* ---------------------------------------------------------------- karteczki */
+.tb-notes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: var(--sp-3);
+}
+.tb-note {
+  --tb-note-c: var(--c1);
+  position: relative;
+  min-height: 120px;
+  padding: var(--sp-3) var(--sp-3) 26px;
+  border-radius: var(--r-inner);
+  background: color-mix(in srgb, var(--tb-note-c) 20%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--tb-note-c) 42%, transparent);
+  font-size: 13px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.tb-note:focus-within { box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent); }
+.tb-note-text { outline: none; min-height: 60px; display: block; }
+.tb-note-text:empty::before { content: attr(data-placeholder); color: var(--muted); }
+.tb-note-foot {
+  position: absolute; left: var(--sp-3); right: var(--sp-3); bottom: 7px;
+  display: flex; align-items: center; gap: 5px;
+  font-size: 10.5px; color: var(--text-2);
+}
+.tb-note-colors { display: flex; gap: 3px; margin-left: auto; }
+.tb-note-colors button {
+  width: 13px; height: 13px; border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--text) 25%, transparent);
+  cursor: pointer; padding: 0;
+}
+.tb-note-c1 { --tb-note-c: var(--c1); }
+.tb-note-c2 { --tb-note-c: var(--c2); }
+.tb-note-c3 { --tb-note-c: var(--c3); }
+.tb-note-c4 { --tb-note-c: var(--c4); }
+.tb-note-c5 { --tb-note-c: var(--c5); }
+/* karteczki przypięte do wiersza — węższe, w drawerze szczegółów */
+.tb-note-pinned { min-height: 0; padding: var(--sp-2) var(--sp-3) 22px; }
+
+/* ---------------------------------------------------------------- agenda */
+.tb-agenda { display: flex; flex-direction: column; gap: var(--sp-4); }
+.tb-agenda-day { display: flex; flex-direction: column; gap: 2px; }
+.tb-agenda-date {
+  display: flex; align-items: baseline; gap: var(--sp-2);
+  font-size: 12px; font-weight: 700;
+  color: var(--text-2);
+  padding-bottom: 5px;
+  border-bottom: 1px solid var(--divider);
+  margin-bottom: 5px;
+}
+.tb-agenda-date small { font-weight: 500; color: var(--muted); }
+.tb-agenda-day.is-today .tb-agenda-date { color: var(--accent); }
+.tb-agenda-day.is-overdue .tb-agenda-date { color: var(--tb-bad); }
+.tb-agenda-item {
+  display: flex; align-items: center; gap: var(--sp-3);
+  padding: 7px 8px; border-radius: var(--r-inner);
+  font-size: 13px; cursor: pointer; min-width: 0;
+}
+.tb-agenda-item:hover { background: var(--hover); }
+.tb-agenda-item .tb-dot { width: 7px; height: 7px; }
+.tb-agenda-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tb-agenda-meta { font-size: 11.5px; color: var(--muted); white-space: nowrap; }
+
+/* ---------------------------------------------------------------- modal */
+.tb-modal {
+  /* Motywy mają uniwersalny reset * { margin:0 }, który kasuje margin:auto
+     z domyślnych stylów przeglądarki dla <dialog> — bez tego modal ląduje
+     w lewym górnym rogu zamiast na środku. */
+  margin: auto;
+  width: min(560px, calc(100vw - 32px));
+  max-height: calc(100vh - 64px);
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--r-card);
+  background: var(--tb-solid);
+  color: var(--text);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.tb-modal::backdrop { background: rgba(0, 0, 0, .5); }
+.tb-modal-sm { width: min(400px, calc(100vw - 32px)); }
+.tb-modal-lg { width: min(880px, calc(100vw - 32px)); }
+.tb-modal-xl { width: min(1180px, calc(100vw - 32px)); }
+.tb-modal-head {
+  display: flex; align-items: flex-start; gap: var(--sp-3);
+  padding: var(--sp-4);
+  border-bottom: 1px solid var(--divider);
+}
+.tb-modal-title { font-family: var(--font-head); font-size: 16px; font-weight: 600; margin: 0; }
+.tb-modal-sub { font-size: 12.5px; color: var(--muted); margin: 3px 0 0; }
+.tb-modal-close {
+  margin-left: auto; flex: none;
+  width: 28px; height: 28px; border-radius: 8px;
+  border: 1px solid var(--border); background: transparent;
+  color: var(--text-2); cursor: pointer; font-size: 14px; line-height: 1;
+}
+.tb-modal-close:hover { background: var(--hover); color: var(--text); }
+.tb-modal-body {
+  padding: var(--sp-4);
+  overflow: auto;
+  max-height: calc(100vh - 220px);
+  display: flex; flex-direction: column; gap: var(--sp-3);
+}
+.tb-modal-foot {
+  display: flex; justify-content: flex-end; gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-4);
+  border-top: 1px solid var(--divider);
+  background: var(--surface-2);
+  flex-wrap: wrap;
+}
+.tb-kv { display: grid; grid-template-columns: auto 1fr; gap: 7px var(--sp-4); margin: 0; font-size: 13px; }
+.tb-kv dt { color: var(--muted); }
+.tb-kv dd { margin: 0; font-weight: 500; }
+
+/* ---------------------------------------------------------------- drawer */
+.tb-drawer {
+  position: fixed; inset: 0 0 0 auto;
+  width: min(520px, 100vw);
+  max-width: 100vw;
+  background: var(--tb-solid);
+  border-left: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  z-index: 60;
+  display: flex; flex-direction: column;
+  transform: translateX(100%);
+  transition: transform .18s ease;
+}
+.tb-drawer.is-open { transform: translateX(0); }
+.tb-drawer-backdrop {
+  position: fixed; inset: 0; background: rgba(0, 0, 0, .4);
+  z-index: 55; opacity: 0; transition: opacity .18s ease;
+}
+.tb-drawer-backdrop.is-open { opacity: 1; }
+.tb-drawer-head {
+  display: flex; align-items: flex-start; gap: var(--sp-3);
+  padding: var(--sp-4);
+  border-bottom: 1px solid var(--divider);
+}
+.tb-drawer-body {
+  flex: 1; overflow: auto; padding: var(--sp-4);
+  display: flex; flex-direction: column; gap: var(--sp-4);
+}
+.tb-drawer-foot {
+  display: flex; justify-content: flex-end; gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-4);
+  border-top: 1px solid var(--divider);
+  background: var(--surface-2);
+  flex-wrap: wrap;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tb-drawer, .tb-drawer-backdrop { transition: none; }
+}
+
+/* ---------------------------------------------------------------- menu kontekstowe */
+.tb-menu {
+  position: fixed; z-index: 90;
+  min-width: 200px; max-width: 280px;
+  padding: 5px;
+  background: var(--tb-solid);
+  border: 1px solid var(--border);
+  border-radius: var(--r-inner);
+  box-shadow: var(--shadow);
+  font-size: 13px;
+}
+.tb-menu-item {
+  display: flex; align-items: center; gap: var(--sp-2);
+  width: 100%;
+  padding: 7px 9px;
+  border: 0; border-radius: 7px;
+  background: transparent;
+  color: var(--text);
+  font: inherit; text-align: left;
+  cursor: pointer;
+}
+.tb-menu-item:hover:not(:disabled), .tb-menu-item:focus-visible { background: var(--hover); }
+.tb-menu-item:disabled { opacity: .45; cursor: not-allowed; }
+.tb-menu-item i { font-style: normal; width: 16px; flex: none; text-align: center; opacity: .8; }
+.tb-menu-item kbd {
+  margin-left: auto; font-family: var(--font-mono); font-size: 10.5px;
+  color: var(--muted); background: var(--surface-2);
+  border: 1px solid var(--border); border-radius: 4px; padding: 1px 4px;
+}
+.tb-menu-item-danger { color: var(--tb-bad); }
+.tb-menu-sep { height: 1px; background: var(--divider); margin: 4px 2px; }
+.tb-menu-head {
+  padding: 5px 9px 4px; font-size: 10.5px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .05em; color: var(--muted);
+}
+
+/* ---------------------------------------------------------------- dropzone */
+.tb-dropzone {
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  padding: var(--sp-6) var(--sp-4);
+  border: 1.5px dashed color-mix(in srgb, var(--accent) 45%, var(--border));
+  border-radius: var(--r-card);
+  background: color-mix(in srgb, var(--accent) 5%, transparent);
+  cursor: pointer; text-align: center;
+}
+.tb-dropzone:hover, .tb-dropzone.is-dragover {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+.tb-dropzone input[type="file"] { display: none; }
+.tb-dropzone-title { font-size: 13.5px; font-weight: 600; }
+.tb-dropzone-hint { font-size: 12px; color: var(--muted); }
+.tb-file {
+  display: flex; align-items: center; gap: var(--sp-3);
+  padding: 9px 12px;
+  border: 1px solid var(--border); border-radius: var(--r-inner);
+  background: var(--surface-2); font-size: 13px;
+}
+.tb-file-ext {
+  font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+  padding: 3px 6px; border-radius: 5px;
+  background: var(--accent); color: #fff; flex: none;
+}
+
+/* ---------------------------------------------------------------- empty / skeleton */
+.tb-empty {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: var(--sp-8) var(--sp-4);
+  text-align: center; color: var(--text-2); font-size: 13px;
+}
+.tb-empty strong { font-size: 14.5px; color: var(--text); }
+.tb-empty-actions { display: flex; gap: var(--sp-2); margin-top: var(--sp-2); flex-wrap: wrap; justify-content: center; }
+.tb-skeleton {
+  height: 12px; border-radius: 6px;
+  background: linear-gradient(90deg,
+    var(--surface-2) 0%,
+    color-mix(in srgb, var(--text) 10%, var(--surface-2)) 50%,
+    var(--surface-2) 100%);
+  background-size: 200% 100%;
+  animation: tb-shimmer 1.3s linear infinite;
+}
+@keyframes tb-shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+@media (prefers-reduced-motion: reduce) { .tb-skeleton { animation: none; } }
+
+/* ---------------------------------------------------------------- wskaźnik zapisu */
+.tb-save {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; color: var(--text-2);
+  padding: 4px 10px; border-radius: var(--r-pill);
+  border: 1px solid var(--border); background: var(--tb-solid);
+  white-space: nowrap;
+}
+.tb-save::before {
+  content: ""; width: 7px; height: 7px; border-radius: 50%; flex: none;
+  background: var(--tb-neutral);
+}
+.tb-save[data-state="saved"]::before { background: var(--tb-ok); }
+.tb-save[data-state="dirty"]::before { background: var(--tb-warn); }
+.tb-save[data-state="saving"]::before { background: var(--tb-info); animation: tb-pulse .9s ease-in-out infinite; }
+.tb-save[data-state="off"]::before { background: var(--tb-bad); }
+@keyframes tb-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .3; } }
+@media (prefers-reduced-motion: reduce) { .tb-save[data-state="saving"]::before { animation: none; } }
+
+/* Tony toasta. Motywy dają samo .toast (+ .show); ton dokładamy kropką,
+   nie podmianą tła — żeby nie tracić wyglądu toasta z motywu. */
+.tb-body .toast { display: inline-flex; align-items: center; gap: 8px; }
+.tb-body .toast[class*="tb-toast-"]::before {
+  content: ""; width: 7px; height: 7px; border-radius: 50%; flex: none;
+}
+.tb-body .toast.tb-toast-success::before { background: var(--tb-ok); }
+.tb-body .toast.tb-toast-warning::before { background: var(--tb-warn); }
+.tb-body .toast.tb-toast-danger::before { background: var(--tb-bad); }
+
+/* ---------------------------------------------------------------- profil i awatar
+   Motywy dają .av (koło 30px) bez tła — tło ustawiamy inline kolorem profilu
+   albo zdjęciem. */
+.tb-profile {
+  display: flex; align-items: center; gap: var(--sp-2);
+  width: 100%; padding: 7px 8px;
+  border: 1px solid transparent; border-radius: var(--r-inner);
+  background: transparent; color: inherit; font: inherit;
+  cursor: pointer; text-align: left; min-width: 0;
+}
+.tb-profile:hover { background: var(--hover); border-color: var(--border); }
+.tb-profile-body { min-width: 0; flex: 1; }
+.tb-profile-name {
+  display: block; font-size: 12.5px; font-weight: 600;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.tb-profile-team {
+  display: block; font-size: 11px; color: var(--muted);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.tb-avatar {
+  width: 30px; height: 30px; flex: none;
+  border-radius: 50%; display: grid; place-items: center;
+  font-size: 11px; font-weight: 700; color: #fff;
+  background-size: cover; background-position: center;
+  border: 1.5px solid color-mix(in srgb, var(--text) 22%, transparent);
+  overflow: hidden;
+}
+.tb-avatar-lg { width: 64px; height: 64px; font-size: 22px; }
+.tb-avatar-has-photo { color: transparent; }
+.tb-colors { display: flex; gap: 6px; flex-wrap: wrap; }
+.tb-colors button {
+  width: 26px; height: 26px; border-radius: 50%; cursor: pointer; padding: 0;
+  border: 2px solid transparent;
+}
+.tb-colors button[aria-pressed="true"] {
+  border-color: var(--text);
+  box-shadow: 0 0 0 2px var(--surface);
+}
+.tb-profile-edit { display: flex; align-items: center; gap: var(--sp-4); flex-wrap: wrap; }
+
+/* ---------------------------------------------------------------- alerty */
+.tb-bell {
+  position: relative; flex: none;
+  width: 32px; height: 32px; padding: 0;
+  border: 1px solid var(--border); border-radius: var(--r-inner);
+  background: var(--tb-solid); color: var(--text-2);
+  cursor: pointer; font-size: 14px; line-height: 1;
+}
+.tb-bell:hover { color: var(--text); background: var(--hover); }
+.tb-bell-count {
+  position: absolute; top: -6px; right: -6px;
+  min-width: 17px; height: 17px; padding: 0 4px;
+  border-radius: 999px;
+  background: var(--tb-bad); color: #fff;
+  font-size: 10px; font-weight: 700; line-height: 17px;
+  text-align: center;
+}
+.tb-bell[data-tone="warning"] .tb-bell-count { background: var(--tb-warn); color: var(--text); }
+.tb-bell[data-tone="info"] .tb-bell-count { background: var(--tb-info); }
+.tb-alert-item { align-items: flex-start; }
+.tb-alert-item .tb-alert-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex: none; margin-top: 5px;
+}
+.tb-alert-body { min-width: 0; }
+.tb-alert-title { display: block; font-weight: 600; }
+.tb-alert-text { display: block; font-size: 11.5px; color: var(--muted); white-space: normal; }
+
+/* ---------------------------------------------------------------- tooltip UI */
+.tb-tip { position: relative; }
+.tb-tip[data-tip]:hover::after, .tb-tip[data-tip]:focus-visible::after {
+  content: attr(data-tip);
+  position: absolute; bottom: calc(100% + 6px); left: 50%;
+  transform: translateX(-50%);
+  background: var(--tb-solid); color: var(--text);
+  border: 1px solid var(--border); box-shadow: var(--shadow);
+  border-radius: 7px; padding: 4px 8px;
+  font-size: 11.5px; font-weight: 500; white-space: nowrap;
+  z-index: 70; pointer-events: none;
+}
+
+/* ---------------------------------------------------------------- accordion */
+.tb-acc { border: 1px solid var(--border); border-radius: var(--r-inner); overflow: hidden; }
+.tb-acc + .tb-acc { margin-top: var(--sp-2); }
+.tb-acc > summary {
+  padding: 10px var(--sp-4);
+  cursor: pointer; font-size: 13.5px; font-weight: 600;
+  display: flex; align-items: center; gap: var(--sp-2);
+  background: var(--surface-2);
+  list-style: none;
+}
+.tb-acc > summary::-webkit-details-marker { display: none; }
+.tb-acc > summary::before { content: "▸"; font-size: 11px; color: var(--muted); transition: transform .15s; }
+.tb-acc[open] > summary::before { transform: rotate(90deg); }
+.tb-acc-body { padding: var(--sp-4); display: flex; flex-direction: column; gap: var(--sp-3); }
+
+/* ---------------------------------------------------------------- stepper */
+.tb-steps { display: flex; align-items: center; gap: var(--sp-2); flex-wrap: wrap; list-style: none; margin: 0; padding: 0; }
+.tb-step {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 12.5px; color: var(--muted);
+}
+.tb-step::before {
+  content: attr(data-n);
+  width: 22px; height: 22px; flex: none;
+  border-radius: 50%; border: 1px solid var(--border);
+  display: grid; place-items: center;
+  font-size: 11px; font-weight: 700;
+  background: var(--surface);
+}
+.tb-step.is-active { color: var(--text); font-weight: 600; }
+.tb-step.is-active::before { background: var(--accent); border-color: var(--accent); color: #fff; }
+.tb-step.is-done::before { content: "✓"; background: var(--tb-ok); border-color: var(--tb-ok); color: #fff; }
+.tb-step-sep { width: 18px; height: 1px; background: var(--divider); flex: none; }
+
+/* ---------------------------------------------------------------- breadcrumbs */
+.tb-crumbs {
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  list-style: none; margin: 0; padding: 0;
+  font-size: 12.5px; color: var(--muted);
+}
+.tb-crumbs a { color: var(--text-2); text-decoration: none; }
+.tb-crumbs a:hover { color: var(--text); text-decoration: underline; }
+.tb-crumbs li + li::before { content: "/"; margin-right: 6px; opacity: .55; }
+.tb-crumbs li[aria-current="page"] { color: var(--text); font-weight: 600; }
+
+/* ---------------------------------------------------------------- brama przeglądarki */
+.tb-gate {
+  position: fixed; inset: 0; z-index: 200;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: var(--sp-3); padding: var(--sp-8);
+  background: var(--page-bg); color: var(--text); text-align: center;
+}
+.tb-gate h1 { font-family: var(--font-head); font-size: 22px; margin: 0; }
+.tb-gate p { max-width: 46ch; color: var(--text-2); font-size: 14px; margin: 0; }

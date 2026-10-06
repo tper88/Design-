@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tracker builder</title>
+<style><!--WZ:THEMECSS--></style>
+<style><!--WZ:EXTRACSS--></style>
+<style><!--WZ:WIZARDCSS--></style>
+</head>
+<body class="tb-body">
+
+<div class="tb-page">
+  <div class="tb-frame wz-frame">
+    <aside class="tb-side">
+      <div class="tb-brand"><i>▦</i><span>Tracker builder</span></div>
+      <nav class="tb-nav" id="wz-rail" aria-label="Wizard steps"></nav>
+      <div class="tb-spacer"></div>
+      <div class="wz-side-note tb-muted" id="wz-side-note"></div>
+    </aside>
+
+    <main class="tb-main">
+      <header class="tb-head">
+        <h1 class="tb-title" id="wz-step-title">Start</h1>
+        <div class="tb-spacer"></div>
+        <div class="tb-flexrow">
+          <span class="tb-count" id="wz-progress"></span>
+          <button type="button" class="btn btn-ghost" id="wz-prev">← Back</button>
+          <button type="button" class="btn btn-primary" id="wz-next">Next →</button>
+        </div>
+      </header>
+
+      <div id="wz-errors" class="tb-stack" style="gap:8px"></div>
+
+      <section class="tb-stack" id="wz-step-0">
+        <div class="card">
+          <div class="card-h"><div class="card-t">Let’s start</div></div>
+          <p class="tb-dim" style="font-size:13.5px;margin:0 0 14px">
+            This builder produces a single HTML file that runs without an internet connection and
+            writes your data to a <code>.json</code> file on your own disk.
+          </p>
+          <div class="tb-grid tb-grid-2" id="wz-start-cards"></div>
+        </div>
+        <div class="card">
+          <div class="card-h"><div class="card-t">Already have a tracker and want to change it</div></div>
+          <p class="tb-dim" style="font-size:13.5px;margin:0 0 12px">
+            Load the <code>.tracker.json</code> the builder saved next to your tracker. Its structure
+            comes back for editing — including the style — and the data inside the deployed tracker
+            is left untouched.
+          </p>
+          <label class="tb-dropzone" id="wz-cfg-zone">
+            <input type="file" id="wz-cfg-file" accept=".json,application/json">
+            <span class="tb-dropzone-title">Drop a .tracker.json file here, or click to pick one</span>
+            <span class="tb-dropzone-hint">Do not have one? Start from a template — it only takes a few steps.</span>
+          </label>
+        </div>
+      </section>
+
+      <section class="tb-stack" id="wz-step-1" hidden></section>
+      <section class="tb-stack" id="wz-step-2" hidden></section>
+      <section class="tb-stack" id="wz-step-3" hidden></section>
+      <section class="tb-stack" id="wz-step-4" hidden></section>
+      <section class="tb-stack" id="wz-step-5" hidden></section>
+      <section class="tb-stack" id="wz-step-6" hidden></section>
+    </main>
+  </div>
+</div>
+
+<!-- Assety trackera trzymane jako base64. Dzięki temu literalne "</script"
+     albo "-->" w kodzie CSS/JS nie jest w stanie zamknąć wyspy. Samo atob()
+     zepsułoby znaki spoza ASCII, więc dekodujemy przez TextDecoder. -->
+<!--WZ:ASSETS-->
+
+<script><!--WZ:CHARTS--></script>
+<script><!--WZ:UI--></script>
+<script><!--WZ:PARSE--></script>
+<script><!--WZ:WIZARDJS--></script>
+</body>
+</html>

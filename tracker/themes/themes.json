@@ -1,0 +1,140 @@
+{
+  "contract": [
+    "--page-bg",
+    "--surface",
+    "--surface-2",
+    "--text",
+    "--text-2",
+    "--muted",
+    "--border",
+    "--divider",
+    "--accent",
+    "--hover",
+    "--up",
+    "--down",
+    "--c1",
+    "--c2",
+    "--c3",
+    "--c4",
+    "--c5",
+    "--shadow",
+    "--r-card",
+    "--r-inner",
+    "--r-pill",
+    "--sp-1",
+    "--sp-2",
+    "--sp-3",
+    "--sp-4",
+    "--sp-5",
+    "--sp-6",
+    "--sp-8",
+    "--font-head",
+    "--font-body",
+    "--font-mono",
+    "--code-bg",
+    "--code-text",
+    "--toc-bg"
+  ],
+  "themes": [
+    {
+      "id": "soft-corporate",
+      "name": "Soft Corporate",
+      "file": "soft-corporate.css",
+      "bytes": 7830,
+      "fontHref": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap",
+      "swatch": {
+        "pageBg": "#F3F4F8",
+        "surface": "#FFFFFF",
+        "text": "#1E2533",
+        "accent": "#3D6FCC",
+        "series": [
+          "#3D6FCC",
+          "#4FAE9B",
+          "#F2B53A",
+          "#8CC4A8",
+          "#E26A5A"
+        ]
+      }
+    },
+    {
+      "id": "pastel-iridescent",
+      "name": "Pastel Iridescent",
+      "file": "pastel-iridescent.css",
+      "bytes": 8162,
+      "fontHref": "https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=JetBrains+Mono:wght@400;500&display=swap",
+      "swatch": {
+        "pageBg": "#EFEFF2",
+        "surface": "#FFFFFF",
+        "text": "#16161A",
+        "accent": "#0E0E10",
+        "series": [
+          "#A3122A",
+          "#F4A38A",
+          "#A9BEE8",
+          "#B7A4F4",
+          "#F28DB2"
+        ]
+      }
+    },
+    {
+      "id": "frosted-mono",
+      "name": "Frosted Mono Glass",
+      "file": "frosted-mono.css",
+      "bytes": 8209,
+      "fontHref": "https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap",
+      "swatch": {
+        "pageBg": "#E6E4DF",
+        "surface": "rgba(255,255,255,.42)",
+        "text": "#141416",
+        "accent": "#0D0D0F",
+        "series": [
+          "#0D0D0F",
+          "#48484C",
+          "#8C8C93",
+          "#FFFFFF",
+          "#C9C6C0"
+        ]
+      }
+    },
+    {
+      "id": "crisp-fintech",
+      "name": "Crisp Fintech",
+      "file": "crisp-fintech.css",
+      "bytes": 8012,
+      "fontHref": "https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap",
+      "swatch": {
+        "pageBg": "#E3E3E6",
+        "surface": "#FFFFFF",
+        "text": "#0F0F11",
+        "accent": "#2F55F5",
+        "series": [
+          "#2F55F5",
+          "#1FAE4B",
+          "#EE5FA7",
+          "#F4833D",
+          "#8FA4FF"
+        ]
+      }
+    },
+    {
+      "id": "amber-dusk",
+      "name": "Amber Dusk",
+      "file": "amber-dusk.css",
+      "bytes": 9169,
+      "fontHref": "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap",
+      "swatch": {
+        "pageBg": "#2A1E19",
+        "surface": "rgba(24,21,22,.62)",
+        "text": "#F4EFEA",
+        "accent": "#F7C59C",
+        "series": [
+          "#F4A95E",
+          "#8EA6F4",
+          "#B7A9F2",
+          "#F2C94C",
+          "#E870A8"
+        ]
+      }
+    }
+  ]
+}

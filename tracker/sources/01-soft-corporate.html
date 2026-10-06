@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Soft Corporate — Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* ---------- Fonty ---------- */
+  --font-head: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* ---------- Neutralne i powierzchnie ---------- */
+  --lm-bg: #F3F4F8;                    /* Background — Tło aplikacji */
+  --lm-surface: #FFFFFF;               /* Surface — Karty i panele */
+  --lm-surface-2: #F8F9FB;             /* Surface 2 — Segmenty, hover, nagłówki tabel */
+  --lm-border: #E5E7EE;                /* Border — Ramki kart, inputów, selectów */
+  --lm-divider: #EEF0F4;               /* Divider — Linie między wierszami, tory pasków */
+
+  /* ---------- Tekst ---------- */
+  --lm-text: #1E2533;                  /* Text primary — Tytuły, liczby KPI */
+  --lm-text-2: #4B5363;                /* Text secondary — Treść, etykiety wierszy */
+  --lm-muted: #8A91A0;                 /* Muted — Podpisy, osie, placeholdery */
+
+  /* ---------- Akcenty i serie danych ---------- */
+  --lm-blue: #3D6FCC;                  /* Blue · primary — Seria 1, linia wykresu, CTA, aktywna zakładka */
+  --lm-blue-light: #8DB0E8;            /* Blue light — Druga tonacja niebieskiego, słupki pomocnicze */
+  --lm-teal: #4FAE9B;                  /* Teal — Seria 2, paski postępu */
+  --lm-amber: #F2B53A;                 /* Amber — Seria 3, gwiazdki ocen, uwaga */
+  --lm-sage: #8CC4A8;                  /* Sage — Seria 4, neutralne segmenty donuta */
+  --lm-coral: #E26A5A;                 /* Coral — Seria 5, spadki, błędy */
+  --lm-orange: #F0973A;                /* Orange — Strzałki „przejdź” w nagłówkach KPI */
+
+  /* ---------- Statusy i tła tonalne ---------- */
+  --lm-green: #3C9A6B;                 /* Positive — Trend ▲, sukces */
+  --lm-blue-soft: #E8F0FC;             /* Blue soft — Tło ikon i chipów niebieskich */
+  --lm-teal-soft: #E3F4EF;             /* Teal soft — Tło ikon sukcesu */
+  --lm-amber-soft: #FDF3DC;            /* Amber soft — Tło ikon ostrzeżeń */
+  --lm-coral-soft: #FCE9E6;            /* Coral soft — Tło ikon błędów */
+
+  /* ---------- Kolejność serii danych w wykresach ---------- */
+  --c1: var(--lm-blue);
+  --c2: var(--lm-teal);
+  --c3: var(--lm-amber);
+  --c4: var(--lm-sage);
+  --c5: var(--lm-coral);
+
+  /* ---------- Gradienty ---------- */
+  --lm-grad-area: linear-gradient(180deg, rgba(61,111,204,.22) 0%, rgba(61,111,204,0) 100%); /* Wypełnienie pod linią wykresu */
+  --lm-grad-teal: linear-gradient(90deg, #4FAE9B 0%, #7CC7B6 100%); /* Paski postępu umiejętności */
+  --lm-grad-blue: linear-gradient(90deg, #3D6FCC 0%, #8DB0E8 100%); /* Paski postępu niebieskie */
+  --lm-grad-logo: conic-gradient(#3D6FCC 0 25%, #4FAE9B 0 50%, #F2B53A 0 75%, #E26A5A 0); /* Pierścień logo, akcent marki */
+
+  /* ---------- Promienie ---------- */
+  --lm-r-card: 12px; /* Karty */
+  --lm-r-inner: 8px; /* Przyciski, inputy, ikony */
+  --lm-r-pill: 999px; /* Paski, avatary, badge */
+
+  /* ---------- Cienie ---------- */
+  --lm-shadow: 0 1px 2px rgba(20,30,50,.04), 0 4px 16px rgba(20,30,50,.05); /* Karty */
+  --lm-shadow-pop: 0 10px 30px rgba(20,30,50,.12); /* Dropdowny, tooltipy */
+
+  /* ---------- Odstępy ---------- */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+
+  /* ---------- Aliasy semantyczne (używaj w komponentach) ---------- */
+  --page-bg: var(--lm-bg);
+  --surface: var(--lm-surface);
+  --surface-2: var(--lm-surface-2);
+  --border: var(--lm-border);
+  --divider: var(--lm-divider);
+  --text: var(--lm-text);
+  --text-2: var(--lm-text-2);
+  --muted: var(--lm-muted);
+  --accent: var(--lm-blue);
+  --hover: #EEF1F6;
+  --toc-bg: rgba(255,255,255,.88);
+  --code-bg: #1E2533;
+  --code-text: #E6EAF2;
+  --r-card: var(--lm-r-card);
+  --r-inner: var(--lm-r-inner);
+  --r-pill: var(--lm-r-pill);
+  --shadow: var(--lm-shadow);
+  --up: var(--lm-green);
+  --down: var(--lm-coral);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-body);background:var(--page-bg);color:var(--text);-webkit-font-smoothing:antialiased;line-height:1.5;min-height:100vh}
+button{font:inherit}
+.wrap{max-width:1240px;margin:0 auto;padding:40px 20px 90px;position:relative;z-index:1}
+.hero{display:grid;gap:14px;padding:8px 0 4px}
+.hero h1{font-family:var(--font-head);font-size:clamp(36px,6.4vw,68px);font-weight:var(--hero-w,600);letter-spacing:-.025em;line-height:1.02}
+.hero .kicker{font-size:14px;color:var(--muted);font-weight:500}
+.hero p{color:var(--text-2);max-width:680px;font-size:16px}
+.hero .meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.toc{position:sticky;top:10px;z-index:20;display:flex;gap:4px;overflow-x:auto;padding:5px;margin:30px 0 0;background:var(--toc-bg);border:1px solid var(--border);border-radius:var(--r-pill);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);scrollbar-width:none;box-shadow:var(--shadow)}
+.toc::-webkit-scrollbar{display:none}
+.toc a{white-space:nowrap;padding:8px 14px;border-radius:var(--r-pill);font-size:13px;font-weight:500;color:var(--text-2);text-decoration:none}
+.toc a:hover,.toc a:focus-visible{background:var(--hover);color:var(--text);outline:none}
+section.block{margin-top:60px;scroll-margin-top:80px}
+.sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:18px;flex-wrap:wrap}
+.sec-head h2{font-family:var(--font-head);font-size:26px;font-weight:600;letter-spacing:-.015em}
+.sec-head span{color:var(--muted);font-size:13px}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);box-shadow:var(--shadow);padding:20px}
+.group-title{font-size:13px;font-weight:600;color:var(--text-2);margin:26px 0 10px}
+.group-title:first-child{margin-top:0}
+.swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:12px}
+.sw{padding:0;display:block;width:100%;font:inherit;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-inner);overflow:hidden;cursor:pointer;text-align:left;color:inherit;transition:transform .15s ease}
+.sw:hover{transform:translateY(-2px)}
+.sw:focus-visible,.btn:focus-visible,.copy:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.sw-color{height:86px;border-bottom:1px solid var(--border)}
+.sw-info{padding:10px 12px 12px}
+.sw-name{font-size:13px;font-weight:600;display:block}
+.sw-hex{font-family:var(--font-mono);font-size:11.5px;color:var(--text-2);display:block;word-break:break-all}
+.sw-var{font-family:var(--font-mono);font-size:11px;color:var(--muted);display:block}
+.sw-use{font-size:11.5px;color:var(--muted);margin-top:5px;line-height:1.35;display:block}
+.series{display:flex;height:46px;border-radius:var(--r-inner);overflow:hidden;margin-top:6px}
+.series div{flex:1;display:flex;align-items:flex-end;padding:6px 8px;font:500 11px var(--font-mono);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.25)}
+.grads{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px}
+.panel.grad{padding:0;overflow:hidden;cursor:pointer}
+.grad .g{height:120px}
+.grad .gi{padding:12px 14px}
+.grad code{display:block;font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-top:4px;word-break:break-all}
+.type-row{display:grid;grid-template-columns:180px 1fr;gap:18px;align-items:center;padding:16px 0;border-bottom:1px solid var(--divider)}
+.type-row:last-child{border-bottom:0}
+.type-meta b{display:block;font-size:13px}
+.type-meta span{font-family:var(--font-mono);font-size:11.5px;color:var(--muted)}
+.tok-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+.rad-row{display:flex;gap:14px;flex-wrap:wrap;margin-top:6px}
+.rad-row .rb{width:78px;height:64px;background:var(--surface-2);border:1.5px solid var(--accent)}
+.rad-row small,.sh small,.spc small{display:block;font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-top:6px}
+.sh{display:flex;gap:16px;flex-wrap:wrap}
+.sh .sb{width:120px;height:74px;background:var(--surface);border-radius:var(--r-inner)}
+.spc .s{height:10px;background:var(--accent);border-radius:3px;opacity:.8}
+.spc div.i{display:grid;grid-template-columns:70px 1fr;align-items:center;gap:10px;margin:7px 0}
+.comp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.comp-label{font-size:12.5px;color:var(--muted);font-weight:500;margin-bottom:14px}
+.flex{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.pb{margin:10px 0}
+.pb-h{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px}
+.chart{width:100%;height:auto;display:block;overflow:visible}
+.codebox{position:relative}
+pre{font-family:var(--font-mono);font-size:12.5px;line-height:1.65;white-space:pre-wrap;word-break:break-word;background:var(--code-bg);color:var(--code-text);border-radius:var(--r-inner);padding:22px;padding-top:56px;max-height:620px;overflow:auto}
+.code-actions{position:absolute;top:12px;right:12px;display:flex;gap:8px}
+.copy{border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.1);color:#fff;border-radius:999px;padding:7px 14px;font-size:12.5px;font-weight:500;cursor:pointer}
+.copy:hover{background:rgba(255,255,255,.2)}
+.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.rules h3{font-family:var(--font-head);font-size:16px;margin-bottom:10px}
+.rules ul{list-style:none;display:grid;gap:9px}
+.rules li{font-size:14px;color:var(--text-2);padding-left:22px;position:relative}
+.rules .do li::before{content:"✓";position:absolute;left:0;color:var(--up);font-weight:700}
+.rules .dont li::before{content:"✕";position:absolute;left:0;color:var(--down);font-weight:700}
+.toast{position:fixed;bottom:26px;left:50%;transform:translate(-50%,16px);opacity:0;pointer-events:none;background:#111;color:#fff;padding:10px 18px;border-radius:999px;font-size:13px;transition:.25s;z-index:99;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+footer{margin-top:70px;color:var(--muted);font-size:12.5px;text-align:center}
+@media (max-width:820px){
+  .dgrid{grid-template-columns:1fr !important}
+  .dgrid>*{grid-column:auto !important;grid-row:auto !important}
+  .type-row{grid-template-columns:1fr;gap:6px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important;scroll-behavior:auto !important}}
+
+:root{--hero-w:600}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);box-shadow:var(--shadow);padding:18px 20px;min-width:0}
+.card-h{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+.card-t{font-size:16px;font-weight:600}
+.btn{font-weight:500;font-size:13px;border-radius:8px;padding:9px 14px;border:1px solid transparent;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--lm-blue);color:#fff;box-shadow:0 1px 2px rgba(61,111,204,.35)}
+.btn-primary:hover{background:#3362BA}
+.btn-secondary{background:#fff;border-color:var(--border);color:var(--text)}
+.btn-ghost{background:transparent;color:var(--text-2)}
+.btn-icon{width:36px;height:36px;border-radius:8px;border:1px solid var(--border);background:#fff;display:inline-grid;place-items:center;color:var(--text-2);cursor:pointer;font-size:10px;letter-spacing:1px}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--border)}
+.tab{padding:8px 12px;font-size:13px;color:var(--muted);font-weight:500;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tab.active{color:var(--lm-blue);border-color:var(--lm-blue)}
+.seg{display:inline-flex;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:3px;gap:2px}
+.seg span{padding:6px 12px;border-radius:6px;font-size:12.5px;color:var(--text-2)}
+.seg .on{background:#fff;box-shadow:0 1px 2px rgba(20,30,50,.08);color:var(--text);font-weight:600}
+.kpi-t{display:flex;justify-content:space-between;font-size:15px;font-weight:500}
+.kpi-t .arr{color:var(--lm-orange)}
+.kpi-v{font-size:34px;font-weight:600;letter-spacing:-.02em;margin-top:6px;display:flex;align-items:baseline;gap:14px;font-variant-numeric:tabular-nums}
+.kpi-s{font-size:13px;color:var(--muted)}
+.trend{font-size:13px;font-weight:600;display:inline-flex;gap:3px;align-items:center;letter-spacing:0}
+.trend.up{color:var(--lm-green)}.trend.down{color:var(--lm-coral)}
+.badge{background:var(--lm-blue);color:#fff;font-size:11px;font-weight:600;padding:3px 8px;border-radius:6px}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--text-2)}
+.chip i{width:8px;height:8px;border-radius:50%;background:var(--c)}
+.bar{height:8px;background:var(--divider);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;background:var(--c)}
+.row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:11px 0;border-bottom:1px solid var(--divider);font-size:14px}
+.row:last-child{border-bottom:0}
+.row>span:first-child{flex:1}
+.input,.select{display:flex;align-items:center;justify-content:space-between;gap:8px;background:#fff;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:13px;color:var(--text-2)}
+.input{justify-content:flex-start;color:var(--muted)}
+.ico{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;background:var(--s);color:var(--c);font-size:14px;flex:none}
+/* demo */
+.lm-shell{background:var(--lm-bg);border:1px solid var(--border);border-radius:16px;padding:18px;box-shadow:var(--lm-shadow-pop)}
+.lm-top{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin-bottom:14px;flex-wrap:wrap}
+.lm-logo{display:flex;align-items:center;gap:10px;font-size:19px;font-weight:600}
+.lm-logo i{width:26px;height:26px;border-radius:50%;background:var(--lm-grad-logo);-webkit-mask:radial-gradient(circle,transparent 6px,#000 7px);mask:radial-gradient(circle,transparent 6px,#000 7px)}
+.lm-logo small{font-weight:400;color:var(--muted);font-size:14px}
+.av{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:600;color:#fff;background:linear-gradient(135deg,#3D6FCC,#4FAE9B);flex:none}
+.dgrid{display:grid;gap:14px}
+.k4{grid-template-columns:repeat(4,1fr);margin-bottom:14px}
+.g21{grid-template-columns:2fr 1fr;margin-bottom:14px}
+.g11{grid-template-columns:1fr 1fr}
+.legend{display:grid;gap:7px;font-size:12.5px;color:var(--text-2)}
+.legend div{display:flex;justify-content:space-between;gap:10px}
+.sat{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.rec{display:flex;gap:12px;align-items:flex-start;padding:12px;border:1px solid var(--border);border-radius:8px;margin-top:10px}
+.rec b{font-size:14px;font-weight:600;display:block}.rec span{font-size:12.5px;color:var(--muted)}
+.tip{position:absolute;right:22px;top:66px;background:var(--lm-blue);color:#fff;font-size:11px;font-weight:600;padding:3px 8px;border-radius:6px}
+
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="kicker">Styl 1 z 4 · referencja: Learning Success Dashboard</div>
+    <h1>Soft Corporate</h1>
+    <p>Jasny, spokojny dashboard analityczny. Szaroniebieskie tło, białe karty z cienką ramką i ledwie widocznym cieniem, dużo danych na jednym ekranie i stonowana paleta: niebieski, morski, bursztyn. Dobry do raportów KPI, operacji, HR i szkoleń.</p>
+  </header>
+  <nav class="toc">
+    <a href="#demo">Podgląd</a><a href="#colors">Kolory</a><a href="#gradients">Gradienty</a><a href="#type">Typografia</a><a href="#tokens">Promienie, cienie, odstępy</a><a href="#components">Komponenty</a><a href="#rules">Zasady</a><a href="#css">CSS tokens</a><a href="#prompt">Prompt</a>
+  </nav>
+
+  <section class="block" id="demo">
+    <div class="sec-head"><h2>Podgląd na żywo</h2><span>Przykładowy dashboard zbudowany wyłącznie z tokenów poniżej</span></div>
+    
+<div class="lm-shell">
+  <div class="lm-top">
+    <div class="lm-logo"><i></i>Learning Success <small>Dashboard ▾</small></div>
+    <div class="flex"><button class="btn-icon" aria-label="Filtr">⛉</button><div class="select" style="min-width:190px"><span>▦ 1 sty – 31 sty 2026</span><span>▾</span></div><div class="av">TK</div></div>
+  </div>
+  <div class="dgrid k4">
+    <div class="card kpi"><div class="kpi-t">Ukończenia <span class="arr" style="color:var(--lm-green)">→</span></div><div class="kpi-v">5.3k <span class="trend up">▲ 15%</span></div><div class="kpi-s">Wszystkie ukończenia</div></div>
+    <div class="card kpi"><div class="kpi-t">Aktywni <span class="arr">→</span></div><div class="kpi-v">1.8k <span class="trend up">▲ 9%</span></div><div class="kpi-s">Aktywni uczestnicy</div></div>
+    <div class="card kpi"><div class="kpi-t">Zaangażowanie <span class="arr" style="color:var(--lm-green)">→</span></div><div class="kpi-v">75% <span class="trend up">▲ 12%</span></div><div class="kpi-s">Wzrost wskaźnika</div></div>
+    <div class="card kpi"><div class="kpi-t">Ocena <span class="arr">→</span></div><div class="kpi-v">4.5 <span style="color:var(--lm-amber);font-size:14px;letter-spacing:1px">★★★★☆</span></div><div class="kpi-s">Średnia z ankiet</div></div>
+  </div>
+  <div class="dgrid g21">
+    <div class="card" style="position:relative"><div class="card-h"><div class="card-t">Przegląd nauki</div><div class="select"><span>Zaangażowanie dzienne</span><span>▾</span></div></div><span class="tip">+812%</span><svg viewBox="0 0 620 230" class="chart" style="font-family:inherit"><line x1="36" x2="608" y1="204.0" y2="204.0" stroke="#EEF0F4"/><text x="28" y="208.0" text-anchor="end" font-size="11" fill="#8A91A0">0</text><line x1="36" x2="608" y1="140.7" y2="140.7" stroke="#EEF0F4"/><text x="28" y="144.7" text-anchor="end" font-size="11" fill="#8A91A0">10K</text><line x1="36" x2="608" y1="77.3" y2="77.3" stroke="#EEF0F4"/><text x="28" y="81.3" text-anchor="end" font-size="11" fill="#8A91A0">20K</text><line x1="36" x2="608" y1="14.0" y2="14.0" stroke="#EEF0F4"/><text x="28" y="18.0" text-anchor="end" font-size="11" fill="#8A91A0">30K</text><text x="36.0" y="224" text-anchor="middle" font-size="11" fill="#8A91A0">Pon</text><text x="99.6" y="224" text-anchor="middle" font-size="11" fill="#8A91A0"></text><text x="163.1" y="224" text-anchor="middle" font-size="11" fill="#8A91A0">Wt</text><text x="226.7" y="224" text-anchor="middle" font-size="11" fill="#8A91A0"></text><text x="290.2" y="224" text-anchor="middle" font-size="11" fill="#8A91A0">Śr</text><text x="353.8" y="224" text-anchor="middle" font-size="11" fill="#8A91A0">Czw</text><text x="417.3" y="224" text-anchor="middle" font-size="11" fill="#8A91A0"></text><text x="480.9" y="224" text-anchor="middle" font-size="11" fill="#8A91A0">Pt</text><text x="544.4" y="224" text-anchor="middle" font-size="11" fill="#8A91A0">Sob</text><text x="608.0" y="224" text-anchor="middle" font-size="11" fill="#8A91A0">Nd</text><defs><linearGradient id="lmA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3D6FCC" stop-opacity="0.25"/><stop offset="1" stop-color="#3D6FCC" stop-opacity="0"/></linearGradient></defs><path d="M36.0,175.9 C46.6,171.2 78.4,157.1 99.6,147.7 C120.7,138.3 141.9,121.9 163.1,119.6 C184.3,117.2 205.5,136.0 226.7,133.6 C247.9,131.3 269.0,112.5 290.2,105.5 C311.4,98.4 332.6,99.6 353.8,91.4 C375.0,83.2 396.1,59.7 417.3,56.2 C438.5,52.7 459.7,66.8 480.9,70.3 C502.1,73.8 523.3,80.9 544.4,77.3 C565.6,73.8 597.4,53.9 608.0,49.2 L608.0,204 L36.0,204 Z" fill="url(#lmA)"/><path d="M36.0,175.9 C46.6,171.2 78.4,157.1 99.6,147.7 C120.7,138.3 141.9,121.9 163.1,119.6 C184.3,117.2 205.5,136.0 226.7,133.6 C247.9,131.3 269.0,112.5 290.2,105.5 C311.4,98.4 332.6,99.6 353.8,91.4 C375.0,83.2 396.1,59.7 417.3,56.2 C438.5,52.7 459.7,66.8 480.9,70.3 C502.1,73.8 523.3,80.9 544.4,77.3 C565.6,73.8 597.4,53.9 608.0,49.2" fill="none" stroke="#3D6FCC" stroke-width="2.5" stroke-linecap="round"/><circle cx="36.0" cy="175.9" r="4" fill="#fff" stroke="#3D6FCC" stroke-width="2"/><circle cx="226.7" cy="133.6" r="4" fill="#fff" stroke="#3D6FCC" stroke-width="2"/><circle cx="417.3" cy="56.2" r="4" fill="#fff" stroke="#3D6FCC" stroke-width="2"/><circle cx="544.4" cy="77.3" r="4" fill="#fff" stroke="#3D6FCC" stroke-width="2"/><circle cx="608.0" cy="49.2" r="4" fill="#fff" stroke="#3D6FCC" stroke-width="2"/></svg></div>
+    <div class="card"><div class="card-h"><div class="card-t">Satysfakcja</div></div>
+      <div style="font-size:24px;font-weight:600;margin-bottom:10px">4 872 <small style="font-size:13px;color:var(--muted);font-weight:400">odpowiedzi</small></div>
+      <div class="sat"><svg viewBox="0 0 150 150" class="donut" style="width:150px;max-width:100%"><circle cx="75.0" cy="75.0" r="66.0" fill="none" stroke="#EEF0F4" stroke-width="18"/><g transform="rotate(-90 75.0 75.0)"><circle cx="75.0" cy="75.0" r="66.0" fill="none" stroke="#3D6FCC" stroke-width="18" stroke-dasharray="196.1 218.6" stroke-dashoffset="0.0" stroke-linecap="butt"/><circle cx="75.0" cy="75.0" r="66.0" fill="none" stroke="#4FAE9B" stroke-width="18" stroke-dasharray="104.8 309.9" stroke-dashoffset="-199.1" stroke-linecap="butt"/><circle cx="75.0" cy="75.0" r="66.0" fill="none" stroke="#F2B53A" stroke-width="18" stroke-dasharray="46.8 367.9" stroke-dashoffset="-306.9" stroke-linecap="butt"/><circle cx="75.0" cy="75.0" r="66.0" fill="none" stroke="#8CC4A8" stroke-width="18" stroke-dasharray="30.2 384.5" stroke-dashoffset="-356.6" stroke-linecap="butt"/><circle cx="75.0" cy="75.0" r="66.0" fill="none" stroke="#E26A5A" stroke-width="18" stroke-dasharray="21.9 392.8" stroke-dashoffset="-389.8" stroke-linecap="butt"/></g><text x="50%" y="75.0" text-anchor="middle" font-size="24" font-weight="600" fill="#1E2533" font-family="'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif">4.5</text><text x="50%" y="95.0" text-anchor="middle" font-size="12" fill="#8A91A0" font-family="'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif">8 065 ocen</text></svg><div class="legend" style="flex:1;min-width:130px">
+        <div><span class="chip"><i style="--c:var(--c1)"></i>Bardzo zadowoleni</span><b>48%</b></div>
+        <div><span class="chip"><i style="--c:var(--c2)"></i>Zadowoleni</span><b>26%</b></div>
+        <div><span class="chip"><i style="--c:var(--c3)"></i>Neutralni</span><b>12%</b></div>
+        <div><span class="chip"><i style="--c:var(--c4)"></i>Niezadowoleni</span><b>8%</b></div>
+        <div><span class="chip"><i style="--c:var(--c5)"></i>Bardzo niezadowoleni</span><b>6%</b></div>
+      </div></div></div>
+  </div>
+  <div class="dgrid g21">
+    <div class="card"><div class="card-h"><div class="card-t">Najpopularniejsze kursy</div><div class="seg"><span class="on">Tydzień</span><span>Miesiąc</span></div></div>
+      <div class="row"><span>Leadership Essentials</span><b style="width:60px;text-align:right">1 264</b><span class="trend up" style="width:56px">▲ 11%</span><div class="bar" style="width:34%"><i style="width:88%;--c:var(--lm-grad-teal)"></i></div></div>
+      <div class="row"><span>Project Management</span><b style="width:60px;text-align:right">1 032</b><span class="trend up" style="width:56px">▲ 8%</span><div class="bar" style="width:34%"><i style="width:70%;--c:var(--lm-amber)"></i></div></div>
+      <div class="row"><span>Data Analysis</span><b style="width:60px;text-align:right">856</b><span class="trend up" style="width:56px">▲ 14%</span><div class="bar" style="width:34%"><i style="width:56%;--c:var(--lm-grad-blue)"></i></div></div>
+    </div>
+    <div class="card"><div class="card-t">Rekomendacje</div>
+      <div class="rec"><div class="ico" style="--s:var(--lm-blue-soft);--c:var(--lm-blue)">⛨</div><div><b>Odśwież kurs cyberbezpieczeństwa</b><span>Najniższe wyniki w kwartale</span></div></div>
+      <div class="rec"><div class="ico" style="--s:var(--lm-teal-soft);--c:var(--lm-teal)">➚</div><div><b>Promuj onboarding zdalny</b><span>Niska świadomość ścieżki</span></div></div>
+    </div>
+  </div>
+  <div class="dgrid g11">
+    <div class="card"><div class="card-t" style="margin-bottom:12px">Rozwój umiejętności</div>
+      <div class="pb"><div class="pb-h"><span><span class="ico" style="display:inline-grid;width:22px;height:22px;font-size:11px;--s:var(--lm-amber-soft);--c:var(--lm-amber);vertical-align:middle;margin-right:8px">●</span>Komunikacja</span><b>77% <span class="trend up">▲ 22%</span></b></div><div class="bar"><i style="width:77%;--c:var(--lm-grad-teal)"></i></div></div>
+      <div class="pb"><div class="pb-h"><span><span class="ico" style="display:inline-grid;width:22px;height:22px;font-size:11px;--s:var(--lm-teal-soft);--c:var(--lm-teal);vertical-align:middle;margin-right:8px">✓</span>Przywództwo</span><b>63% <span class="trend up">▲ 16%</span></b></div><div class="bar"><i style="width:63%;--c:var(--lm-blue-light)"></i></div></div>
+      <div class="pb"><div class="pb-h"><span><span class="ico" style="display:inline-grid;width:22px;height:22px;font-size:11px;--s:var(--lm-blue-soft);--c:var(--lm-blue);vertical-align:middle;margin-right:8px">◆</span>Analityka</span><b>55% <span class="trend up">▲ 12%</span></b></div><div class="bar"><i style="width:55%;--c:var(--lm-grad-blue)"></i></div></div>
+    </div>
+    <div class="card"><div class="card-h"><div class="card-t">Wyniki kwartalne</div><span class="kpi-s">% realizacji celu</span></div><svg viewBox="0 0 460 210" class="chart" style="font-family:inherit"><line x1="32" x2="454" y1="186.0" y2="186.0" stroke="#EEF0F4"/><text x="26" y="190.0" text-anchor="end" font-size="10" fill="#8A91A0">0</text><line x1="32" x2="454" y1="142.0" y2="142.0" stroke="#EEF0F4"/><text x="26" y="146.0" text-anchor="end" font-size="10" fill="#8A91A0">25</text><line x1="32" x2="454" y1="98.0" y2="98.0" stroke="#EEF0F4"/><text x="26" y="102.0" text-anchor="end" font-size="10" fill="#8A91A0">50</text><line x1="32" x2="454" y1="54.0" y2="54.0" stroke="#EEF0F4"/><text x="26" y="58.0" text-anchor="end" font-size="10" fill="#8A91A0">75</text><line x1="32" x2="454" y1="10.0" y2="10.0" stroke="#EEF0F4"/><text x="26" y="14.0" text-anchor="end" font-size="10" fill="#8A91A0">100</text><rect x="62.8" y="50.3" width="44" height="135.7" rx="4" fill="#3D6FCC"/><text x="84.8" y="204" text-anchor="middle" font-size="10.5" fill="#8A91A0">Q1</text><rect x="168.2" y="26.0" width="44" height="160.0" rx="4" fill="#4FAE9B"/><text x="190.2" y="204" text-anchor="middle" font-size="10.5" fill="#8A91A0">Q2</text><rect x="273.8" y="64.3" width="44" height="121.7" rx="4" fill="#8CC4A8"/><text x="295.8" y="204" text-anchor="middle" font-size="10.5" fill="#8A91A0">Q3</text><rect x="379.2" y="33.0" width="44" height="153.0" rx="4" fill="#F2B53A"/><text x="401.2" y="204" text-anchor="middle" font-size="10.5" fill="#8A91A0">Q4</text></svg></div>
+  </div>
+</div>
+  </section>
+
+  <section class="block" id="colors">
+    <div class="sec-head"><h2>Paleta kolorów</h2><span>Kliknij próbkę, żeby skopiować wartość</span></div>
+    <div class="panel"><div class="group-title">Neutralne i powierzchnie</div><div class="swatches"><button class="sw" data-copy="#F3F4F8"><div class="sw-color" style="background:linear-gradient(#F3F4F8,#F3F4F8),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Background</span><span class="sw-hex">#F3F4F8</span><span class="sw-var">--lm-bg</span><span class="sw-use">Tło aplikacji</span></div></button><button class="sw" data-copy="#FFFFFF"><div class="sw-color" style="background:linear-gradient(#FFFFFF,#FFFFFF),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Surface</span><span class="sw-hex">#FFFFFF</span><span class="sw-var">--lm-surface</span><span class="sw-use">Karty i panele</span></div></button><button class="sw" data-copy="#F8F9FB"><div class="sw-color" style="background:linear-gradient(#F8F9FB,#F8F9FB),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Surface 2</span><span class="sw-hex">#F8F9FB</span><span class="sw-var">--lm-surface-2</span><span class="sw-use">Segmenty, hover, nagłówki tabel</span></div></button><button class="sw" data-copy="#E5E7EE"><div class="sw-color" style="background:linear-gradient(#E5E7EE,#E5E7EE),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Border</span><span class="sw-hex">#E5E7EE</span><span class="sw-var">--lm-border</span><span class="sw-use">Ramki kart, inputów, selectów</span></div></button><button class="sw" data-copy="#EEF0F4"><div class="sw-color" style="background:linear-gradient(#EEF0F4,#EEF0F4),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Divider</span><span class="sw-hex">#EEF0F4</span><span class="sw-var">--lm-divider</span><span class="sw-use">Linie między wierszami, tory pasków</span></div></button></div><div class="group-title">Tekst</div><div class="swatches"><button class="sw" data-copy="#1E2533"><div class="sw-color" style="background:linear-gradient(#1E2533,#1E2533),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Text primary</span><span class="sw-hex">#1E2533</span><span class="sw-var">--lm-text</span><span class="sw-use">Tytuły, liczby KPI</span></div></button><button class="sw" data-copy="#4B5363"><div class="sw-color" style="background:linear-gradient(#4B5363,#4B5363),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Text secondary</span><span class="sw-hex">#4B5363</span><span class="sw-var">--lm-text-2</span><span class="sw-use">Treść, etykiety wierszy</span></div></button><button class="sw" data-copy="#8A91A0"><div class="sw-color" style="background:linear-gradient(#8A91A0,#8A91A0),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Muted</span><span class="sw-hex">#8A91A0</span><span class="sw-var">--lm-muted</span><span class="sw-use">Podpisy, osie, placeholdery</span></div></button></div><div class="group-title">Akcenty i serie danych</div><div class="swatches"><button class="sw" data-copy="#3D6FCC"><div class="sw-color" style="background:linear-gradient(#3D6FCC,#3D6FCC),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Blue · primary</span><span class="sw-hex">#3D6FCC</span><span class="sw-var">--lm-blue</span><span class="sw-use">Seria 1, linia wykresu, CTA, aktywna zakładka</span></div></button><button class="sw" data-copy="#8DB0E8"><div class="sw-color" style="background:linear-gradient(#8DB0E8,#8DB0E8),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Blue light</span><span class="sw-hex">#8DB0E8</span><span class="sw-var">--lm-blue-light</span><span class="sw-use">Druga tonacja niebieskiego, słupki pomocnicze</span></div></button><button class="sw" data-copy="#4FAE9B"><div class="sw-color" style="background:linear-gradient(#4FAE9B,#4FAE9B),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Teal</span><span class="sw-hex">#4FAE9B</span><span class="sw-var">--lm-teal</span><span class="sw-use">Seria 2, paski postępu</span></div></button><button class="sw" data-copy="#F2B53A"><div class="sw-color" style="background:linear-gradient(#F2B53A,#F2B53A),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Amber</span><span class="sw-hex">#F2B53A</span><span class="sw-var">--lm-amber</span><span class="sw-use">Seria 3, gwiazdki ocen, uwaga</span></div></button><button class="sw" data-copy="#8CC4A8"><div class="sw-color" style="background:linear-gradient(#8CC4A8,#8CC4A8),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Sage</span><span class="sw-hex">#8CC4A8</span><span class="sw-var">--lm-sage</span><span class="sw-use">Seria 4, neutralne segmenty donuta</span></div></button><button class="sw" data-copy="#E26A5A"><div class="sw-color" style="background:linear-gradient(#E26A5A,#E26A5A),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Coral</span><span class="sw-hex">#E26A5A</span><span class="sw-var">--lm-coral</span><span class="sw-use">Seria 5, spadki, błędy</span></div></button><button class="sw" data-copy="#F0973A"><div class="sw-color" style="background:linear-gradient(#F0973A,#F0973A),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Orange</span><span class="sw-hex">#F0973A</span><span class="sw-var">--lm-orange</span><span class="sw-use">Strzałki „przejdź” w nagłówkach KPI</span></div></button></div><div class="group-title">Statusy i tła tonalne</div><div class="swatches"><button class="sw" data-copy="#3C9A6B"><div class="sw-color" style="background:linear-gradient(#3C9A6B,#3C9A6B),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Positive</span><span class="sw-hex">#3C9A6B</span><span class="sw-var">--lm-green</span><span class="sw-use">Trend ▲, sukces</span></div></button><button class="sw" data-copy="#E8F0FC"><div class="sw-color" style="background:linear-gradient(#E8F0FC,#E8F0FC),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Blue soft</span><span class="sw-hex">#E8F0FC</span><span class="sw-var">--lm-blue-soft</span><span class="sw-use">Tło ikon i chipów niebieskich</span></div></button><button class="sw" data-copy="#E3F4EF"><div class="sw-color" style="background:linear-gradient(#E3F4EF,#E3F4EF),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Teal soft</span><span class="sw-hex">#E3F4EF</span><span class="sw-var">--lm-teal-soft</span><span class="sw-use">Tło ikon sukcesu</span></div></button><button class="sw" data-copy="#FDF3DC"><div class="sw-color" style="background:linear-gradient(#FDF3DC,#FDF3DC),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Amber soft</span><span class="sw-hex">#FDF3DC</span><span class="sw-var">--lm-amber-soft</span><span class="sw-use">Tło ikon ostrzeżeń</span></div></button><button class="sw" data-copy="#FCE9E6"><div class="sw-color" style="background:linear-gradient(#FCE9E6,#FCE9E6),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Coral soft</span><span class="sw-hex">#FCE9E6</span><span class="sw-var">--lm-coral-soft</span><span class="sw-use">Tło ikon błędów</span></div></button></div><div class="group-title">Kolejność serii danych (--c1 … --c5)</div><div class="series"><div style="background:var(--lm-blue)">c1</div><div style="background:var(--lm-teal)">c2</div><div style="background:var(--lm-amber)">c3</div><div style="background:var(--lm-sage)">c4</div><div style="background:var(--lm-coral)">c5</div></div></div>
+  </section>
+
+  <section class="block" id="gradients">
+    <div class="sec-head"><h2>Gradienty i efekty</h2><span>Kliknij, żeby skopiować deklarację CSS</span></div>
+    <div class="grads"><button class="panel grad sw" data-copy="--lm-grad-area: linear-gradient(180deg, rgba(61,111,204,.22) 0%, rgba(61,111,204,0) 100%);"><div class="g" style="background:linear-gradient(180deg, rgba(61,111,204,.22) 0%, rgba(61,111,204,0) 100%)"></div><div class="gi"><span class="sw-name">Area fill</span><span class="sw-use">Wypełnienie pod linią wykresu</span><code>--lm-grad-area</code></div></button><button class="panel grad sw" data-copy="--lm-grad-teal: linear-gradient(90deg, #4FAE9B 0%, #7CC7B6 100%);"><div class="g" style="background:linear-gradient(90deg, #4FAE9B 0%, #7CC7B6 100%)"></div><div class="gi"><span class="sw-name">Teal progress</span><span class="sw-use">Paski postępu umiejętności</span><code>--lm-grad-teal</code></div></button><button class="panel grad sw" data-copy="--lm-grad-blue: linear-gradient(90deg, #3D6FCC 0%, #8DB0E8 100%);"><div class="g" style="background:linear-gradient(90deg, #3D6FCC 0%, #8DB0E8 100%)"></div><div class="gi"><span class="sw-name">Blue progress</span><span class="sw-use">Paski postępu niebieskie</span><code>--lm-grad-blue</code></div></button><button class="panel grad sw" data-copy="--lm-grad-logo: conic-gradient(#3D6FCC 0 25%, #4FAE9B 0 50%, #F2B53A 0 75%, #E26A5A 0);"><div class="g" style="background:conic-gradient(#3D6FCC 0 25%, #4FAE9B 0 50%, #F2B53A 0 75%, #E26A5A 0)"></div><div class="gi"><span class="sw-name">Logo ring</span><span class="sw-use">Pierścień logo, akcent marki</span><code>--lm-grad-logo</code></div></button></div>
+  </section>
+
+  <section class="block" id="type">
+    <div class="sec-head"><h2>Typografia</h2><span>Inter 400/500/600/700 dla całości · JetBrains Mono tylko do kodu</span></div>
+    <div class="panel"><div class="type-row"><div class="type-meta"><b>Display · KPI</b><span>34 / 600 / -2%</span></div><div style="font-size:34px;font-weight:600;letter-spacing:-.02em">5.3k</div></div><div class="type-row"><div class="type-meta"><b>H1 · tytuł strony</b><span>22 / 600</span></div><div style="font-size:22px;font-weight:600">Learning Success Dashboard</div></div><div class="type-row"><div class="type-meta"><b>H2 · tytuł karty</b><span>16 / 600</span></div><div style="font-size:16px;font-weight:600">Learning Overview</div></div><div class="type-row"><div class="type-meta"><b>Body</b><span>14 / 400</span></div><div style="font-size:14px">Leadership Essentials · 1 264 ukończeń</div></div><div class="type-row"><div class="type-meta"><b>Label</b><span>13 / 500 · muted</span></div><div style="font-size:13px;font-weight:500;color:var(--muted)">Total completions</div></div><div class="type-row"><div class="type-meta"><b>Caption · oś</b><span>11 / 500 · muted</span></div><div style="font-size:11px;font-weight:500;color:var(--muted)">Pon  Wt  Śr  Czw  Pt  Sob  Nd</div></div></div>
+  </section>
+
+  <section class="block" id="tokens">
+    <div class="sec-head"><h2>Promienie, cienie, odstępy</h2><span>Hierarchia zaokrągleń i głębi</span></div>
+    <div class="tok-grid">
+      <div class="panel"><div class="comp-label">Border radius</div><div class="rad-row"><div><div class="rb" style="border-radius:12px"></div><small>--lm-r-card<br>12px</small></div><div><div class="rb" style="border-radius:8px"></div><small>--lm-r-inner<br>8px</small></div><div><div class="rb" style="border-radius:999px"></div><small>--lm-r-pill<br>999px</small></div></div></div>
+      <div class="panel"><div class="comp-label">Cienie</div><div class="sh"><div><div class="sb" style="box-shadow:0 1px 2px rgba(20,30,50,.04), 0 4px 16px rgba(20,30,50,.05)"></div><small>--lm-shadow</small></div><div><div class="sb" style="box-shadow:0 10px 30px rgba(20,30,50,.12)"></div><small>--lm-shadow-pop</small></div></div></div>
+      <div class="panel spc"><div class="comp-label">Skala odstępów (siatka 4 px)</div><div class="i"><small style="margin:0">--sp-1</small><div class="s" style="width:4px"></div></div><div class="i"><small style="margin:0">--sp-2</small><div class="s" style="width:8px"></div></div><div class="i"><small style="margin:0">--sp-3</small><div class="s" style="width:12px"></div></div><div class="i"><small style="margin:0">--sp-4</small><div class="s" style="width:16px"></div></div><div class="i"><small style="margin:0">--sp-5</small><div class="s" style="width:20px"></div></div><div class="i"><small style="margin:0">--sp-6</small><div class="s" style="width:24px"></div></div><div class="i"><small style="margin:0">--sp-8</small><div class="s" style="width:32px"></div></div></div>
+    </div>
+  </section>
+
+  <section class="block" id="components">
+    <div class="sec-head"><h2>Komponenty bazowe</h2><span>Te same klasy we wszystkich 4 stylach — zmienia się tylko skórka</span></div>
+    
+<div class="comp-grid">
+  <div class="panel comp"><div class="comp-label">Przyciski</div>
+    <div class="flex">
+      <button class="btn btn-primary">+ Dodaj widget</button>
+      <button class="btn btn-secondary">Filtruj</button>
+      <button class="btn btn-ghost">Anuluj</button>
+      <button class="btn-icon" aria-label="Więcej">•••</button>
+    </div></div>
+  <div class="panel comp"><div class="comp-label">Nawigacja i przełączniki</div>
+    <div class="tabs"><span class="tab active">Przegląd</span><span class="tab">Płatności</span><span class="tab">Raporty</span></div>
+    <div style="height:14px"></div>
+    <div class="seg"><span class="on">Dzień</span><span>Tydzień</span><span>Miesiąc</span><span>Rok</span></div></div>
+  <div class="panel comp"><div class="comp-label">Karta KPI</div>
+    <div class="card kpi">
+      <div class="kpi-t">Aktywni użytkownicy <span class="arr">↗</span></div>
+      <div class="kpi-v">1.8k <span class="trend up">▲ 9%</span></div>
+      <div class="kpi-s">vs poprzedni miesiąc</div>
+    </div></div>
+  <div class="panel comp"><div class="comp-label">Paski postępu (kolory serii)</div>
+    <div class="pb"><div class="pb-h"><span>Seria 1</span><b>77%</b></div><div class="bar"><i style="width:77%;--c:var(--c1)"></i></div></div>
+    <div class="pb"><div class="pb-h"><span>Seria 2</span><b>63%</b></div><div class="bar"><i style="width:63%;--c:var(--c2)"></i></div></div>
+    <div class="pb"><div class="pb-h"><span>Seria 3</span><b>41%</b></div><div class="bar"><i style="width:41%;--c:var(--c3)"></i></div></div></div>
+  <div class="panel comp"><div class="comp-label">Trendy, badge, chipy</div>
+    <div class="flex">
+      <span class="trend up">▲ 12%</span><span class="trend down">▼ 4%</span>
+      <span class="badge">Nowe</span>
+      <span class="chip"><i style="--c:var(--c1)"></i>Marketing</span>
+      <span class="chip"><i style="--c:var(--c2)"></i>Sprzedaż</span>
+      <span class="chip"><i style="--c:var(--c3)"></i>Operacje</span>
+    </div></div>
+  <div class="panel comp"><div class="comp-label">Lista / wiersze tabeli</div>
+    <div class="row"><span>Leadership Essentials</span><b>1 264</b><span class="trend up">▲ 11%</span></div>
+    <div class="row"><span>Project Management</span><b>1 032</b><span class="trend up">▲ 8%</span></div>
+    <div class="row"><span>Data Analysis</span><b>856</b><span class="trend down">▼ 3%</span></div></div>
+  <div class="panel comp"><div class="comp-label">Input i select</div>
+    <div class="input">⌕ <span>Szukaj…</span></div>
+    <div style="height:10px"></div>
+    <div class="select"><span>▦ 1 sty – 31 sty 2026</span><span>▾</span></div></div>
+</div>
+
+  </section>
+
+  <section class="block" id="rules">
+    <div class="sec-head"><h2>Zasady stylu</h2><span>Co trzyma ten styl w ryzach</span></div>
+    <div class="rules">
+      <div class="panel do"><h3>Rób</h3><ul><li>Białe karty 12 px na szaroniebieskim tle, ramka 1 px #E5E7EE plus bardzo delikatny cień.</li><li>Nagłówek karty: tytuł 16/600 po lewej, select lub ikona-przycisk po prawej.</li><li>KPI: tytuł, duża liczba 34/600 i obok zielony trend ▲ 12%, pod spodem szary podpis.</li><li>Ikony w kwadratach 30 px z tonalnym tłem (soft) i kolorem akcentu.</li><li>Paski postępu 8 px, zaokrąglone, na torze #EEF0F4.</li><li>Gęsty, ale uporządkowany układ: 4 KPI w rzędzie, potem siatka 2:1 i 1:1.</li></ul></div>
+      <div class="panel dont"><h3>Unikaj</h3><ul><li>Ciemnych teł i mocnych, nasyconych gradientów w tle kart.</li><li>Cieni głębszych niż --lm-shadow na zwykłych kartach.</li><li>Więcej niż 5 kolorów w jednym wykresie.</li><li>Zaokrągleń powyżej 12 px na kartach — to styl rzeczowy, nie „bąbelkowy”.</li><li>Pogrubień 700+ w liczbach; KPI mają 600.</li></ul></div>
+    </div>
+  </section>
+
+  <section class="block" id="css">
+    <div class="sec-head"><h2>CSS design tokens</h2><span>Wklej do :root w nowym projekcie</span></div>
+    <div class="codebox"><div class="code-actions"><button class="copy" data-copy-target="tokcode">Kopiuj CSS</button></div><pre id="tokcode">:root {
+  /* ---------- Fonty ---------- */
+  --font-head: &#x27;Inter&#x27;, system-ui, -apple-system, &#x27;Segoe UI&#x27;, sans-serif;
+  --font-body: &#x27;Inter&#x27;, system-ui, -apple-system, &#x27;Segoe UI&#x27;, sans-serif;
+  --font-mono: &#x27;JetBrains Mono&#x27;, ui-monospace, monospace;
+
+  /* ---------- Neutralne i powierzchnie ---------- */
+  --lm-bg: #F3F4F8;                    /* Background — Tło aplikacji */
+  --lm-surface: #FFFFFF;               /* Surface — Karty i panele */
+  --lm-surface-2: #F8F9FB;             /* Surface 2 — Segmenty, hover, nagłówki tabel */
+  --lm-border: #E5E7EE;                /* Border — Ramki kart, inputów, selectów */
+  --lm-divider: #EEF0F4;               /* Divider — Linie między wierszami, tory pasków */
+
+  /* ---------- Tekst ---------- */
+  --lm-text: #1E2533;                  /* Text primary — Tytuły, liczby KPI */
+  --lm-text-2: #4B5363;                /* Text secondary — Treść, etykiety wierszy */
+  --lm-muted: #8A91A0;                 /* Muted — Podpisy, osie, placeholdery */
+
+  /* ---------- Akcenty i serie danych ---------- */
+  --lm-blue: #3D6FCC;                  /* Blue · primary — Seria 1, linia wykresu, CTA, aktywna zakładka */
+  --lm-blue-light: #8DB0E8;            /* Blue light — Druga tonacja niebieskiego, słupki pomocnicze */
+  --lm-teal: #4FAE9B;                  /* Teal — Seria 2, paski postępu */
+  --lm-amber: #F2B53A;                 /* Amber — Seria 3, gwiazdki ocen, uwaga */
+  --lm-sage: #8CC4A8;                  /* Sage — Seria 4, neutralne segmenty donuta */
+  --lm-coral: #E26A5A;                 /* Coral — Seria 5, spadki, błędy */
+  --lm-orange: #F0973A;                /* Orange — Strzałki „przejdź” w nagłówkach KPI */
+
+  /* ---------- Statusy i tła tonalne ---------- */
+  --lm-green: #3C9A6B;                 /* Positive — Trend ▲, sukces */
+  --lm-blue-soft: #E8F0FC;             /* Blue soft — Tło ikon i chipów niebieskich */
+  --lm-teal-soft: #E3F4EF;             /* Teal soft — Tło ikon sukcesu */
+  --lm-amber-soft: #FDF3DC;            /* Amber soft — Tło ikon ostrzeżeń */
+  --lm-coral-soft: #FCE9E6;            /* Coral soft — Tło ikon błędów */
+
+  /* ---------- Kolejność serii danych w wykresach ---------- */
+  --c1: var(--lm-blue);
+  --c2: var(--lm-teal);
+  --c3: var(--lm-amber);
+  --c4: var(--lm-sage);
+  --c5: var(--lm-coral);
+
+  /* ---------- Gradienty ---------- */
+  --lm-grad-area: linear-gradient(180deg, rgba(61,111,204,.22) 0%, rgba(61,111,204,0) 100%); /* Wypełnienie pod linią wykresu */
+  --lm-grad-teal: linear-gradient(90deg, #4FAE9B 0%, #7CC7B6 100%); /* Paski postępu umiejętności */
+  --lm-grad-blue: linear-gradient(90deg, #3D6FCC 0%, #8DB0E8 100%); /* Paski postępu niebieskie */
+  --lm-grad-logo: conic-gradient(#3D6FCC 0 25%, #4FAE9B 0 50%, #F2B53A 0 75%, #E26A5A 0); /* Pierścień logo, akcent marki */
+
+  /* ---------- Promienie ---------- */
+  --lm-r-card: 12px; /* Karty */
+  --lm-r-inner: 8px; /* Przyciski, inputy, ikony */
+  --lm-r-pill: 999px; /* Paski, avatary, badge */
+
+  /* ---------- Cienie ---------- */
+  --lm-shadow: 0 1px 2px rgba(20,30,50,.04), 0 4px 16px rgba(20,30,50,.05); /* Karty */
+  --lm-shadow-pop: 0 10px 30px rgba(20,30,50,.12); /* Dropdowny, tooltipy */
+
+  /* ---------- Odstępy ---------- */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+
+  /* ---------- Aliasy semantyczne (używaj w komponentach) ---------- */
+  --page-bg: var(--lm-bg);
+  --surface: var(--lm-surface);
+  --surface-2: var(--lm-surface-2);
+  --border: var(--lm-border);
+  --divider: var(--lm-divider);
+  --text: var(--lm-text);
+  --text-2: var(--lm-text-2);
+  --muted: var(--lm-muted);
+  --accent: var(--lm-blue);
+  --hover: #EEF1F6;
+  --toc-bg: rgba(255,255,255,.88);
+  --code-bg: #1E2533;
+  --code-text: #E6EAF2;
+  --r-card: var(--lm-r-card);
+  --r-inner: var(--lm-r-inner);
+  --r-pill: var(--lm-r-pill);
+  --shadow: var(--lm-shadow);
+  --up: var(--lm-green);
+  --down: var(--lm-coral);
+}</pre></div>
+  </section>
+
+  <section class="block" id="prompt">
+    <div class="sec-head"><h2>Prompt do nowego czatu</h2><span>Wklej w nowej rozmowie lub narzędziu — model odtworzy ten styl</span></div>
+    <div class="codebox"><div class="code-actions"><button class="copy" data-download="01-learnmate-soft-corporate-prompt.md">Pobierz .md</button><button class="copy" data-copy-target="promptcode">Kopiuj prompt</button></div><pre id="promptcode"># Styl: Soft Corporate
+
+Jesteś senior UI designerem i front-end developerem. Budujesz dashboardy jako pojedyncze pliki HTML (HTML + CSS w &lt;style&gt; + JS w &lt;script&gt;). Każdy dashboard, który wygenerujesz w tej rozmowie, ma wyglądać jak z jednej rodziny wizualnej „Soft Corporate”. Trzymaj się ściśle poniższego design systemu: nie dodawaj kolorów, fontów, promieni ani cieni spoza tokenów. Jeśli czegoś brakuje, wyprowadź to z istniejących tokenów (np. przezroczystość istniejącego koloru).
+
+## Charakter stylu
+Jasny, rzeczowy, korporacyjny dashboard analityczny. Szaroniebieskie tło #F3F4F8, białe karty z cienką ramką i minimalnym cieniem. Dużo informacji, ale porządek i oddech. Paleta chłodna (niebieski, morski) z ciepłymi akcentami (bursztyn, koral, pomarańczowe strzałki). Wrażenie: profesjonalny raport HR / L&amp;D / operacyjny.
+
+## Fonty
+&lt;link href=&quot;https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;
+Inter 400/500/600/700 dla całości · JetBrains Mono tylko do kodu
+
+## Design tokens — wklej 1:1 do &lt;style&gt;
+:root {
+  /* ---------- Fonty ---------- */
+  --font-head: &#x27;Inter&#x27;, system-ui, -apple-system, &#x27;Segoe UI&#x27;, sans-serif;
+  --font-body: &#x27;Inter&#x27;, system-ui, -apple-system, &#x27;Segoe UI&#x27;, sans-serif;
+  --font-mono: &#x27;JetBrains Mono&#x27;, ui-monospace, monospace;
+
+  /* ---------- Neutralne i powierzchnie ---------- */
+  --lm-bg: #F3F4F8;                    /* Background — Tło aplikacji */
+  --lm-surface: #FFFFFF;               /* Surface — Karty i panele */
+  --lm-surface-2: #F8F9FB;             /* Surface 2 — Segmenty, hover, nagłówki tabel */
+  --lm-border: #E5E7EE;                /* Border — Ramki kart, inputów, selectów */
+  --lm-divider: #EEF0F4;               /* Divider — Linie między wierszami, tory pasków */
+
+  /* ---------- Tekst ---------- */
+  --lm-text: #1E2533;                  /* Text primary — Tytuły, liczby KPI */
+  --lm-text-2: #4B5363;                /* Text secondary — Treść, etykiety wierszy */
+  --lm-muted: #8A91A0;                 /* Muted — Podpisy, osie, placeholdery */
+
+  /* ---------- Akcenty i serie danych ---------- */
+  --lm-blue: #3D6FCC;                  /* Blue · primary — Seria 1, linia wykresu, CTA, aktywna zakładka */
+  --lm-blue-light: #8DB0E8;            /* Blue light — Druga tonacja niebieskiego, słupki pomocnicze */
+  --lm-teal: #4FAE9B;                  /* Teal — Seria 2, paski postępu */
+  --lm-amber: #F2B53A;                 /* Amber — Seria 3, gwiazdki ocen, uwaga */
+  --lm-sage: #8CC4A8;                  /* Sage — Seria 4, neutralne segmenty donuta */
+  --lm-coral: #E26A5A;                 /* Coral — Seria 5, spadki, błędy */
+  --lm-orange: #F0973A;                /* Orange — Strzałki „przejdź” w nagłówkach KPI */
+
+  /* ---------- Statusy i tła tonalne ---------- */
+  --lm-green: #3C9A6B;                 /* Positive — Trend ▲, sukces */
+  --lm-blue-soft: #E8F0FC;             /* Blue soft — Tło ikon i chipów niebieskich */
+  --lm-teal-soft: #E3F4EF;             /* Teal soft — Tło ikon sukcesu */
+  --lm-amber-soft: #FDF3DC;            /* Amber soft — Tło ikon ostrzeżeń */
+  --lm-coral-soft: #FCE9E6;            /* Coral soft — Tło ikon błędów */
+
+  /* ---------- Kolejność serii danych w wykresach ---------- */
+  --c1: var(--lm-blue);
+  --c2: var(--lm-teal);
+  --c3: var(--lm-amber);
+  --c4: var(--lm-sage);
+  --c5: var(--lm-coral);
+
+  /* ---------- Gradienty ---------- */
+  --lm-grad-area: linear-gradient(180deg, rgba(61,111,204,.22) 0%, rgba(61,111,204,0) 100%); /* Wypełnienie pod linią wykresu */
+  --lm-grad-teal: linear-gradient(90deg, #4FAE9B 0%, #7CC7B6 100%); /* Paski postępu umiejętności */
+  --lm-grad-blue: linear-gradient(90deg, #3D6FCC 0%, #8DB0E8 100%); /* Paski postępu niebieskie */
+  --lm-grad-logo: conic-gradient(#3D6FCC 0 25%, #4FAE9B 0 50%, #F2B53A 0 75%, #E26A5A 0); /* Pierścień logo, akcent marki */
+
+  /* ---------- Promienie ---------- */
+  --lm-r-card: 12px; /* Karty */
+  --lm-r-inner: 8px; /* Przyciski, inputy, ikony */
+  --lm-r-pill: 999px; /* Paski, avatary, badge */
+
+  /* ---------- Cienie ---------- */
+  --lm-shadow: 0 1px 2px rgba(20,30,50,.04), 0 4px 16px rgba(20,30,50,.05); /* Karty */
+  --lm-shadow-pop: 0 10px 30px rgba(20,30,50,.12); /* Dropdowny, tooltipy */
+
+  /* ---------- Odstępy ---------- */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+
+  /* ---------- Aliasy semantyczne (używaj w komponentach) ---------- */
+  --page-bg: var(--lm-bg);
+  --surface: var(--lm-surface);
+  --surface-2: var(--lm-surface-2);
+  --border: var(--lm-border);
+  --divider: var(--lm-divider);
+  --text: var(--lm-text);
+  --text-2: var(--lm-text-2);
+  --muted: var(--lm-muted);
+  --accent: var(--lm-blue);
+  --hover: #EEF1F6;
+  --toc-bg: rgba(255,255,255,.88);
+  --code-bg: #1E2533;
+  --code-text: #E6EAF2;
+  --r-card: var(--lm-r-card);
+  --r-inner: var(--lm-r-inner);
+  --r-pill: var(--lm-r-pill);
+  --shadow: var(--lm-shadow);
+  --up: var(--lm-green);
+  --down: var(--lm-coral);
+}
+
+## Layout
+- Kontener max 1280 px, padding 18–24 px, gap między kartami 14 px.
+- Górny pasek jako biała karta: logo (pierścień z --lm-grad-logo) + tytuł z chevronem ▾ po lewej; ikona filtra, select zakresu dat i avatar po prawej.
+- Rząd 4 kart KPI, pod nim siatka 2fr/1fr (duży wykres + donut), potem 2fr/1fr lub 1fr/1fr (listy, paski, rekomendacje).
+- Wyrównanie do lewej, tytuły kart 16/600, akcje karty po prawej w nagłówku.
+
+## Komponenty
+- Karta: #FFF, border 1px var(--lm-border), radius 12 px, padding 18–20 px, shadow var(--lm-shadow).
+- KPI: tytuł 15/500 + strzałka „→” (orange lub green) po prawej; wartość 34/600 letter-spacing -0.02em; obok trend 13/600 zielony ▲ lub koralowy ▼; podpis 13 px muted.
+- Select / dropdown: biały, border 1 px, radius 8 px, tekst 13 px, chevron ▾.
+- Przycisk primary: tło --lm-blue, biały tekst, radius 8 px; secondary: biały z ramką.
+- Segment control: tło --lm-surface-2 z ramką, aktywny segment biały z mikro-cieniem.
+- Ikony w kwadratach 30 px radius 8 px, tło tonalne *-soft, znak w kolorze akcentu.
+- Listy: wiersze 11 px padding, divider #EEF0F4; nazwa · liczba · trend · pasek postępu 8 px.
+- Rekomendacje / powiadomienia: mini-karty z ramką, ikona + pogrubiony tytuł + szary opis.
+
+## Wykresy
+- Linia: 2.5 px, --lm-blue, wygładzona (monotone/spline), wypełnienie --lm-grad-area, kropki białe z niebieską obwódką tylko na kluczowych punktach.
+- Siatka pozioma 1 px #EEF0F4, bez pionowej; osie 11 px muted; brak ramki wykresu.
+- Donut: grubość ~12% średnicy, odstępy 2–3 px między segmentami, duża wartość w środku 600 + podpis muted; legenda z kropkami obok.
+- Słupki: szerokość ~30 px, radius 4 px, kolory serii; tooltip/wyróżnik jako niebieski badge z białym tekstem.
+- Kolory serii zawsze w kolejności --c1, --c2, --c3, --c4, --c5.
+- Liczby z font-variant-numeric: tabular-nums; separatory tysięcy zgodne z językiem treści.
+- Możesz używać Chart.js / ECharts / ApexCharts z CDN albo inline SVG — ale zawsze ostyluj je tokenami (kolory, fonty, siatka, tooltipy).
+
+## Zasady
+Rób:
+- Białe karty 12 px na szaroniebieskim tle, ramka 1 px #E5E7EE plus bardzo delikatny cień.
+- Nagłówek karty: tytuł 16/600 po lewej, select lub ikona-przycisk po prawej.
+- KPI: tytuł, duża liczba 34/600 i obok zielony trend ▲ 12%, pod spodem szary podpis.
+- Ikony w kwadratach 30 px z tonalnym tłem (soft) i kolorem akcentu.
+- Paski postępu 8 px, zaokrąglone, na torze #EEF0F4.
+- Gęsty, ale uporządkowany układ: 4 KPI w rzędzie, potem siatka 2:1 i 1:1.
+
+Unikaj:
+- Ciemnych teł i mocnych, nasyconych gradientów w tle kart.
+- Cieni głębszych niż --lm-shadow na zwykłych kartach.
+- Więcej niż 5 kolorów w jednym wykresie.
+- Zaokrągleń powyżej 12 px na kartach — to styl rzeczowy, nie „bąbelkowy”.
+- Pogrubień 700+ w liczbach; KPI mają 600.
+
+## Wymagania techniczne
+- Jeden samowystarczalny plik HTML; wszystkie kolory przez var(--…).
+- Responsywność: CSS grid; poniżej 820 px jedna kolumna, karty na pełną szerokość.
+- Widoczny focus dla klawiatury, kontrast tekstu min. 4.5:1, respektuj prefers-reduced-motion.
+- Zanim zaczniesz, dopytaj o dane / KPI, jeśli nie zostały podane — nie wymyślaj metryk biznesowych bez potwierdzenia.
+</pre></div>
+  </section>
+
+  <footer>Soft Corporate · design system wyekstrahowany z referencji · wszystkie wartości do użycia w generatorze dashboardów HTML</footer>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const toast=(m)=>{const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(window.__t);window.__t=setTimeout(()=>t.classList.remove('show'),1600)};
+async function copyText(txt,msg){try{await navigator.clipboard.writeText(txt)}catch(e){const a=document.createElement('textarea');a.value=txt;a.style.position='fixed';a.style.opacity='0';document.body.appendChild(a);a.select();try{document.execCommand('copy')}catch(_){}a.remove()}toast(msg)}
+document.querySelectorAll('[data-copy]').forEach(el=>el.addEventListener('click',()=>copyText(el.dataset.copy,'Skopiowano: '+el.dataset.copy.slice(0,48))));
+document.querySelectorAll('[data-copy-target]').forEach(b=>b.addEventListener('click',()=>copyText(document.getElementById(b.dataset.copyTarget).innerText,'Skopiowano do schowka')));
+document.querySelectorAll('[data-download]').forEach(b=>b.addEventListener('click',()=>{const blob=new Blob([document.getElementById('promptcode').innerText],{type:'text/markdown'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=b.dataset.download;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast('Pobieranie promptu')}));
+
+</script>
+</body>
+</html>

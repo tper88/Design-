@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Frosted Mono Glass — Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* ---------- Fonty ---------- */
+  --font-head: 'Montserrat', system-ui, sans-serif;
+  --font-body: 'Montserrat', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* ---------- Szkło ---------- */
+  --gl-glass: rgba(255,255,255,.42);   /* Glass — Jasny kafel / panel główny */
+  --gl-glass-strong: rgba(255,255,255,.68); /* Glass strong — Pigułki, elementy na szkle, hover */
+  --gl-glass-edge: rgba(255,255,255,.70); /* Glass edge — Obwódka 1 px na szkle */
+  --gl-tile: rgba(58,58,62,.80);       /* Graphite tile — Ciemny kafel (szkło przydymione) */
+  --gl-tile-solid: #48484C;            /* Graphite solid — Ciemny kafel bez przezroczystości */
+
+  /* ---------- Monochrom ---------- */
+  --gl-ink: #0D0D0F;                   /* Ink — Linie danych, pigułki zdarzeń, aktywne punkty */
+  --gl-text: #141416;                  /* Text primary — Tytuły, liczby */
+  --gl-text-2: #4A4A50;                /* Text secondary — Treść */
+  --gl-muted: #8C8C93;                 /* Muted — Podpisy, osie */
+  --gl-line: rgba(20,20,22,.14);       /* Line — Linie siatki, tory pasków */
+  --gl-white: #FFFFFF;                 /* White — Tekst na ciemnych kaflach, kreski danych na grafice */
+  --gl-white-60: rgba(255,255,255,.60); /* White 60 — Drugorzędny tekst na ciemnym */
+
+  /* ---------- Tło (scena) ---------- */
+  --gl-bg-1: #F6F5F2;                  /* Light — Najjaśniejsze partie tła (okna) */
+  --gl-bg-2: #E6E4DF;                  /* Mid — Ściana / podstawowe tło */
+  --gl-bg-3: #C9C6C0;                  /* Shade — Cień na podłodze, dół sceny */
+  --gl-plant: #6F7A63;                 /* Plant (rozmyty) — Tylko jako rozmyta plama w tle */
+
+  /* ---------- Kolejność serii danych w wykresach ---------- */
+  --c1: var(--gl-ink);
+  --c2: var(--gl-tile-solid);
+  --c3: var(--gl-muted);
+  --c4: var(--gl-white);
+  --c5: var(--gl-bg-3);
+
+  /* ---------- Gradienty ---------- */
+  --gl-grad-scene: radial-gradient(900px 600px at 18% 8%, #FFFFFF 0%, transparent 60%), radial-gradient(800px 600px at 88% 18%, #F6F5F2 0%, transparent 60%), linear-gradient(180deg, #DCDAD5 0%, #ECEAE6 45%, #C9C6C0 100%); /* Tło strony, imituje jasne wnętrze */
+  --gl-grad-tile: linear-gradient(160deg, rgba(92,92,96,.86) 0%, rgba(52,52,56,.84) 100%); /* Ciemny kafel z lekkim gradientem */
+  --gl-grad-chrome: radial-gradient(circle at 34% 28%, #FFFFFF 0%, #D6D6DA 16%, #8E8E94 36%, #2A2A2E 62%, #0D0D0F 80%); /* Obiekt 3D / sfera akcentowa */
+  --gl-grad-mountain: linear-gradient(180deg, #0D0D0F 0%, rgba(13,13,15,.55) 60%, rgba(13,13,15,.05) 100%); /* Wypełnienie wykresu obszarowego */
+
+  /* ---------- Promienie ---------- */
+  --gl-r-panel: 32px; /* Główny szklany panel */
+  --gl-r-tile: 22px; /* Kafle */
+  --gl-r-inner: 14px; /* Elementy w kaflu */
+  --gl-r-pill: 999px; /* Pigułki, nawigacja, przełączniki */
+
+  /* ---------- Cienie ---------- */
+  --gl-shadow: 0 10px 36px rgba(0,0,0,.08), inset 0 1px 0 rgba(255,255,255,.75); /* Szkło */
+  --gl-shadow-dark: 0 12px 30px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.12); /* Ciemny kafel */
+  --gl-blur: blur(24px) saturate(140%); /* Wartość do backdrop-filter */
+
+  /* ---------- Odstępy ---------- */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+
+  /* ---------- Aliasy semantyczne (używaj w komponentach) ---------- */
+  --page-bg: var(--gl-bg-2);
+  --surface: var(--gl-glass);
+  --surface-2: var(--gl-glass-strong);
+  --border: var(--gl-glass-edge);
+  --divider: var(--gl-line);
+  --text: var(--gl-text);
+  --text-2: var(--gl-text-2);
+  --muted: var(--gl-muted);
+  --accent: var(--gl-ink);
+  --hover: rgba(255,255,255,.6);
+  --toc-bg: rgba(255,255,255,.45);
+  --code-bg: rgba(20,20,22,.88);
+  --code-text: #F2F2F2;
+  --r-card: var(--gl-r-tile);
+  --r-inner: var(--gl-r-inner);
+  --r-pill: var(--gl-r-pill);
+  --shadow: var(--gl-shadow);
+  --up: var(--gl-ink);
+  --down: var(--gl-muted);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-body);background:var(--page-bg);color:var(--text);-webkit-font-smoothing:antialiased;line-height:1.5;min-height:100vh}
+button{font:inherit}
+.wrap{max-width:1240px;margin:0 auto;padding:40px 20px 90px;position:relative;z-index:1}
+.hero{display:grid;gap:14px;padding:8px 0 4px}
+.hero h1{font-family:var(--font-head);font-size:clamp(36px,6.4vw,68px);font-weight:var(--hero-w,600);letter-spacing:-.025em;line-height:1.02}
+.hero .kicker{font-size:14px;color:var(--muted);font-weight:500}
+.hero p{color:var(--text-2);max-width:680px;font-size:16px}
+.hero .meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.toc{position:sticky;top:10px;z-index:20;display:flex;gap:4px;overflow-x:auto;padding:5px;margin:30px 0 0;background:var(--toc-bg);border:1px solid var(--border);border-radius:var(--r-pill);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);scrollbar-width:none;box-shadow:var(--shadow)}
+.toc::-webkit-scrollbar{display:none}
+.toc a{white-space:nowrap;padding:8px 14px;border-radius:var(--r-pill);font-size:13px;font-weight:500;color:var(--text-2);text-decoration:none}
+.toc a:hover,.toc a:focus-visible{background:var(--hover);color:var(--text);outline:none}
+section.block{margin-top:60px;scroll-margin-top:80px}
+.sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:18px;flex-wrap:wrap}
+.sec-head h2{font-family:var(--font-head);font-size:26px;font-weight:600;letter-spacing:-.015em}
+.sec-head span{color:var(--muted);font-size:13px}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);box-shadow:var(--shadow);padding:20px}
+.group-title{font-size:13px;font-weight:600;color:var(--text-2);margin:26px 0 10px}
+.group-title:first-child{margin-top:0}
+.swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:12px}
+.sw{padding:0;display:block;width:100%;font:inherit;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-inner);overflow:hidden;cursor:pointer;text-align:left;color:inherit;transition:transform .15s ease}
+.sw:hover{transform:translateY(-2px)}
+.sw:focus-visible,.btn:focus-visible,.copy:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.sw-color{height:86px;border-bottom:1px solid var(--border)}
+.sw-info{padding:10px 12px 12px}
+.sw-name{font-size:13px;font-weight:600;display:block}
+.sw-hex{font-family:var(--font-mono);font-size:11.5px;color:var(--text-2);display:block;word-break:break-all}
+.sw-var{font-family:var(--font-mono);font-size:11px;color:var(--muted);display:block}
+.sw-use{font-size:11.5px;color:var(--muted);margin-top:5px;line-height:1.35;display:block}
+.series{display:flex;height:46px;border-radius:var(--r-inner);overflow:hidden;margin-top:6px}
+.series div{flex:1;display:flex;align-items:flex-end;padding:6px 8px;font:500 11px var(--font-mono);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.25)}
+.grads{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px}
+.panel.grad{padding:0;overflow:hidden;cursor:pointer}
+.grad .g{height:120px}
+.grad .gi{padding:12px 14px}
+.grad code{display:block;font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-top:4px;word-break:break-all}
+.type-row{display:grid;grid-template-columns:180px 1fr;gap:18px;align-items:center;padding:16px 0;border-bottom:1px solid var(--divider)}
+.type-row:last-child{border-bottom:0}
+.type-meta b{display:block;font-size:13px}
+.type-meta span{font-family:var(--font-mono);font-size:11.5px;color:var(--muted)}
+.tok-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+.rad-row{display:flex;gap:14px;flex-wrap:wrap;margin-top:6px}
+.rad-row .rb{width:78px;height:64px;background:var(--surface-2);border:1.5px solid var(--accent)}
+.rad-row small,.sh small,.spc small{display:block;font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-top:6px}
+.sh{display:flex;gap:16px;flex-wrap:wrap}
+.sh .sb{width:120px;height:74px;background:var(--surface);border-radius:var(--r-inner)}
+.spc .s{height:10px;background:var(--accent);border-radius:3px;opacity:.8}
+.spc div.i{display:grid;grid-template-columns:70px 1fr;align-items:center;gap:10px;margin:7px 0}
+.comp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.comp-label{font-size:12.5px;color:var(--muted);font-weight:500;margin-bottom:14px}
+.flex{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.pb{margin:10px 0}
+.pb-h{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px}
+.chart{width:100%;height:auto;display:block;overflow:visible}
+.codebox{position:relative}
+pre{font-family:var(--font-mono);font-size:12.5px;line-height:1.65;white-space:pre-wrap;word-break:break-word;background:var(--code-bg);color:var(--code-text);border-radius:var(--r-inner);padding:22px;padding-top:56px;max-height:620px;overflow:auto}
+.code-actions{position:absolute;top:12px;right:12px;display:flex;gap:8px}
+.copy{border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.1);color:#fff;border-radius:999px;padding:7px 14px;font-size:12.5px;font-weight:500;cursor:pointer}
+.copy:hover{background:rgba(255,255,255,.2)}
+.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.rules h3{font-family:var(--font-head);font-size:16px;margin-bottom:10px}
+.rules ul{list-style:none;display:grid;gap:9px}
+.rules li{font-size:14px;color:var(--text-2);padding-left:22px;position:relative}
+.rules .do li::before{content:"✓";position:absolute;left:0;color:var(--up);font-weight:700}
+.rules .dont li::before{content:"✕";position:absolute;left:0;color:var(--down);font-weight:700}
+.toast{position:fixed;bottom:26px;left:50%;transform:translate(-50%,16px);opacity:0;pointer-events:none;background:#111;color:#fff;padding:10px 18px;border-radius:999px;font-size:13px;transition:.25s;z-index:99;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+footer{margin-top:70px;color:var(--muted);font-size:12.5px;text-align:center}
+@media (max-width:820px){
+  .dgrid{grid-template-columns:1fr !important}
+  .dgrid>*{grid-column:auto !important;grid-row:auto !important}
+  .type-row{grid-template-columns:1fr;gap:6px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important;scroll-behavior:auto !important}}
+
+:root{--hero-w:400}
+body{background:var(--gl-grad-scene);background-attachment:fixed}
+.hero h1{font-weight:400}
+.panel,.sw,.card,.toc{backdrop-filter:var(--gl-blur);-webkit-backdrop-filter:var(--gl-blur)}
+.panel{border-radius:var(--gl-r-tile)}
+.sw{background:rgba(255,255,255,.5)}
+.card{background:var(--gl-glass);border:1px solid var(--gl-glass-edge);border-radius:var(--gl-r-tile);box-shadow:var(--gl-shadow);padding:18px;min-width:0;position:relative}
+.card.dark{background:var(--gl-grad-tile);border-color:rgba(255,255,255,.14);color:#fff;box-shadow:var(--gl-shadow-dark)}
+.card.dark .kpi-s,.card.dark small{color:var(--gl-white-60)}
+.card-t{font-size:15px;font-weight:600}
+.card-h{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:10px}
+.btn{font-weight:500;font-size:13px;border-radius:999px;padding:9px 18px;border:1px solid transparent;cursor:pointer}
+.btn-primary{background:var(--gl-ink);color:#fff}
+.btn-secondary{background:var(--gl-glass-strong);border-color:var(--gl-glass-edge);color:var(--text);backdrop-filter:blur(12px)}
+.btn-ghost{background:transparent;color:var(--text-2)}
+.btn-icon{width:36px;height:36px;border-radius:50%;background:var(--gl-ink);color:#fff;border:0;display:inline-grid;place-items:center;cursor:pointer;font-size:9px;letter-spacing:1px}
+.tabs,.gl-nav{display:inline-flex;gap:2px;padding:4px;border-radius:999px;background:rgba(40,40,44,.55);backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.18)}
+.tab,.gl-nav span{padding:7px 16px;border-radius:999px;font-size:13px;color:rgba(255,255,255,.75);font-weight:500}
+.tab.active,.gl-nav .on{background:rgba(255,255,255,.22);color:#fff}
+.seg{display:inline-flex;gap:4px}
+.seg span{padding:5px 13px;border-radius:999px;font-size:12px;border:1px solid rgba(20,20,22,.18);color:var(--text-2)}
+.seg .on{background:var(--gl-ink);color:#fff;border-color:var(--gl-ink)}
+.kpi-t{display:flex;justify-content:space-between;font-size:15px;font-weight:600}
+.kpi-v{font-size:32px;font-weight:500;letter-spacing:-.01em;margin-top:6px;display:flex;align-items:center;gap:12px;font-variant-numeric:tabular-nums}
+.kpi-s{font-size:11.5px;color:var(--muted);font-weight:500}
+.trend{font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;background:var(--gl-ink);color:#fff}
+.trend.down{background:transparent;color:var(--gl-text-2);border:1px solid rgba(20,20,22,.25)}
+.badge{background:#fff;color:var(--gl-ink);font-size:11px;font-weight:600;padding:3px 10px;border-radius:999px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.chip{display:inline-flex;align-items:center;gap:7px;font-size:12px;padding:5px 11px;border-radius:999px;border:1px solid rgba(20,20,22,.18)}
+.chip i{width:7px;height:7px;border-radius:50%;background:var(--c);box-shadow:0 0 0 1px rgba(0,0,0,.25)}
+.bar{height:5px;background:var(--gl-line);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;background:var(--c)}
+.card.dark .bar{background:rgba(255,255,255,.18)}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--gl-line);font-size:13.5px}
+.row:last-child{border-bottom:0}.row>span:first-child{flex:1}
+.input,.select{display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--gl-glass-strong);border:1px solid var(--gl-glass-edge);border-radius:999px;padding:9px 16px;font-size:13px;color:var(--text-2)}
+.input{justify-content:flex-start;color:var(--muted)}
+/* demo */
+.gl-stage{position:relative;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.6);border-radius:var(--gl-r-panel);padding:20px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:var(--gl-shadow)}
+.gl-title{font-size:clamp(46px,9vw,96px);font-weight:400;letter-spacing:-.025em;text-align:center;line-height:1;padding:18px 0 22px}
+.dgrid{display:grid;gap:12px}
+.gl-grid{grid-template-columns:1fr 2fr 1.4fr 1.3fr}
+.sphere{width:96px;height:96px;border-radius:50%;background:var(--gl-grad-chrome);margin:12px auto 0;box-shadow:0 14px 24px rgba(0,0,0,.35);position:relative}
+.sphere::after{content:"";position:absolute;inset:18% 24% 50% 30%;border-radius:50%;background:rgba(255,255,255,.55);filter:blur(4px)}
+.pills{display:flex;gap:6px;flex-wrap:wrap}
+.pill-dark{background:var(--gl-ink);color:#fff;border-radius:999px;padding:7px 13px;font-size:12px;font-weight:600;display:inline-flex;flex-direction:column;align-items:center;line-height:1.15}
+.pill-dark small{font-size:9.5px;font-weight:500;opacity:.7}
+.tg{display:flex;justify-content:space-between;align-items:center;font-size:12px;margin:6px 0}
+.sw-t{width:30px;height:16px;border-radius:99px;background:rgba(255,255,255,.25);position:relative}
+.sw-t::after{content:"";position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:#fff;transition:.2s}
+.sw-t.on{background:#fff}.sw-t.on::after{left:16px;background:var(--gl-ink)}
+.cal{display:grid;grid-template-columns:44px repeat(7,1fr);font-size:11.5px;row-gap:12px;position:relative}
+.cal .h{text-align:center;color:var(--text-2);font-weight:500}
+.cal .t{color:var(--muted)}
+.ev{position:absolute;background:var(--gl-ink);color:#fff;font-size:10.5px;font-weight:500;border-radius:999px;padding:4px 10px;white-space:nowrap}
+.ev.light{background:#fff;color:var(--gl-ink);box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.dock{display:flex;justify-content:center;margin-top:18px}
+.dock .gl-nav{background:rgba(40,40,44,.6)}
+.dock .plus{width:34px;height:34px;border-radius:50%;background:#fff;color:#111;display:grid;place-items:center;font-weight:600;margin-left:4px}
+
+</style>
+</head>
+<body>
+<div aria-hidden="true" style="position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none">
+<div style="position:absolute;left:-4%;top:0;width:34%;height:78%;background:linear-gradient(90deg,rgba(255,255,255,.95),rgba(255,255,255,.55));filter:blur(18px)"></div>
+<div style="position:absolute;left:4%;top:0;width:1.2%;height:80%;background:rgba(180,178,172,.55);filter:blur(3px)"></div>
+<div style="position:absolute;left:16%;top:0;width:1.2%;height:80%;background:rgba(180,178,172,.45);filter:blur(3px)"></div>
+<div style="position:absolute;right:-4%;top:4%;width:26%;height:70%;background:linear-gradient(270deg,rgba(255,255,255,.95),rgba(255,255,255,.4));filter:blur(18px)"></div>
+<div style="position:absolute;right:12%;top:0;width:1.1%;height:74%;background:rgba(180,178,172,.45);filter:blur(3px)"></div>
+<div style="position:absolute;left:30%;top:46%;width:22%;height:30%;border-radius:50%;background:#6F7A63;opacity:.35;filter:blur(60px)"></div>
+<div style="position:absolute;left:18%;right:18%;bottom:-6%;height:24%;border-radius:50%;background:#B9B6B0;opacity:.6;filter:blur(40px)"></div>
+</div>
+<div class="wrap">
+  <header class="hero">
+    <div class="kicker">Styl 3 z 4 · referencja: szklany dashboard monochromatyczny</div>
+    <h1>Frosted Mono Glass</h1>
+    <p>Matowe szkło na jasnym, rozmytym wnętrzu. Zero koloru: biel, grafit i czerń. Jasne, półprzezroczyste kafle przeplatają się z ciemnymi, grafitowymi, a dane rysuje czarna kreska i czarne pigułki. Dobry do dashboardów produktywności, portfolio, prezentacji na ekranie.</p>
+  </header>
+  <nav class="toc">
+    <a href="#demo">Podgląd</a><a href="#colors">Kolory</a><a href="#gradients">Gradienty</a><a href="#type">Typografia</a><a href="#tokens">Promienie, cienie, odstępy</a><a href="#components">Komponenty</a><a href="#rules">Zasady</a><a href="#css">CSS tokens</a><a href="#prompt">Prompt</a>
+  </nav>
+
+  <section class="block" id="demo">
+    <div class="sec-head"><h2>Podgląd na żywo</h2><span>Przykładowy dashboard zbudowany wyłącznie z tokenów poniżej</span></div>
+    
+<div class="gl-stage">
+  <div class="gl-title">Dashboard</div>
+  <div class="dgrid gl-grid">
+    <div class="card dark"><div class="card-t">Geometria chaosu</div><small style="font-size:11px">Uporządkowany nieład</small><div class="sphere"></div></div>
+    <div class="card"><div class="card-h"><div><div class="card-t">Tydzień w pracy</div><div class="kpi-s">Częstotliwość obciążenia</div></div><div style="font-size:30px;font-weight:500">16 h</div></div><svg viewBox="0 0 260 124" class="chart"><rect x="15" y="50" width="6" height="34" rx="3" fill="#FFFFFF" stroke="rgba(0,0,0,.06)"/><circle cx="18" cy="96" r="3.2" fill="#FFFFFF"/><text x="18" y="118" text-anchor="middle" font-size="11" fill="#4A4A50">Pn</text><rect x="53" y="40" width="6" height="44" rx="3" fill="#FFFFFF" stroke="rgba(0,0,0,.06)"/><circle cx="56" cy="96" r="3.2" fill="#FFFFFF"/><text x="56" y="118" text-anchor="middle" font-size="11" fill="#4A4A50">Wt</text><rect x="91" y="14" width="6" height="70" rx="3" fill="#0D0D0F" /><circle cx="94" cy="96" r="4" fill="#0D0D0F"/><text x="94" y="118" text-anchor="middle" font-size="11" fill="#4A4A50">Śr</text><rect x="129" y="32" width="6" height="52" rx="3" fill="#FFFFFF" stroke="rgba(0,0,0,.06)"/><circle cx="132" cy="96" r="3.2" fill="#FFFFFF"/><text x="132" y="118" text-anchor="middle" font-size="11" fill="#4A4A50">Cz</text><rect x="167" y="40" width="6" height="44" rx="3" fill="#FFFFFF" stroke="rgba(0,0,0,.06)"/><circle cx="170" cy="96" r="3.2" fill="#FFFFFF"/><text x="170" y="118" text-anchor="middle" font-size="11" fill="#4A4A50">Pt</text><rect x="205" y="58" width="6" height="26" rx="3" fill="#FFFFFF" stroke="rgba(0,0,0,.06)"/><circle cx="208" cy="96" r="3.2" fill="#FFFFFF"/><text x="208" y="118" text-anchor="middle" font-size="11" fill="#4A4A50">Sb</text><rect x="243" y="64" width="6" height="20" rx="3" fill="#FFFFFF" stroke="rgba(0,0,0,.06)"/><circle cx="246" cy="96" r="3.2" fill="#FFFFFF"/><text x="246" y="118" text-anchor="middle" font-size="11" fill="#4A4A50">Nd</text></svg></div>
+    <div class="card"><div class="card-t">Poziom energii</div>
+      <div class="flex" style="justify-content:space-around;margin:8px 0 4px"><svg viewBox="0 0 76 76" style="width:76px;max-width:100%"><circle cx="38.0" cy="38.0" r="36.0" fill="none" stroke="rgba(20,20,22,.14)" stroke-width="4"/><circle cx="38.0" cy="38.0" r="36.0" fill="none" stroke="#0D0D0F" stroke-width="4" stroke-linecap="round" stroke-dasharray="203.6 226.2" transform="rotate(-90 38.0 38.0)"/><text x="50%" y="43.4" text-anchor="middle" font-size="15" font-weight="500" fill="#141416" font-family="'Montserrat', system-ui, sans-serif">90%</text></svg><svg viewBox="0 0 76 76" style="width:76px;max-width:100%"><circle cx="38.0" cy="38.0" r="36.0" fill="none" stroke="rgba(20,20,22,.14)" stroke-width="4"/><circle cx="38.0" cy="38.0" r="36.0" fill="none" stroke="#0D0D0F" stroke-width="4" stroke-linecap="round" stroke-dasharray="147.0 226.2" transform="rotate(-90 38.0 38.0)"/><text x="50%" y="43.4" text-anchor="middle" font-size="15" font-weight="500" fill="#141416" font-family="'Montserrat', system-ui, sans-serif">65%</text></svg></div>
+      <div class="flex" style="justify-content:space-around;font-size:10.5px;color:var(--muted);margin-bottom:10px"><span>Zadania zrobione</span><span>W trybie flow</span></div>
+      <div class="pb" style="margin:6px 0"><div class="pb-h" style="font-size:11px"><span>Praca głęboka</span><b>80%</b></div><div class="bar"><i style="width:80%;--c:var(--gl-ink)"></i></div></div>
+      <div class="pb" style="margin:6px 0"><div class="pb-h" style="font-size:11px"><span>Administracja</span><b>7%</b></div><div class="bar"><i style="width:7%;--c:var(--gl-ink)"></i></div></div>
+      <div class="pb" style="margin:6px 0"><div class="pb-h" style="font-size:11px"><span>Generowanie pomysłów</span><b>13%</b></div><div class="bar"><i style="width:13%;--c:var(--gl-ink)"></i></div></div></div>
+    <div class="card"><div class="card-t" style="margin-bottom:12px">Analityka pracy</div>
+      <div class="pills"><span class="pill-dark">1065<small>Szkice</small></span><span class="pill-dark">∞<small>Kreatywność</small></span><span class="pill-dark">7<small>Dni do deadline</small></span></div></div>
+    <div class="card dark"><div class="card-t">Liczba zamówień</div><small style="font-size:11px">Zależność od miesiąca</small><svg viewBox="0 0 240 130" class="chart" style="font-family:inherit"><text x="10.0" y="124" text-anchor="middle" font-size="11" fill="rgba(255,255,255,.6)">Lut</text><text x="53.6" y="124" text-anchor="middle" font-size="11" fill="rgba(255,255,255,.6)">Mar</text><text x="97.2" y="124" text-anchor="middle" font-size="11" fill="rgba(255,255,255,.6)"></text><text x="140.8" y="124" text-anchor="middle" font-size="11" fill="rgba(255,255,255,.6)">Kwi</text><text x="184.4" y="124" text-anchor="middle" font-size="11" fill="rgba(255,255,255,.6)"></text><text x="228.0" y="124" text-anchor="middle" font-size="11" fill="rgba(255,255,255,.6)">Maj</text><path d="M10.0,84.8 C17.3,82.7 39.1,73.0 53.6,72.2 C68.1,71.3 82.7,81.0 97.2,79.7 C111.7,78.5 126.3,68.4 140.8,64.6 C155.3,60.8 169.9,63.8 184.4,57.1 C198.9,50.3 220.7,29.7 228.0,24.3" fill="none" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+    <div class="card" style="grid-column:span 2"><div class="card-h"><span class="chip">Kwiecień</span><div class="card-t">Maj 2026</div><span class="chip">Czerwiec</span></div>
+      <div class="cal"><span></span><span class="h">Pn</span><span class="h">Wt</span><span class="h">Śr</span><span class="h">Cz</span><span class="h">Pt</span><span class="h">Sb</span><span class="h">Nd</span>
+        <span class="t">12:00</span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+        <span class="t">13:00</span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+        <span class="t">14:00</span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+        <span class="t">15:00</span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+        <span class="ev" style="left:9%;top:30px">Spotkanie z klientem ▶</span>
+        <span class="ev light" style="left:58%;top:58px">Analiza statystyk ⌗</span>
+        <span class="ev" style="left:36%;top:88px">Analiza konkurencji ▤</span>
+        <span class="ev light" style="left:62%;top:116px">Badanie trendów ▣</span></div></div>
+    <div class="card dark"><div class="card-t" style="margin-bottom:8px">Ustawienia projektu</div>
+      <div class="tg"><span>Elastyczne przeglądy</span><span class="sw-t on"></span></div>
+      <div class="tg"><span>Pełne zanurzenie</span><span class="sw-t on"></span></div>
+      <div class="tg"><span>Szybkość i jakość</span><span class="sw-t"></span></div>
+      <div style="margin-top:10px;font-size:11px;color:var(--gl-white-60)">Etapy w godzinach</div>
+      <div class="pb" style="margin:5px 0"><div class="bar"><i style="width:20%;--c:#fff"></i></div></div>
+      <div class="pb" style="margin:5px 0"><div class="bar"><i style="width:50%;--c:#fff"></i></div></div>
+      <div class="pb" style="margin:5px 0"><div class="bar"><i style="width:80%;--c:#fff"></i></div></div></div>
+    <div class="card" style="grid-column:span 2"><div class="card-t">Czas pracy vs energia</div><svg viewBox="0 0 360 150" class="chart" style="font-family:inherit"><line x1="38" x2="348" y1="124.0" y2="124.0" stroke="rgba(20,20,22,.10)"/><text x="30" y="128.0" text-anchor="end" font-size="11" fill="#8C8C93">9.00</text><line x1="38" x2="348" y1="96.5" y2="96.5" stroke="rgba(20,20,22,.10)"/><text x="30" y="100.5" text-anchor="end" font-size="11" fill="#8C8C93">12.00</text><line x1="38" x2="348" y1="69.0" y2="69.0" stroke="rgba(20,20,22,.10)"/><text x="30" y="73.0" text-anchor="end" font-size="11" fill="#8C8C93">15.00</text><line x1="38" x2="348" y1="41.5" y2="41.5" stroke="rgba(20,20,22,.10)"/><text x="30" y="45.5" text-anchor="end" font-size="11" fill="#8C8C93">18.00</text><line x1="38" x2="348" y1="14.0" y2="14.0" stroke="rgba(20,20,22,.10)"/><text x="30" y="18.0" text-anchor="end" font-size="11" fill="#8C8C93">21.00</text><text x="38.0" y="144" text-anchor="middle" font-size="11" fill="#8C8C93">30%</text><text x="66.2" y="144" text-anchor="middle" font-size="11" fill="#8C8C93"></text><text x="94.4" y="144" text-anchor="middle" font-size="11" fill="#8C8C93">40%</text><text x="122.5" y="144" text-anchor="middle" font-size="11" fill="#8C8C93"></text><text x="150.7" y="144" text-anchor="middle" font-size="11" fill="#8C8C93">50%</text><text x="178.9" y="144" text-anchor="middle" font-size="11" fill="#8C8C93"></text><text x="207.1" y="144" text-anchor="middle" font-size="11" fill="#8C8C93">60%</text><text x="235.3" y="144" text-anchor="middle" font-size="11" fill="#8C8C93"></text><text x="263.5" y="144" text-anchor="middle" font-size="11" fill="#8C8C93">70%</text><text x="291.6" y="144" text-anchor="middle" font-size="11" fill="#8C8C93"></text><text x="319.8" y="144" text-anchor="middle" font-size="11" fill="#8C8C93">80%</text><text x="348.0" y="144" text-anchor="middle" font-size="11" fill="#8C8C93"></text><defs><linearGradient id="glm" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0D0D0F" stop-opacity="0.95"/><stop offset="1" stop-color="#0D0D0F" stop-opacity="0"/></linearGradient></defs><path d="M38.0,93.4 C42.7,91.4 56.8,82.2 66.2,81.2 C75.6,80.2 85.0,90.4 94.4,87.3 C103.8,84.3 113.2,65.4 122.5,62.9 C131.9,60.3 141.3,77.1 150.7,72.1 C160.1,67.0 169.5,35.9 178.9,32.3 C188.3,28.8 197.7,52.7 207.1,50.7 C216.5,48.6 225.9,19.1 235.3,20.1 C244.7,21.1 254.1,53.7 263.5,56.8 C272.8,59.8 282.2,35.4 291.6,38.4 C301.0,41.5 310.4,67.0 319.8,75.1 C329.2,83.3 343.3,85.3 348.0,87.3 L348.0,124 L38.0,124 Z" fill="url(#glm)"/><path d="M38.0,93.4 C42.7,91.4 56.8,82.2 66.2,81.2 C75.6,80.2 85.0,90.4 94.4,87.3 C103.8,84.3 113.2,65.4 122.5,62.9 C131.9,60.3 141.3,77.1 150.7,72.1 C160.1,67.0 169.5,35.9 178.9,32.3 C188.3,28.8 197.7,52.7 207.1,50.7 C216.5,48.6 225.9,19.1 235.3,20.1 C244.7,21.1 254.1,53.7 263.5,56.8 C272.8,59.8 282.2,35.4 291.6,38.4 C301.0,41.5 310.4,67.0 319.8,75.1 C329.2,83.3 343.3,85.3 348.0,87.3" fill="none" stroke="#0D0D0F" stroke-width="1.4" stroke-linecap="round"/></svg></div>
+    <div class="card" style="grid-column:span 2"><div class="card-t">Jakość</div><div class="flex" style="justify-content:space-around;margin-top:14px"><svg viewBox="0 0 108 108" style="width:108px;max-width:100%"><circle cx="54.0" cy="54.0" r="51.5" fill="none" stroke="rgba(20,20,22,.14)" stroke-width="5"/><circle cx="54.0" cy="54.0" r="51.5" fill="none" stroke="#0D0D0F" stroke-width="5" stroke-linecap="round" stroke-dasharray="64.7 323.6" transform="rotate(-90 54.0 54.0)"/><text x="50%" y="61.9" text-anchor="middle" font-size="22" font-weight="500" fill="#141416" font-family="'Montserrat', system-ui, sans-serif">20%</text></svg><svg viewBox="0 0 108 108" style="width:108px;max-width:100%"><circle cx="54.0" cy="54.0" r="51.5" fill="none" stroke="rgba(20,20,22,.14)" stroke-width="5"/><circle cx="54.0" cy="54.0" r="51.5" fill="none" stroke="#0D0D0F" stroke-width="5" stroke-linecap="round" stroke-dasharray="300.9 323.6" transform="rotate(-90 54.0 54.0)"/><text x="50%" y="61.9" text-anchor="middle" font-size="22" font-weight="500" fill="#141416" font-family="'Montserrat', system-ui, sans-serif">93%</text></svg></div>
+      <div class="flex" style="justify-content:space-around;font-size:13px;color:var(--text-2);margin-top:8px"><span>Poprawki</span><span>Analiza</span></div></div>
+  </div>
+  <div class="dock"><div class="gl-nav" style="align-items:center"><span class="on">Główna</span><span>Prace</span><span>Proces</span><span>Blog</span><span class="plus">+</span></div></div>
+</div>
+  </section>
+
+  <section class="block" id="colors">
+    <div class="sec-head"><h2>Paleta kolorów</h2><span>Kliknij próbkę, żeby skopiować wartość</span></div>
+    <div class="panel"><div class="group-title">Szkło</div><div class="swatches"><button class="sw" data-copy="rgba(255,255,255,.42)"><div class="sw-color" style="background:linear-gradient(rgba(255,255,255,.42),rgba(255,255,255,.42)),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Glass</span><span class="sw-hex">rgba(255,255,255,.42)</span><span class="sw-var">--gl-glass</span><span class="sw-use">Jasny kafel / panel główny</span></div></button><button class="sw" data-copy="rgba(255,255,255,.68)"><div class="sw-color" style="background:linear-gradient(rgba(255,255,255,.68),rgba(255,255,255,.68)),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Glass strong</span><span class="sw-hex">rgba(255,255,255,.68)</span><span class="sw-var">--gl-glass-strong</span><span class="sw-use">Pigułki, elementy na szkle, hover</span></div></button><button class="sw" data-copy="rgba(255,255,255,.70)"><div class="sw-color" style="background:linear-gradient(rgba(255,255,255,.70),rgba(255,255,255,.70)),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Glass edge</span><span class="sw-hex">rgba(255,255,255,.70)</span><span class="sw-var">--gl-glass-edge</span><span class="sw-use">Obwódka 1 px na szkle</span></div></button><button class="sw" data-copy="rgba(58,58,62,.80)"><div class="sw-color" style="background:linear-gradient(rgba(58,58,62,.80),rgba(58,58,62,.80)),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Graphite tile</span><span class="sw-hex">rgba(58,58,62,.80)</span><span class="sw-var">--gl-tile</span><span class="sw-use">Ciemny kafel (szkło przydymione)</span></div></button><button class="sw" data-copy="#48484C"><div class="sw-color" style="background:linear-gradient(#48484C,#48484C),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Graphite solid</span><span class="sw-hex">#48484C</span><span class="sw-var">--gl-tile-solid</span><span class="sw-use">Ciemny kafel bez przezroczystości</span></div></button></div><div class="group-title">Monochrom</div><div class="swatches"><button class="sw" data-copy="#0D0D0F"><div class="sw-color" style="background:linear-gradient(#0D0D0F,#0D0D0F),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Ink</span><span class="sw-hex">#0D0D0F</span><span class="sw-var">--gl-ink</span><span class="sw-use">Linie danych, pigułki zdarzeń, aktywne punkty</span></div></button><button class="sw" data-copy="#141416"><div class="sw-color" style="background:linear-gradient(#141416,#141416),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Text primary</span><span class="sw-hex">#141416</span><span class="sw-var">--gl-text</span><span class="sw-use">Tytuły, liczby</span></div></button><button class="sw" data-copy="#4A4A50"><div class="sw-color" style="background:linear-gradient(#4A4A50,#4A4A50),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Text secondary</span><span class="sw-hex">#4A4A50</span><span class="sw-var">--gl-text-2</span><span class="sw-use">Treść</span></div></button><button class="sw" data-copy="#8C8C93"><div class="sw-color" style="background:linear-gradient(#8C8C93,#8C8C93),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Muted</span><span class="sw-hex">#8C8C93</span><span class="sw-var">--gl-muted</span><span class="sw-use">Podpisy, osie</span></div></button><button class="sw" data-copy="rgba(20,20,22,.14)"><div class="sw-color" style="background:linear-gradient(rgba(20,20,22,.14),rgba(20,20,22,.14)),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Line</span><span class="sw-hex">rgba(20,20,22,.14)</span><span class="sw-var">--gl-line</span><span class="sw-use">Linie siatki, tory pasków</span></div></button><button class="sw" data-copy="#FFFFFF"><div class="sw-color" style="background:linear-gradient(#FFFFFF,#FFFFFF),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">White</span><span class="sw-hex">#FFFFFF</span><span class="sw-var">--gl-white</span><span class="sw-use">Tekst na ciemnych kaflach, kreski danych na grafice</span></div></button><button class="sw" data-copy="rgba(255,255,255,.60)"><div class="sw-color" style="background:linear-gradient(rgba(255,255,255,.60),rgba(255,255,255,.60)),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">White 60</span><span class="sw-hex">rgba(255,255,255,.60)</span><span class="sw-var">--gl-white-60</span><span class="sw-use">Drugorzędny tekst na ciemnym</span></div></button></div><div class="group-title">Tło (scena)</div><div class="swatches"><button class="sw" data-copy="#F6F5F2"><div class="sw-color" style="background:linear-gradient(#F6F5F2,#F6F5F2),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Light</span><span class="sw-hex">#F6F5F2</span><span class="sw-var">--gl-bg-1</span><span class="sw-use">Najjaśniejsze partie tła (okna)</span></div></button><button class="sw" data-copy="#E6E4DF"><div class="sw-color" style="background:linear-gradient(#E6E4DF,#E6E4DF),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Mid</span><span class="sw-hex">#E6E4DF</span><span class="sw-var">--gl-bg-2</span><span class="sw-use">Ściana / podstawowe tło</span></div></button><button class="sw" data-copy="#C9C6C0"><div class="sw-color" style="background:linear-gradient(#C9C6C0,#C9C6C0),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Shade</span><span class="sw-hex">#C9C6C0</span><span class="sw-var">--gl-bg-3</span><span class="sw-use">Cień na podłodze, dół sceny</span></div></button><button class="sw" data-copy="#6F7A63"><div class="sw-color" style="background:linear-gradient(#6F7A63,#6F7A63),repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px"></div><div class="sw-info"><span class="sw-name">Plant (rozmyty)</span><span class="sw-hex">#6F7A63</span><span class="sw-var">--gl-plant</span><span class="sw-use">Tylko jako rozmyta plama w tle</span></div></button></div><div class="group-title">Kolejność serii danych (--c1 … --c5)</div><div class="series"><div style="background:var(--gl-ink)">c1</div><div style="background:var(--gl-tile-solid)">c2</div><div style="background:var(--gl-muted)">c3</div><div style="background:var(--gl-white)">c4</div><div style="background:var(--gl-bg-3)">c5</div></div></div>
+  </section>
+
+  <section class="block" id="gradients">
+    <div class="sec-head"><h2>Gradienty i efekty</h2><span>Kliknij, żeby skopiować deklarację CSS</span></div>
+    <div class="grads"><button class="panel grad sw" data-copy="--gl-grad-scene: radial-gradient(900px 600px at 18% 8%, #FFFFFF 0%, transparent 60%), radial-gradient(800px 600px at 88% 18%, #F6F5F2 0%, transparent 60%), linear-gradient(180deg, #DCDAD5 0%, #ECEAE6 45%, #C9C6C0 100%);"><div class="g" style="background:radial-gradient(900px 600px at 18% 8%, #FFFFFF 0%, transparent 60%), radial-gradient(800px 600px at 88% 18%, #F6F5F2 0%, transparent 60%), linear-gradient(180deg, #DCDAD5 0%, #ECEAE6 45%, #C9C6C0 100%)"></div><div class="gi"><span class="sw-name">Scena</span><span class="sw-use">Tło strony, imituje jasne wnętrze</span><code>--gl-grad-scene</code></div></button><button class="panel grad sw" data-copy="--gl-grad-tile: linear-gradient(160deg, rgba(92,92,96,.86) 0%, rgba(52,52,56,.84) 100%);"><div class="g" style="background:linear-gradient(160deg, rgba(92,92,96,.86) 0%, rgba(52,52,56,.84) 100%)"></div><div class="gi"><span class="sw-name">Graphite tile</span><span class="sw-use">Ciemny kafel z lekkim gradientem</span><code>--gl-grad-tile</code></div></button><button class="panel grad sw" data-copy="--gl-grad-chrome: radial-gradient(circle at 34% 28%, #FFFFFF 0%, #D6D6DA 16%, #8E8E94 36%, #2A2A2E 62%, #0D0D0F 80%);"><div class="g" style="background:radial-gradient(circle at 34% 28%, #FFFFFF 0%, #D6D6DA 16%, #8E8E94 36%, #2A2A2E 62%, #0D0D0F 80%)"></div><div class="gi"><span class="sw-name">Chrome</span><span class="sw-use">Obiekt 3D / sfera akcentowa</span><code>--gl-grad-chrome</code></div></button><button class="panel grad sw" data-copy="--gl-grad-mountain: linear-gradient(180deg, #0D0D0F 0%, rgba(13,13,15,.55) 60%, rgba(13,13,15,.05) 100%);"><div class="g" style="background:linear-gradient(180deg, #0D0D0F 0%, rgba(13,13,15,.55) 60%, rgba(13,13,15,.05) 100%)"></div><div class="gi"><span class="sw-name">Mountain fill</span><span class="sw-use">Wypełnienie wykresu obszarowego</span><code>--gl-grad-mountain</code></div></button></div>
+  </section>
+
+  <section class="block" id="type">
+    <div class="sec-head"><h2>Typografia</h2><span>Montserrat 300–700 dla całości (tytuł display 400, kafle 600)</span></div>
+    <div class="panel"><div class="type-row"><div class="type-meta"><b>Display</b><span>84 / 400 / -2%</span></div><div style="font-size:clamp(44px,8vw,84px);font-weight:400;letter-spacing:-.02em;line-height:1">Dashboard</div></div><div class="type-row"><div class="type-meta"><b>Liczba w kaflu</b><span>30 / 500</span></div><div style="font-size:30px;font-weight:500;letter-spacing:-.01em">16 h</div></div><div class="type-row"><div class="type-meta"><b>Tytuł kafla</b><span>15 / 600</span></div><div style="font-size:15px;font-weight:600">Tydzień w pracy</div></div><div class="type-row"><div class="type-meta"><b>Body</b><span>13.5 / 400</span></div><div style="font-size:13.5px;font-weight:400">Spotkanie z klientem · 12:00</div></div><div class="type-row"><div class="type-meta"><b>Podpis</b><span>11 / 500 · muted</span></div><div style="font-size:11px;font-weight:500;color:var(--muted)">Częstotliwość obciążenia</div></div><div class="type-row"><div class="type-meta"><b>Nawigacja</b><span>13 / 500</span></div><div style="font-size:13px;font-weight:500">Główna   Prace   Proces   Blog</div></div></div>
+  </section>
+
+  <section class="block" id="tokens">
+    <div class="sec-head"><h2>Promienie, cienie, odstępy</h2><span>Hierarchia zaokrągleń i głębi</span></div>
+    <div class="tok-grid">
+      <div class="panel"><div class="comp-label">Border radius</div><div class="rad-row"><div><div class="rb" style="border-radius:32px"></div><small>--gl-r-panel<br>32px</small></div><div><div class="rb" style="border-radius:22px"></div><small>--gl-r-tile<br>22px</small></div><div><div class="rb" style="border-radius:14px"></div><small>--gl-r-inner<br>14px</small></div><div><div class="rb" style="border-radius:999px"></div><small>--gl-r-pill<br>999px</small></div></div></div>
+      <div class="panel"><div class="comp-label">Cienie</div><div class="sh"><div><div class="sb" style="box-shadow:0 10px 36px rgba(0,0,0,.08), inset 0 1px 0 rgba(255,255,255,.75)"></div><small>--gl-shadow</small></div><div><div class="sb" style="box-shadow:0 12px 30px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.12)"></div><small>--gl-shadow-dark</small></div><div><div class="sb" style="box-shadow:blur(24px) saturate(140%)"></div><small>--gl-blur</small></div></div></div>
+      <div class="panel spc"><div class="comp-label">Skala odstępów (siatka 4 px)</div><div class="i"><small style="margin:0">--sp-1</small><div class="s" style="width:4px"></div></div><div class="i"><small style="margin:0">--sp-2</small><div class="s" style="width:8px"></div></div><div class="i"><small style="margin:0">--sp-3</small><div class="s" style="width:12px"></div></div><div class="i"><small style="margin:0">--sp-4</small><div class="s" style="width:16px"></div></div><div class="i"><small style="margin:0">--sp-5</small><div class="s" style="width:20px"></div></div><div class="i"><small style="margin:0">--sp-6</small><div class="s" style="width:24px"></div></div><div class="i"><small style="margin:0">--sp-8</small><div class="s" style="width:32px"></div></div></div>
+    </div>
+  </section>
+
+  <section class="block" id="components">
+    <div class="sec-head"><h2>Komponenty bazowe</h2><span>Te same klasy we wszystkich 4 stylach — zmienia się tylko skórka</span></div>
+    
+<div class="comp-grid">
+  <div class="panel comp"><div class="comp-label">Przyciski</div>
+    <div class="flex">
+      <button class="btn btn-primary">+ Dodaj widget</button>
+      <button class="btn btn-secondary">Filtruj</button>
+      <button class="btn btn-ghost">Anuluj</button>
+      <button class="btn-icon" aria-label="Więcej">•••</button>
+    </div></div>
+  <div class="panel comp"><div class="comp-label">Nawigacja i przełączniki</div>
+    <div class="tabs"><span class="tab active">Przegląd</span><span class="tab">Płatności</span><span class="tab">Raporty</span></div>
+    <div style="height:14px"></div>
+    <div class="seg"><span class="on">Dzień</span><span>Tydzień</span><span>Miesiąc</span><span>Rok</span></div></div>
+  <div class="panel comp"><div class="comp-label">Karta KPI</div>
+    <div class="card kpi">
+      <div class="kpi-t">Aktywni użytkownicy <span class="arr">↗</span></div>
+      <div class="kpi-v">1.8k <span class="trend up">▲ 9%</span></div>
+      <div class="kpi-s">vs poprzedni miesiąc</div>
+    </div></div>
+  <div class="panel comp"><div class="comp-label">Paski postępu (kolory serii)</div>
+    <div class="pb"><div class="pb-h"><span>Seria 1</span><b>77%</b></div><div class="bar"><i style="width:77%;--c:var(--c1)"></i></div></div>
+    <div class="pb"><div class="pb-h"><span>Seria 2</span><b>63%</b></div><div class="bar"><i style="width:63%;--c:var(--c2)"></i></div></div>
+    <div class="pb"><div class="pb-h"><span>Seria 3</span><b>41%</b></div><div class="bar"><i style="width:41%;--c:var(--c3)"></i></div></div></div>
+  <div class="panel comp"><div class="comp-label">Trendy, badge, chipy</div>
+    <div class="flex">
+      <span class="trend up">▲ 12%</span><span class="trend down">▼ 4%</span>
+      <span class="badge">Nowe</span>
+      <span class="chip"><i style="--c:var(--c1)"></i>Marketing</span>
+      <span class="chip"><i style="--c:var(--c2)"></i>Sprzedaż</span>
+      <span class="chip"><i style="--c:var(--c3)"></i>Operacje</span>
+    </div></div>
+  <div class="panel comp"><div class="comp-label">Lista / wiersze tabeli</div>
+    <div class="row"><span>Leadership Essentials</span><b>1 264</b><span class="trend up">▲ 11%</span></div>
+    <div class="row"><span>Project Management</span><b>1 032</b><span class="trend up">▲ 8%</span></div>
+    <div class="row"><span>Data Analysis</span><b>856</b><span class="trend down">▼ 3%</span></div></div>
+  <div class="panel comp"><div class="comp-label">Input i select</div>
+    <div class="input">⌕ <span>Szukaj…</span></div>
+    <div style="height:10px"></div>
+    <div class="select"><span>▦ 1 sty – 31 sty 2026</span><span>▾</span></div></div>
+</div>
+
+  </section>
+
+  <section class="block" id="rules">
+    <div class="sec-head"><h2>Zasady stylu</h2><span>Co trzyma ten styl w ryzach</span></div>
+    <div class="rules">
+      <div class="panel do"><h3>Rób</h3><ul><li>Każda powierzchnia to szkło: półprzezroczyste tło + backdrop-filter blur(24px) + biała obwódka 1 px.</li><li>Rytm jasne / ciemne kafle w szachownicę, żeby siatka „oddychała”.</li><li>Dane rysuj czernią na jasnym i bielą na ciemnym — bez żadnego koloru.</li><li>Wydarzenia, statusy i wartości jako czarne pigułki z białym tekstem.</li><li>Wielki, cienki tytuł „Dashboard” jako element kompozycji.</li><li>Pływająca pigułkowa nawigacja na dole ekranu.</li></ul></div>
+      <div class="panel dont"><h3>Unikaj</h3><ul><li>Jakichkolwiek kolorów nasyconych — nawet dla błędów (użyj grafitu, podkreślenia, ikony).</li><li>Płaskiego, jednolitego tła strony — szkło potrzebuje sceny pod spodem.</li><li>Grubych ramek i twardych cieni.</li><li>Gęstych tabel — to styl ekspozycyjny, nie arkusz.</li><li>Tekstu poniżej 11 px na szkle (spada czytelność).</li></ul></div>
+    </div>
+  </section>
+
+  <section class="block" id="css">
+    <div class="sec-head"><h2>CSS design tokens</h2><span>Wklej do :root w nowym projekcie</span></div>
+    <div class="codebox"><div class="code-actions"><button class="copy" data-copy-target="tokcode">Kopiuj CSS</button></div><pre id="tokcode">:root {
+  /* ---------- Fonty ---------- */
+  --font-head: &#x27;Montserrat&#x27;, system-ui, sans-serif;
+  --font-body: &#x27;Montserrat&#x27;, system-ui, sans-serif;
+  --font-mono: &#x27;JetBrains Mono&#x27;, ui-monospace, monospace;
+
+  /* ---------- Szkło ---------- */
+  --gl-glass: rgba(255,255,255,.42);   /* Glass — Jasny kafel / panel główny */
+  --gl-glass-strong: rgba(255,255,255,.68); /* Glass strong — Pigułki, elementy na szkle, hover */
+  --gl-glass-edge: rgba(255,255,255,.70); /* Glass edge — Obwódka 1 px na szkle */
+  --gl-tile: rgba(58,58,62,.80);       /* Graphite tile — Ciemny kafel (szkło przydymione) */
+  --gl-tile-solid: #48484C;            /* Graphite solid — Ciemny kafel bez przezroczystości */
+
+  /* ---------- Monochrom ---------- */
+  --gl-ink: #0D0D0F;                   /* Ink — Linie danych, pigułki zdarzeń, aktywne punkty */
+  --gl-text: #141416;                  /* Text primary — Tytuły, liczby */
+  --gl-text-2: #4A4A50;                /* Text secondary — Treść */
+  --gl-muted: #8C8C93;                 /* Muted — Podpisy, osie */
+  --gl-line: rgba(20,20,22,.14);       /* Line — Linie siatki, tory pasków */
+  --gl-white: #FFFFFF;                 /* White — Tekst na ciemnych kaflach, kreski danych na grafice */
+  --gl-white-60: rgba(255,255,255,.60); /* White 60 — Drugorzędny tekst na ciemnym */
+
+  /* ---------- Tło (scena) ---------- */
+  --gl-bg-1: #F6F5F2;                  /* Light — Najjaśniejsze partie tła (okna) */
+  --gl-bg-2: #E6E4DF;                  /* Mid — Ściana / podstawowe tło */
+  --gl-bg-3: #C9C6C0;                  /* Shade — Cień na podłodze, dół sceny */
+  --gl-plant: #6F7A63;                 /* Plant (rozmyty) — Tylko jako rozmyta plama w tle */
+
+  /* ---------- Kolejność serii danych w wykresach ---------- */
+  --c1: var(--gl-ink);
+  --c2: var(--gl-tile-solid);
+  --c3: var(--gl-muted);
+  --c4: var(--gl-white);
+  --c5: var(--gl-bg-3);
+
+  /* ---------- Gradienty ---------- */
+  --gl-grad-scene: radial-gradient(900px 600px at 18% 8%, #FFFFFF 0%, transparent 60%), radial-gradient(800px 600px at 88% 18%, #F6F5F2 0%, transparent 60%), linear-gradient(180deg, #DCDAD5 0%, #ECEAE6 45%, #C9C6C0 100%); /* Tło strony, imituje jasne wnętrze */
+  --gl-grad-tile: linear-gradient(160deg, rgba(92,92,96,.86) 0%, rgba(52,52,56,.84) 100%); /* Ciemny kafel z lekkim gradientem */
+  --gl-grad-chrome: radial-gradient(circle at 34% 28%, #FFFFFF 0%, #D6D6DA 16%, #8E8E94 36%, #2A2A2E 62%, #0D0D0F 80%); /* Obiekt 3D / sfera akcentowa */
+  --gl-grad-mountain: linear-gradient(180deg, #0D0D0F 0%, rgba(13,13,15,.55) 60%, rgba(13,13,15,.05) 100%); /* Wypełnienie wykresu obszarowego */
+
+  /* ---------- Promienie ---------- */
+  --gl-r-panel: 32px; /* Główny szklany panel */
+  --gl-r-tile: 22px; /* Kafle */
+  --gl-r-inner: 14px; /* Elementy w kaflu */
+  --gl-r-pill: 999px; /* Pigułki, nawigacja, przełączniki */
+
+  /* ---------- Cienie ---------- */
+  --gl-shadow: 0 10px 36px rgba(0,0,0,.08), inset 0 1px 0 rgba(255,255,255,.75); /* Szkło */
+  --gl-shadow-dark: 0 12px 30px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.12); /* Ciemny kafel */
+  --gl-blur: blur(24px) saturate(140%); /* Wartość do backdrop-filter */
+
+  /* ---------- Odstępy ---------- */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+
+  /* ---------- Aliasy semantyczne (używaj w komponentach) ---------- */
+  --page-bg: var(--gl-bg-2);
+  --surface: var(--gl-glass);
+  --surface-2: var(--gl-glass-strong);
+  --border: var(--gl-glass-edge);
+  --divider: var(--gl-line);
+  --text: var(--gl-text);
+  --text-2: var(--gl-text-2);
+  --muted: var(--gl-muted);
+  --accent: var(--gl-ink);
+  --hover: rgba(255,255,255,.6);
+  --toc-bg: rgba(255,255,255,.45);
+  --code-bg: rgba(20,20,22,.88);
+  --code-text: #F2F2F2;
+  --r-card: var(--gl-r-tile);
+  --r-inner: var(--gl-r-inner);
+  --r-pill: var(--gl-r-pill);
+  --shadow: var(--gl-shadow);
+  --up: var(--gl-ink);
+  --down: var(--gl-muted);
+}</pre></div>
+  </section>
+
+  <section class="block" id="prompt">
+    <div class="sec-head"><h2>Prompt do nowego czatu</h2><span>Wklej w nowej rozmowie lub narzędziu — model odtworzy ten styl</span></div>
+    <div class="codebox"><div class="code-actions"><button class="copy" data-download="03-frosted-mono-glass-prompt.md">Pobierz .md</button><button class="copy" data-copy-target="promptcode">Kopiuj prompt</button></div><pre id="promptcode"># Styl: Frosted Mono Glass
+
+Jesteś senior UI designerem i front-end developerem. Budujesz dashboardy jako pojedyncze pliki HTML (HTML + CSS w &lt;style&gt; + JS w &lt;script&gt;). Każdy dashboard, który wygenerujesz w tej rozmowie, ma wyglądać jak z jednej rodziny wizualnej „Frosted Mono Glass”. Trzymaj się ściśle poniższego design systemu: nie dodawaj kolorów, fontów, promieni ani cieni spoza tokenów. Jeśli czegoś brakuje, wyprowadź to z istniejących tokenów (np. przezroczystość istniejącego koloru).
+
+## Charakter stylu
+Matowe szkło (glassmorphism) na jasnej, rozmytej scenie wnętrza. Całkowicie monochromatyczny: biel, grafit, czerń. Jasne półprzezroczyste kafle przeplatają się z ciemnymi przydymionymi. Dane rysowane cienką czarną kreską (na jasnym) albo białą (na ciemnym). Charakter: galeryjny, spokojny, „apple-vision” — prezentacja, nie arkusz.
+
+## Fonty
+&lt;link href=&quot;https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;
+Montserrat 300–700 dla całości (tytuł display 400, kafle 600)
+
+## Design tokens — wklej 1:1 do &lt;style&gt;
+:root {
+  /* ---------- Fonty ---------- */
+  --font-head: &#x27;Montserrat&#x27;, system-ui, sans-serif;
+  --font-body: &#x27;Montserrat&#x27;, system-ui, sans-serif;
+  --font-mono: &#x27;JetBrains Mono&#x27;, ui-monospace, monospace;
+
+  /* ---------- Szkło ---------- */
+  --gl-glass: rgba(255,255,255,.42);   /* Glass — Jasny kafel / panel główny */
+  --gl-glass-strong: rgba(255,255,255,.68); /* Glass strong — Pigułki, elementy na szkle, hover */
+  --gl-glass-edge: rgba(255,255,255,.70); /* Glass edge — Obwódka 1 px na szkle */
+  --gl-tile: rgba(58,58,62,.80);       /* Graphite tile — Ciemny kafel (szkło przydymione) */
+  --gl-tile-solid: #48484C;            /* Graphite solid — Ciemny kafel bez przezroczystości */
+
+  /* ---------- Monochrom ---------- */
+  --gl-ink: #0D0D0F;                   /* Ink — Linie danych, pigułki zdarzeń, aktywne punkty */
+  --gl-text: #141416;                  /* Text primary — Tytuły, liczby */
+  --gl-text-2: #4A4A50;                /* Text secondary — Treść */
+  --gl-muted: #8C8C93;                 /* Muted — Podpisy, osie */
+  --gl-line: rgba(20,20,22,.14);       /* Line — Linie siatki, tory pasków */
+  --gl-white: #FFFFFF;                 /* White — Tekst na ciemnych kaflach, kreski danych na grafice */
+  --gl-white-60: rgba(255,255,255,.60); /* White 60 — Drugorzędny tekst na ciemnym */
+
+  /* ---------- Tło (scena) ---------- */
+  --gl-bg-1: #F6F5F2;                  /* Light — Najjaśniejsze partie tła (okna) */
+  --gl-bg-2: #E6E4DF;                  /* Mid — Ściana / podstawowe tło */
+  --gl-bg-3: #C9C6C0;                  /* Shade — Cień na podłodze, dół sceny */
+  --gl-plant: #6F7A63;                 /* Plant (rozmyty) — Tylko jako rozmyta plama w tle */
+
+  /* ---------- Kolejność serii danych w wykresach ---------- */
+  --c1: var(--gl-ink);
+  --c2: var(--gl-tile-solid);
+  --c3: var(--gl-muted);
+  --c4: var(--gl-white);
+  --c5: var(--gl-bg-3);
+
+  /* ---------- Gradienty ---------- */
+  --gl-grad-scene: radial-gradient(900px 600px at 18% 8%, #FFFFFF 0%, transparent 60%), radial-gradient(800px 600px at 88% 18%, #F6F5F2 0%, transparent 60%), linear-gradient(180deg, #DCDAD5 0%, #ECEAE6 45%, #C9C6C0 100%); /* Tło strony, imituje jasne wnętrze */
+  --gl-grad-tile: linear-gradient(160deg, rgba(92,92,96,.86) 0%, rgba(52,52,56,.84) 100%); /* Ciemny kafel z lekkim gradientem */
+  --gl-grad-chrome: radial-gradient(circle at 34% 28%, #FFFFFF 0%, #D6D6DA 16%, #8E8E94 36%, #2A2A2E 62%, #0D0D0F 80%); /* Obiekt 3D / sfera akcentowa */
+  --gl-grad-mountain: linear-gradient(180deg, #0D0D0F 0%, rgba(13,13,15,.55) 60%, rgba(13,13,15,.05) 100%); /* Wypełnienie wykresu obszarowego */
+
+  /* ---------- Promienie ---------- */
+  --gl-r-panel: 32px; /* Główny szklany panel */
+  --gl-r-tile: 22px; /* Kafle */
+  --gl-r-inner: 14px; /* Elementy w kaflu */
+  --gl-r-pill: 999px; /* Pigułki, nawigacja, przełączniki */
+
+  /* ---------- Cienie ---------- */
+  --gl-shadow: 0 10px 36px rgba(0,0,0,.08), inset 0 1px 0 rgba(255,255,255,.75); /* Szkło */
+  --gl-shadow-dark: 0 12px 30px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.12); /* Ciemny kafel */
+  --gl-blur: blur(24px) saturate(140%); /* Wartość do backdrop-filter */
+
+  /* ---------- Odstępy ---------- */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+
+  /* ---------- Aliasy semantyczne (używaj w komponentach) ---------- */
+  --page-bg: var(--gl-bg-2);
+  --surface: var(--gl-glass);
+  --surface-2: var(--gl-glass-strong);
+  --border: var(--gl-glass-edge);
+  --divider: var(--gl-line);
+  --text: var(--gl-text);
+  --text-2: var(--gl-text-2);
+  --muted: var(--gl-muted);
+  --accent: var(--gl-ink);
+  --hover: rgba(255,255,255,.6);
+  --toc-bg: rgba(255,255,255,.45);
+  --code-bg: rgba(20,20,22,.88);
+  --code-text: #F2F2F2;
+  --r-card: var(--gl-r-tile);
+  --r-inner: var(--gl-r-inner);
+  --r-pill: var(--gl-r-pill);
+  --shadow: var(--gl-shadow);
+  --up: var(--gl-ink);
+  --down: var(--gl-muted);
+}
+
+## Layout
+- Strona ma tło-scenę (--gl-grad-scene + rozmyte plamy światła/okien), nigdy płaski kolor.
+- Na scenie jeden duży szklany panel radius 32 px; na górze ogromny tytuł „Dashboard” Montserrat 400, wyśrodkowany.
+- Siatka kafli (np. 1fr 2fr 1.4fr 1.3fr), gap 12 px, kafle jasne i ciemne na zmianę (szachownica).
+- Na dole wyśrodkowana pływająca nawigacja w ciemnej szklanej pigułce + biały okrągły przycisk „+”.
+
+## Komponenty
+- Jasny kafel: background var(--gl-glass), backdrop-filter var(--gl-blur), border 1px var(--gl-glass-edge), radius 22 px, shadow var(--gl-shadow).
+- Ciemny kafel: var(--gl-grad-tile), tekst biały, podpisy rgba(255,255,255,.6), shadow var(--gl-shadow-dark).
+- Tytuł kafla 15/600, podpis 11/500 muted, duża liczba 30/500 w prawym górnym rogu.
+- Pigułki danych: czarne, biały tekst 12/600, pod spodem mini-etykieta 9.5 px.
+- Przełączniki: tor 30×16, gałka biała; stan ON = biały tor z czarną gałką.
+- Kalendarz / timeline: siatka godzin, wydarzenia jako czarne lub białe pigułki z ikonką.
+- Obiekt 3D akcentu: chromowa sfera (--gl-grad-chrome) z odblaskiem.
+
+## Wykresy
+- Tygodniowe słupki jako pionowe pigułki 6 px + kropka pod spodem (jak „!”); wyróżniony dzień czarny, reszta biała.
+- Wykres obszarowy „górski”: czarna linia 1.4 px, wypełnienie --gl-grad-mountain.
+- Linia na ciemnym kaflu: biała 1.6 px, bez wypełnienia i bez punktów.
+- Pierścienie (gauge): tor rgba(20,20,22,.14), łuk czarny z zaokrąglonym końcem, wartość w środku 15–22/500.
+- Paski: 5 px, tor --gl-line, wypełnienie czarne (na jasnym) lub białe (na ciemnym).
+- Kolory serii zawsze w kolejności --c1, --c2, --c3, --c4, --c5.
+- Liczby z font-variant-numeric: tabular-nums; separatory tysięcy zgodne z językiem treści.
+- Możesz używać Chart.js / ECharts / ApexCharts z CDN albo inline SVG — ale zawsze ostyluj je tokenami (kolory, fonty, siatka, tooltipy).
+
+## Zasady
+Rób:
+- Każda powierzchnia to szkło: półprzezroczyste tło + backdrop-filter blur(24px) + biała obwódka 1 px.
+- Rytm jasne / ciemne kafle w szachownicę, żeby siatka „oddychała”.
+- Dane rysuj czernią na jasnym i bielą na ciemnym — bez żadnego koloru.
+- Wydarzenia, statusy i wartości jako czarne pigułki z białym tekstem.
+- Wielki, cienki tytuł „Dashboard” jako element kompozycji.
+- Pływająca pigułkowa nawigacja na dole ekranu.
+
+Unikaj:
+- Jakichkolwiek kolorów nasyconych — nawet dla błędów (użyj grafitu, podkreślenia, ikony).
+- Płaskiego, jednolitego tła strony — szkło potrzebuje sceny pod spodem.
+- Grubych ramek i twardych cieni.
+- Gęstych tabel — to styl ekspozycyjny, nie arkusz.
+- Tekstu poniżej 11 px na szkle (spada czytelność).
+
+## Wymagania techniczne
+- Jeden samowystarczalny plik HTML; wszystkie kolory przez var(--…).
+- Responsywność: CSS grid; poniżej 820 px jedna kolumna, karty na pełną szerokość.
+- Widoczny focus dla klawiatury, kontrast tekstu min. 4.5:1, respektuj prefers-reduced-motion.
+- Zanim zaczniesz, dopytaj o dane / KPI, jeśli nie zostały podane — nie wymyślaj metryk biznesowych bez potwierdzenia.
+</pre></div>
+  </section>
+
+  <footer>Frosted Mono Glass · design system wyekstrahowany z referencji · wszystkie wartości do użycia w generatorze dashboardów HTML</footer>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const toast=(m)=>{const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(window.__t);window.__t=setTimeout(()=>t.classList.remove('show'),1600)};
+async function copyText(txt,msg){try{await navigator.clipboard.writeText(txt)}catch(e){const a=document.createElement('textarea');a.value=txt;a.style.position='fixed';a.style.opacity='0';document.body.appendChild(a);a.select();try{document.execCommand('copy')}catch(_){}a.remove()}toast(msg)}
+document.querySelectorAll('[data-copy]').forEach(el=>el.addEventListener('click',()=>copyText(el.dataset.copy,'Skopiowano: '+el.dataset.copy.slice(0,48))));
+document.querySelectorAll('[data-copy-target]').forEach(b=>b.addEventListener('click',()=>copyText(document.getElementById(b.dataset.copyTarget).innerText,'Skopiowano do schowka')));
+document.querySelectorAll('[data-download]').forEach(b=>b.addEventListener('click',()=>{const blob=new Blob([document.getElementById('promptcode').innerText],{type:'text/markdown'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=b.dataset.download;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast('Pobieranie promptu')}));
+document.querySelectorAll('.sw-t').forEach(t=>t.addEventListener('click',()=>t.classList.toggle('on')));
+</script>
+</body>
+</html>

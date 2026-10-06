@@ -1,0 +1,159 @@
+/* Crisp Fintech — motyw trackera.
+   WYGENEROWANY z sources/04-crisp-fintech.html przez build-themes.py. Nie edytuj ręcznie.
+   Layout shella jest w tracker.css; tutaj tokeny, komponenty i skóra shella. */
+
+:root {
+  
+  --font-head: 'Geist', 'Inter', system-ui, sans-serif;
+  --font-body: 'Geist', 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  
+  --zt-outer: #E3E3E6;                 
+  --zt-bg: #F4F4F5;                    
+  --zt-surface: #FFFFFF;               
+  --zt-surface-2: #F7F7F8;             
+  --zt-border: #EAEAEC;                
+
+  
+  --zt-ink: #111113;                   
+  --zt-text: #0F0F11;                  
+  --zt-text-2: #5B5C63;                
+  --zt-muted: #A1A2A8;                 
+
+  
+  --zt-blue: #2F55F5;                  
+  --zt-blue-300: #8FA4FF;              
+  --zt-blue-100: #E6EBFF;              
+  --zt-green: #1FAE4B;                 
+  --zt-green-300: #86DDA2;             
+  --zt-pink: #EE5FA7;                  
+  --zt-pink-100: #FCE4F0;              
+  --zt-orange: #F4833D;                
+  --zt-navy: #1B2766;                  
+
+  
+  --zt-positive-bg: #E7F7EC;           
+  --zt-negative: #E5484D;              
+  --zt-highlight: #FFE9C2;             
+
+  
+  --c1: var(--zt-blue);
+  --c2: var(--zt-green);
+  --c3: var(--zt-pink);
+  --c4: var(--zt-orange);
+  --c5: var(--zt-blue-300);
+
+  
+  --zt-hatch-blue: repeating-linear-gradient(135deg, #2F55F5 0 2px, #DCE3FF 2px 6px); 
+  --zt-hatch-green: repeating-linear-gradient(135deg, #1FAE4B 0 2px, #D3F2DD 2px 6px); 
+  --zt-hatch-pink: repeating-linear-gradient(135deg, #EE5FA7 0 2px, #FBDDEB 2px 6px); 
+  --zt-grad-bar: linear-gradient(180deg, #4B6BFF 0%, #2440E0 100%); 
+  --zt-grad-insight: linear-gradient(135deg, #1B2766 0%, #3A4AA6 38%, #D9825A 76%, #F6C79E 100%); 
+  --zt-grad-ai: linear-gradient(90deg, #EEF1FF 0%, #F8EEFF 100%); 
+
+  
+  --zt-r-canvas: 24px; 
+  --zt-r-card: 16px; 
+  --zt-r-inner: 10px; 
+  --zt-r-pill: 999px; 
+
+  
+  --zt-shadow: 0 1px 0 rgba(15,15,17,.03); 
+  --zt-shadow-canvas: 0 24px 60px rgba(15,15,17,.10); 
+  --zt-shadow-pop: 0 8px 24px rgba(15,15,17,.12); 
+
+  
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+
+  
+  --page-bg: var(--zt-outer);
+  --surface: var(--zt-surface);
+  --surface-2: var(--zt-surface-2);
+  --border: var(--zt-border);
+  --divider: var(--zt-border);
+  --text: var(--zt-text);
+  --text-2: var(--zt-text-2);
+  --muted: var(--zt-muted);
+  --accent: var(--zt-blue);
+  --hover: #F2F2F4;
+  --toc-bg: rgba(255,255,255,.9);
+  --code-bg: #111113;
+  --code-text: #E8EAF2;
+  --r-card: var(--zt-r-card);
+  --r-inner: var(--zt-r-inner);
+  --r-pill: var(--zt-r-pill);
+  --shadow: var(--zt-shadow);
+  --up: var(--zt-green);
+  --down: var(--zt-negative);
+}
+:root{--hero-w:500}
+
+html{scroll-behavior:smooth}
+body{font-family:var(--font-body);background:var(--page-bg);color:var(--text);-webkit-font-smoothing:antialiased;line-height:1.5;min-height:100vh}
+
+*{box-sizing:border-box;margin:0;padding:0}
+button{font:inherit}
+.hero{display:grid;gap:14px;padding:8px 0 4px}
+.hero h1{font-family:var(--font-head);font-size:clamp(36px,6.4vw,68px);font-weight:var(--hero-w,600);letter-spacing:-.025em;line-height:1.02}
+.hero .kicker{font-size:14px;color:var(--muted);font-weight:500}
+.hero p{color:var(--text-2);max-width:680px;font-size:16px}
+.hero .meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+section.block{margin-top:60px;scroll-margin-top:80px}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);box-shadow:var(--shadow);padding:20px}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.series{display:flex;height:46px;border-radius:var(--r-inner);overflow:hidden;margin-top:6px}
+.series div{flex:1;display:flex;align-items:flex-end;padding:6px 8px;font:500 11px var(--font-mono);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.25)}
+.flex{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.pb{margin:10px 0}
+.pb-h{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px}
+.chart{width:100%;height:auto;display:block;overflow:visible}
+pre{font-family:var(--font-mono);font-size:12.5px;line-height:1.65;white-space:pre-wrap;word-break:break-word;background:var(--code-bg);color:var(--code-text);border-radius:var(--r-inner);padding:22px;padding-top:56px;max-height:620px;overflow:auto}
+.toast{position:fixed;bottom:26px;left:50%;transform:translate(-50%,16px);opacity:0;pointer-events:none;background:#111;color:#fff;padding:10px 18px;border-radius:999px;font-size:13px;transition:.25s;z-index:99;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+footer{margin-top:70px;color:var(--muted);font-size:12.5px;text-align:center}
+@media (prefers-reduced-motion:reduce){
+*{animation:none !important;transition:none !important;scroll-behavior:auto !important}
+}
+.hero h1{letter-spacing:-.04em}
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--r-card);box-shadow:var(--shadow);padding:16px 18px;min-width:0;position:relative}
+.card-h{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}
+.card-t{font-size:15px;font-weight:500}
+.btn{font-weight:500;font-size:13px;border-radius:999px;padding:8px 16px;border:1px solid transparent;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--zt-ink);color:#fff}
+.btn-secondary{background:#fff;border-color:var(--border);color:var(--text)}
+.btn-ghost{background:transparent;color:var(--text-2)}
+.btn-icon{width:30px;height:30px;border-radius:50%;border:1px solid var(--border);background:#fff;display:inline-grid;place-items:center;cursor:pointer;font-size:8px;letter-spacing:1px;color:var(--text-2)}
+.tabs{display:flex;gap:2px;flex-wrap:wrap}
+.tab{padding:7px 13px;font-size:12.5px;border-radius:999px;color:var(--text-2);font-weight:500}
+.tab.active{background:var(--zt-ink);color:#fff}
+.seg{display:inline-flex;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:3px}
+.seg span{padding:5px 12px;border-radius:999px;font-size:12px;color:var(--text-2)}
+.seg .on{background:#fff;color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.08);font-weight:500}
+.kpi-t{display:flex;justify-content:space-between;font-size:15px;font-weight:500}
+.kpi-t .arr{width:28px;height:28px;border:1px solid var(--border);border-radius:50%;display:grid;place-items:center;font-size:12px}
+.kpi-v{font-size:42px;font-weight:400;letter-spacing:-.035em;margin-top:6px;display:flex;align-items:center;gap:12px;font-variant-numeric:tabular-nums;line-height:1.1}
+.kpi-s{font-size:12px;color:var(--muted)}
+.trend{font-size:11.5px;font-weight:500;padding:3px 8px;border-radius:999px;letter-spacing:0;border:1px solid transparent}
+.trend.up{background:var(--zt-positive-bg);color:var(--zt-green)}
+.trend.down{background:#FDECEC;color:var(--zt-negative)}
+.badge{background:#fff;border:1px solid var(--border);font-size:11px;font-weight:500;padding:3px 9px;border-radius:999px;box-shadow:var(--zt-shadow-pop)}
+.chip{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--text-2);border:1px solid var(--border);border-radius:999px;padding:4px 10px}
+.chip i{width:8px;height:8px;border-radius:2px;background:var(--c)}
+.bar{height:10px;background:var(--surface-2);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;background:var(--c)}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);font-size:13.5px}
+.row:last-child{border-bottom:0}
+.row>span:first-child{flex:1}
+
+/* ---- skóra shella (layout w tracker.css) ---- */
+.tb-frame{background:var(--zt-bg);border:1px solid #fff;box-shadow:var(--zt-shadow-canvas)}
+.tb-side{background:var(--surface);border-right:1px solid var(--border)}
+.tb-head{background:transparent}
+.tb-nav a.is-active{background:var(--accent);color:#fff}
