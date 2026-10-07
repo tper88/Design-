@@ -137,6 +137,10 @@ ok(dueCells.join(' ').includes(dmy) && dueCells2.join(' ').includes(dmy),
 /* ---------------------------------------- plik danych */
 section('FAZA 6 — plik danych, zapis i wskaźnik');
 await tr.locator('#tb-notices button', { hasText: 'Choose a data file' }).click();
+await tr.waitForSelector('dialog.tb-modal .tb-choice');
+ok(await tr.locator('dialog.tb-modal .tb-choice').count() === 2,
+  'wybór pliku daje dwie drogi: otwórz istniejący / utwórz nowy');
+await tr.locator('dialog.tb-modal .tb-choice', { hasText: 'Create a new data file' }).click();
 await tr.waitForTimeout(600);
 const st1 = await tr.locator('#tb-save').getAttribute('data-state');
 ok(st1 === 'saved', 'po wskazaniu pliku wskaźnik pokazuje "Zapisano"', st1);
@@ -169,6 +173,11 @@ await tr.evaluate(() => {
   });
   window.__fs.mtime = Date.now() + 60000;   // plik "zmieniony poza kartą"
   window.__fs.perm = 'prompt';
+  /* niezapisana zmiana w przeglądarce — dopiero wtedy jest o co się spierać;
+     bez niej nowszy plik po prostu się wczytuje */
+  const r = Object.values(TB.data.index).find(x => x.ds === ds.id && !x._d);
+  r.data[col('Subject')] = 'Zmiana lokalna przed Reconnect';
+  TB.store.touch(r);
 });
 const reconnected = await tr.evaluate(() => TB.store.reconnect());
 await tr.waitForTimeout(500);
@@ -179,6 +188,8 @@ const cActions = await tr.locator('#tb-notices .tb-banner-danger button').allTex
 ok(cActions.length === 3, 'pasek konfliktu daje 3 wyjścia', JSON.stringify(cActions));
 ok((await tr.locator('.tb-table tbody tr').count()) === 3,
   'przed decyzją dane NIE zostały nadpisane');
+const contentDuring = await tr.evaluate(() => { const w = window.__fs.content; return new Promise(res => setTimeout(() => res(w === window.__fs.content), 2200)); });
+ok(contentDuring, 'dopóki wisi pasek konfliktu, autozapis nie rusza pliku');
 await tr.locator('#tb-notices .tb-banner-danger button', { hasText: 'Load from file' }).click();
 await tr.waitForTimeout(700);
 const afterLoad = await tr.locator('.tb-table tbody tr').count();

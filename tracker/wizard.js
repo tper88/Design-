@@ -74,12 +74,14 @@
         trackerId: mintId('trk_'),
         name: 'My tracker',
         theme: (ASSET.themes.themes[0] || {}).id || 'amber-dusk',
+        /* Link do fontów musi iść z motywem od razu. Wcześniej ustawiał go tylko
+           klik w kafelek, więc szablony zawsze dostawały fonty systemowe. */
+        fontHref: (ASSET.themes.themes[0] || {}).fontHref || null,
         locale: 'en-GB',
         currency: 'PLN',
         team: '',
         personalization: true,
-        useWebFonts: true,
-        fontHref: null
+        useWebFonts: true
       },
       datasets: [],
       tabs: [],
@@ -207,6 +209,8 @@
       { k: 'agg.groupBy.field', kind: 'column', label: 'Group by column' },
       { k: 'agg.groupBy.grain', kind: 'enum', label: 'Time grouping', options: GRAINS },
       { k: 'agg.split.field', kind: 'column', label: 'Split into series by' },
+      { k: 'agg.split.limit', kind: 'number', label: 'Max series (line charts: 3 or fewer)',
+        when: function (c) { return !!(c.agg.split && c.agg.split.field); } },
       { k: 'agg.groupBy.limit', kind: 'number', label: 'Max groups (0 = no limit)' },
       { k: 'agg.filter', kind: 'filter', label: 'Only count rows where…', wide: true }
     ],
@@ -759,7 +763,8 @@
       if (i === W.ds) row.style.borderColor = 'var(--accent)';
       var main = el('div', 'wz-row-main');
       main.appendChild(el('div', 'wz-row-title', d.name));
-      main.appendChild(el('div', 'wz-row-meta', d.columns.length + ' columns'));
+      main.appendChild(el('div', 'wz-row-meta', d.columns.length +
+        (d.columns.length === 1 ? ' column' : ' columns')));
       main.style.cursor = 'pointer';
       main.addEventListener('click', function () { W.ds = i; renderStep2(); });
       row.appendChild(main);
@@ -841,6 +846,7 @@
       c.type = v;
       if (v !== 'enum') delete c.options;
       if (v !== 'number') delete c.format;
+      if (!defaultFits(c)) delete c.default;
       renderStep2();
     }), '0 0 130px');
     typeS.setAttribute('aria-label', 'Column type');
@@ -912,6 +918,18 @@
     return row;
   }
 
+  /* Default musi pasować do typu: @today tylko dla daty, @user/@team tylko dla
+     tekstu, wartość listy tylko dla listy. Inaczej zostaje niewidoczny i psuje
+     nowe wiersze po zmianie typu kolumny. */
+  function defaultFits(c) {
+    var d = c.default;
+    if (d == null || d === '') return true;
+    if (d === '@today' || d === '@now') return c.type === 'date';
+    if (d === '@user' || d === '@team') return c.type === 'text';
+    if (c.type === 'enum') return (c.options || []).some(function (o) { return o.value === d; });
+    return false;
+  }
+
   function editOptions(col) {
     col.options = col.options || [];
     var wrap = el('div', 'tb-stack');
@@ -938,6 +956,7 @@
         r.appendChild(m);
         var a = el('div', 'wz-row-actions');
         a.appendChild(mini('✕', 'Remove option', function () {
+          if (col.default === o.value) delete col.default;
           col.options.splice(i, 1);
           draw();
         }, true));
@@ -949,6 +968,15 @@
         col.options.push({ value: 'option' + n, label: 'Option ' + n, tone: '' });
         draw();
       }));
+      var def = field('New rows start as', select(
+        [{ v: '', l: '— empty —' }].concat(col.options.map(function (o) {
+          return { v: o.value, l: o.label || o.value };
+        })),
+        defaultFits(col) && col.default ? col.default : '',
+        function (v) { if (v) col.default = v; else delete col.default; }));
+      def.style.maxWidth = '280px';
+      def.style.marginTop = '12px';
+      wrap.appendChild(def);
     }
     draw();
 
@@ -1028,7 +1056,7 @@
               added++;
             });
             if (!ds.titleField && ds.columns.length) ds.titleField = ds.columns[0].id;
-            TBUI.toast('Created ' + added + ' columns', 'success');
+            TBUI.toast('Created ' + added + (added === 1 ? ' column' : ' columns'), 'success');
             TBUI.modal.close(wrap.closest('dialog'));
             renderStep2();
             return false;
@@ -1504,7 +1532,7 @@
     var kind = (cmp.opts || {}).kind;
     var split = cmp.agg && cmp.agg.split && cmp.agg.split.field;
     if (kind === 'line' && split && !(cmp.agg.split.limit > 0 && cmp.agg.split.limit <= 3)) {
-      return 'A line chart with many series becomes unreadable. Set the series limit to 3 or fewer.';
+      return 'A line chart with many series becomes unreadable. Set “Max series” to 3 or fewer.';
     }
     if (kind === 'donut' && !(cmp.agg && cmp.agg.groupBy && cmp.agg.groupBy.field)) {
       return 'A donut needs a column to group by — without one there is nothing to split.';
@@ -1603,7 +1631,13 @@
       var list = ds.columns.filter(function (c) { return !f.types || f.types.indexOf(c.type) >= 0; });
       return select([{ v: '', l: '— none —' }].concat(
         list.map(function (c) { return { v: c.id, l: c.label }; })),
-        val || '', function (v) { setPath(cmp, f.k, v || null); renderStep4(); });
+        val || '', function (v) {
+          setPath(cmp, f.k, v || null);
+          /* podział na serie od razu z limitem 3 — inaczej wykres liniowy
+             blokował eksport ostrzeżeniem, którego nie dało się spełnić */
+          if (f.k === 'agg.split.field' && v && !(cmp.agg.split.limit > 0)) cmp.agg.split.limit = 3;
+          renderStep4();
+        });
     }
     if (f.kind === 'columns') {
       if (!ds) return el('p', 'tb-dim', 'Choose a dataset first.');
@@ -1690,6 +1724,29 @@
 
   /* Edytor filtra działa na dowolnym obiekcie i ścieżce, żeby mógł go używać
      i panel komponentu, i edytor alertów. */
+  /* Wartość, którą kontrolka pokazuje jako pierwszą. Zapisujemy właśnie ją —
+     wcześniej lista pokazywała np. „today” albo „yes”, a w configu zostawało '',
+     więc filtr działał inaczej, niż wyglądał. */
+  function shownDefault(col, cmp) {
+    if (cmp === 'empty' || cmp === 'notEmpty') return undefined;
+    if (cmp === 'relDate') return 'today';
+    if (col && col.type === 'enum') return ((col.options || [])[0] || {}).value || '';
+    if (col && col.type === 'bool') return 'true';
+    return '';
+  }
+
+  function settleRule(r, ds) {
+    var col = ds.columns.filter(function (c) { return c.id === r.field; })[0];
+    var want = shownDefault(col, r.cmp);
+    if (want === undefined) { delete r.value; return; }
+    var bad = r.value == null || r.value === '' ||
+      (r.cmp === 'relDate' && !REL_DATES.some(function (x) { return x.v === r.value; })) ||
+      (r.cmp !== 'relDate' && col && col.type === 'enum' &&
+        !(col.options || []).some(function (o) { return o.value === r.value; })) ||
+      (r.cmp !== 'relDate' && col && col.type === 'bool' && r.value !== 'true' && r.value !== 'false');
+    if (bad && want !== '') r.value = want;
+  }
+
   function filterEditor(obj, path, ds, redraw) {
     var f = getPath(obj, path);
     if (!f || !f.rules) {
@@ -1699,14 +1756,20 @@
     var box = el('div', '');
     box.appendChild(hint('Every condition must hold at the same time. No conditions means all rows.'));
     f.rules.forEach(function (r, i) {
+      settleRule(r, ds);
       var row = el('div', 'wz-row');
       var m = el('div', 'tb-flexrow');
       m.style.cssText = 'flex:1;gap:6px;flex-wrap:wrap';
       var fs = small(select(ds.columns.map(function (c) { return { v: c.id, l: c.label }; }),
-        r.field || '', function (v) { r.field = v; redraw(); }), '1 1 120px');
+        r.field || '', function (v) { r.field = v; r.value = ''; redraw(); }), '1 1 120px');
       fs.setAttribute('aria-label', 'Column');
       m.appendChild(fs);
-      var cs = small(select(CMPS, r.cmp || 'eq', function (v) { r.cmp = v; redraw(); }), '1 1 130px');
+      var cs = small(select(CMPS, r.cmp || 'eq', function (v) {
+        var wasRel = r.cmp === 'relDate';
+        r.cmp = v;
+        if (wasRel !== (v === 'relDate')) r.value = '';
+        redraw();
+      }), '1 1 130px');
       cs.setAttribute('aria-label', 'Condition');
       m.appendChild(cs);
 
@@ -1804,12 +1867,17 @@
 
       if (a.kind === 'setField' || a.kind === 'clearField') {
         var fs = small(select(ds.columns.map(function (c) { return { v: c.id, l: c.label }; }),
-          a.field || '', function (v) { a.field = v; renderStep4(); }), '1 1 120px');
+          a.field || '', function (v) { a.field = v; a.value = ''; renderStep4(); }), '1 1 120px');
         fs.setAttribute('aria-label', 'Field');
         m.appendChild(fs);
       }
       if (a.kind === 'setField') {
         var col = ds.columns.filter(function (c) { return c.id === a.field; })[0];
+        if (col && col.type === 'enum' &&
+            !(col.options || []).some(function (o) { return o.value === a.value; })) {
+          a.value = ((col.options || [])[0] || {}).value || '';
+        }
+        if (col && col.type === 'bool' && a.value !== 'true' && a.value !== 'false') a.value = 'true';
         var vc;
         if (col && col.type === 'enum') {
           vc = select((col.options || []).map(function (o) { return { v: o.value, l: o.label }; }),
@@ -1839,11 +1907,18 @@
         }
       }
       if (a.kind === 'moveTo') {
+        if (!W.cfg.datasets.some(function (d) { return d.id === a.dataset; })) {
+          var other = W.cfg.datasets.filter(function (d) { return d.id !== ds.id; })[0];
+          a.dataset = (other || W.cfg.datasets[0] || {}).id;
+        }
         var ms = small(select(W.cfg.datasets.map(function (d) { return { v: d.id, l: d.name }; }),
           a.dataset || '', function (v) { a.dataset = v; }), '1 1 130px');
         ms.setAttribute('aria-label', 'Target dataset');
         m.appendChild(ms);
       }
+      var ask = checkbox('Ask before running', !!a.confirm, function (v) { a.confirm = v; });
+      ask.style.flex = '1 1 100%';
+      m.appendChild(ask);
       row.appendChild(m);
       var acts = el('div', 'wz-row-actions');
       acts.appendChild(mini('✕', 'Remove action', function () {
@@ -2026,7 +2101,7 @@
   /* ---- 6: review ---- */
 
   function fileBase() {
-    return (W.cfg.meta.name || 'tracker').replace(/[^\w\-. ]+/g, '_').trim() || 'tracker';
+    return (W.cfg.meta.name || 'tracker').replace(/[^\p{L}\p{N}_\-. ]+/gu, '_').trim() || 'tracker';
   }
 
   function validate() {
@@ -2325,6 +2400,10 @@
       cfg.meta.useWebFonts = cfg.meta.useWebFonts !== false;
       if (cfg.meta.personalization === undefined) cfg.meta.personalization = true;
       delete cfg.meta.allowThemeSwitch;
+      if (!cfg.meta.fontHref) {
+        var th = (ASSET.themes.themes || []).filter(function (x) { return x.id === cfg.meta.theme; })[0];
+        cfg.meta.fontHref = (th && th.fontHref) || null;
+      }
       W.cfg = cfg;
       W.step = 1;
       W.tab = 0;
@@ -2365,6 +2444,7 @@
 
   global.TBWizard = {
     state: W, emit: emit, validate: validate, synth: synth, parseDelimited: parseDelimited,
-    presets: { build: buildPreset, roles: guessRoles }
+    presets: { build: buildPreset, roles: guessRoles },
+    fileBase: fileBase, defaultFits: defaultFits
   };
 })(window);

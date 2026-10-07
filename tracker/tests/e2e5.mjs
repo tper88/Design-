@@ -201,6 +201,8 @@ const fileProfile = await tr.evaluate(() => {
   try { return JSON.parse(window.__fs.content).profile; } catch (e) { return null; }
 });
 await tr.locator('#tb-head-actions button', { hasText: 'Save' }).click();
+/* bez podpiętego pliku Save pyta, czy otworzyć istniejący, czy utworzyć nowy */
+await tr.locator('dialog.tb-modal .tb-choice', { hasText: 'Create a new data file' }).click();
 await tr.waitForTimeout(800);
 const fp2 = await tr.evaluate(() => {
   try { return JSON.parse(window.__fs.content).profile; } catch (e) { return null; }
