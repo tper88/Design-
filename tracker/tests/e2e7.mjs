@@ -127,7 +127,7 @@ const b2 = await gb.locator('dialog.tb-modal .tb-banner-text').textContent();
 ok(/no header row/.test(b2), 'okno mówi, że dopasowanie jest po pozycji', b2);
 ok(/1 row ready/.test(await gb.locator('dialog.tb-modal .tb-banner-title').textContent()),
   'pierwszy wiersz NIE jest zjadany jako nagłówek');
-await gb.locator('dialog.tb-modal button', { hasText: 'Import 1 rows' }).click();
+await gb.locator('dialog.tb-modal button', { hasText: 'Import 1 row' }).click();
 await gb.waitForTimeout(500);
 rows = await records(gb);
 const pj = find(rows, 'Printer jam');

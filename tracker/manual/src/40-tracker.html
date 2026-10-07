@@ -1,0 +1,453 @@
+<section id="tracker" data-level="1" data-pl="Praca w trackerze" data-en="Using the tracker">
+<div class="l-pl" lang="pl">
+<p>Ten rozdział jest dla każdego, kto <strong>używa</strong> trackera — także dla osób, które nigdy nie otworzą kreatora.
+Jeśli przekazujesz tracker koledze, wyślij mu ten rozdział.</p>
+<figure class="shot"><img data-shot="t-table" alt="Tracker z tabelą zgłoszeń"><figcaption>Tracker: zakładki po lewej, profil na dole, u góry dzwonek alertów, stan zapisu, Save i menu ⋯.</figcaption></figure>
+</div>
+<div class="l-en" lang="en">
+<p>This chapter is for everyone who <strong>uses</strong> the tracker — including people who will never open the wizard.
+If you hand the tracker to a colleague, send them this chapter.</p>
+<figure class="shot"><img data-shot="t-table" alt="The tracker with a table of requests"><figcaption>The tracker: tabs on the left, your profile at the bottom, and at the top the alerts bell, save status, Save and the ⋯ menu.</figcaption></figure>
+</div>
+</section>
+
+<section id="t-first" data-level="2" data-pl="Pierwsze otwarcie: plik danych" data-en="First opening: the data file">
+<div class="l-pl" lang="pl">
+<p>Przy pierwszym otwarciu u góry jest żółty baner <span class="ui">Your data is not being written to a file</span>.
+Tracker działa, ale dopóki nie wskażesz pliku, dane są tylko w przeglądarce — wyczyszczenie przeglądarki by je usunęło.</p>
+<figure class="shot"><img data-shot="t-first-open" alt="Pierwsze otwarcie trackera"><figcaption>Pierwsze otwarcie: baner z przyciskiem Choose a data file.</figcaption></figure>
+<p>Kliknij <span class="ui">Choose a data file</span>. Tracker zapyta, skąd mają być dane:</p>
+<figure class="shot small"><img data-shot="t-choose-file" alt="Okno wyboru pliku danych"><figcaption>Dwie drogi — wybierz właściwą.</figcaption></figure>
+<div class="tbl"><table><thead><tr><th>Wybierz…</th><th>gdy…</th><th>co się stanie</th></tr></thead><tbody>
+<tr><td><span class="ui">Create a new data file</span></td><td>używasz tego trackera <strong>pierwszy raz</strong></td><td>Chrome zapyta o folder i nazwę. Wszystko, co już wpisałeś, trafi do nowego pliku.</td></tr>
+<tr><td><span class="ui">Open my existing data file</span></td><td><strong>masz już plik</strong> <code>.data.json</code> — na nowym komputerze, po wyczyszczeniu przeglądarki, po przeniesieniu trackera</td><td>Chrome zapyta, który plik otworzyć, i czy tracker może go zapisywać — zgódź się. Wiersze z pliku pojawią się w trackerze. <strong>Plik nie jest nadpisywany.</strong></td></tr>
+</tbody></table></div>
+<div class="callout bad"><span class="t">Masz już dane? Zawsze „Open my existing data file”</span>
+Jeśli w okienku <span class="ui">Create a new data file</span> wskażesz istniejący plik i zgodzisz się go zastąpić,
+zastąpisz swoje dane tym, co jest w przeglądarce. Chrome o to pyta — przeczytaj pytanie.</div>
+<p>Jeśli plik ma dane, a w przeglądarce są zmiany, których w pliku nie ma, tracker nie zgaduje — zapyta,
+którą wersję zachować (patrz <a href="#t-saving">6.2</a>, „Pasek wyboru wersji”).</p>
+</div>
+<div class="l-en" lang="en">
+<p>The first time, there is a yellow banner at the top: <span class="ui">Your data is not being written to a file</span>.
+The tracker works, but until you choose a file the data lives only in the browser — clearing the browser would delete it.</p>
+<figure class="shot"><img data-shot="t-first-open" alt="Opening the tracker for the first time"><figcaption>First opening: the banner with the Choose a data file button.</figcaption></figure>
+<p>Click <span class="ui">Choose a data file</span>. The tracker asks where your data should live:</p>
+<figure class="shot small"><img data-shot="t-choose-file" alt="The data file choice"><figcaption>Two ways — pick the right one.</figcaption></figure>
+<div class="tbl"><table><thead><tr><th>Choose…</th><th>when…</th><th>what happens</th></tr></thead><tbody>
+<tr><td><span class="ui">Create a new data file</span></td><td>you use this tracker <strong>for the first time</strong></td><td>Chrome asks for a folder and a name. Everything you have typed so far goes into the new file.</td></tr>
+<tr><td><span class="ui">Open my existing data file</span></td><td>you <strong>already have</strong> a <code>.data.json</code> — on a new computer, after clearing the browser, after moving the tracker</td><td>Chrome asks which file to open and whether the tracker may save to it — say yes. The file's rows appear in the tracker. <strong>The file is not overwritten.</strong></td></tr>
+</tbody></table></div>
+<div class="callout bad"><span class="t">Already have data? Always “Open my existing data file”</span>
+If you pick an existing file in <span class="ui">Create a new data file</span> and agree to replace it, you replace your data
+with whatever is in the browser. Chrome asks first — read the question.</div>
+<p>If the file holds data and the browser has changes that are not in it, the tracker does not guess — it asks which
+version to keep (see <a href="#t-saving">6.2</a>, “The which-version bar”).</p>
+</div>
+</section>
+
+<section id="t-saving" data-level="2" data-pl="Zapisywanie i stan zapisu" data-en="Saving and the save status">
+<div class="l-pl" lang="pl">
+<p><strong>Tracker zapisuje sam.</strong> Półtorej sekundy po ostatniej zmianie dane trafiają do pliku. Nie musisz
+niczego klikać. Stan zapisu widać u góry, obok przycisku <span class="ui">Save</span>:</p>
+<figure class="shot"><img data-shot="t-topbar" alt="Górny pasek trackera"><figcaption>Dzwonek alertów, stan zapisu, Save i menu ⋯.</figcaption></figure>
+<div class="tbl"><table><thead><tr><th>Napis</th><th>Kropka</th><th>Znaczenie</th></tr></thead><tbody>
+<tr><td><span class="ui nocheck">Saved 14:32</span></td><td>zielona</td><td>Wszystko jest w pliku. O tej godzinie zapisano ostatnią zmianę.</td></tr>
+<tr><td><span class="ui">Unsaved changes</span></td><td>żółta</td><td>Są zmiany, których jeszcze nie ma w pliku — zaraz się zapiszą. Jeśli napis nie znika, kliknij <span class="ui">Save</span>.</td></tr>
+<tr><td><span class="ui">Saving…</span></td><td>niebieska</td><td>Trwa zapis.</td></tr>
+<tr><td><span class="ui">Not linked to a file</span></td><td>czerwona</td><td>Tracker nie ma pliku albo nie ma do niego dostępu. Dane są tylko w przeglądarce.</td></tr>
+</tbody></table></div>
+<ul>
+<li><span class="ui">Save</span> albo <kbd>Ctrl</kbd>+<kbd>S</kbd> zapisuje natychmiast. Bez pliku otwiera wybór pliku.</li>
+<li>Przejście na inną kartę przeglądarki też wymusza zapis.</li>
+<li>Gdy zamykasz kartę z niezapisanymi zmianami, Chrome zapyta, czy na pewno wyjść — wybierz „Anuluj”, poczekaj na <em>Saved</em>.</li>
+<li>Jeśli zapis się nie uda (np. pełny dysk), zobaczysz czerwony komunikat <span class="ui nocheck">Could not write the data file: …</span>
+i stan <span class="ui">Unsaved changes</span>. Dane są wtedy nadal w przeglądarce — zwolnij miejsce i kliknij <span class="ui">Save</span>.</li>
+</ul>
+<h4>Pasek wyboru wersji</h4>
+<p>Czasem plik i przeglądarka mają <strong>różne</strong> dane: ktoś zmienił plik na innym komputerze, a Ty w tym
+czasie pracowałeś w przeglądarce. Wtedy pojawia się czerwony pasek — <span class="ui">The data file is newer than the browser copy</span>
+albo <span class="ui">This file already holds data</span>.</p>
+<figure class="shot"><img data-shot="t-conflict" alt="Pasek wyboru wersji"><figcaption>Do czasu wyboru tracker niczego nie zapisuje do pliku.</figcaption></figure>
+<dl class="fields">
+<dt><span class="ui">Load from file</span></dt>
+<dd><p>Wygrywa plik. To, co jest w przeglądarce, zostaje zastąpione danymi z pliku.</p></dd>
+<dt><span class="ui">Keep browser copy</span></dt>
+<dd><p>Wygrywa przeglądarka. Plik zostaje nadpisany wersją z przeglądarki.</p></dd>
+<dt><span class="ui">Download both</span></dt>
+<dd><p>Nie wiesz, co wybrać? Pobiera obie wersje jako pliki JSON do folderu Pobrane — możesz je porównać. Pasek zostaje,
+dopóki nie wybierzesz jednej z dwóch powyższych opcji.</p></dd>
+</dl>
+</div>
+<div class="l-en" lang="en">
+<p><strong>The tracker saves by itself.</strong> A second and a half after your last change the data goes into the file.
+You do not need to click anything. The save status is at the top, next to <span class="ui">Save</span>:</p>
+<figure class="shot"><img data-shot="t-topbar" alt="The tracker's top bar"><figcaption>The alerts bell, the save status, Save and the ⋯ menu.</figcaption></figure>
+<div class="tbl"><table><thead><tr><th>Text</th><th>Dot</th><th>Meaning</th></tr></thead><tbody>
+<tr><td><span class="ui nocheck">Saved 14:32</span></td><td>green</td><td>Everything is in the file. The last change was saved at that time.</td></tr>
+<tr><td><span class="ui">Unsaved changes</span></td><td>amber</td><td>There are changes not yet in the file — they will save in a moment. If it does not go away, click <span class="ui">Save</span>.</td></tr>
+<tr><td><span class="ui">Saving…</span></td><td>blue</td><td>Saving is in progress.</td></tr>
+<tr><td><span class="ui">Not linked to a file</span></td><td>red</td><td>The tracker has no file or no access to it. The data is only in the browser.</td></tr>
+</tbody></table></div>
+<ul>
+<li><span class="ui">Save</span> or <kbd>Ctrl</kbd>+<kbd>S</kbd> saves at once. Without a file it opens the file choice.</li>
+<li>Switching to another browser tab also forces a save.</li>
+<li>If you close the tab with unsaved changes, Chrome asks whether you really want to leave — choose “Cancel” and wait for <em>Saved</em>.</li>
+<li>If saving fails (e.g. the disk is full) you see a red message, <span class="ui nocheck">Could not write the data file: …</span>,
+and the status <span class="ui">Unsaved changes</span>. The data is still in the browser — free some space and click <span class="ui">Save</span>.</li>
+</ul>
+<h4>The which-version bar</h4>
+<p>Sometimes the file and the browser hold <strong>different</strong> data: someone changed the file on another computer
+while you were working in the browser. Then a red bar appears — <span class="ui">The data file is newer than the browser copy</span>
+or <span class="ui">This file already holds data</span>.</p>
+<figure class="shot"><img data-shot="t-conflict" alt="The which-version bar"><figcaption>Until you choose, the tracker saves nothing to the file.</figcaption></figure>
+<dl class="fields">
+<dt><span class="ui">Load from file</span></dt>
+<dd><p>The file wins. What is in the browser is replaced with the file's data.</p></dd>
+<dt><span class="ui">Keep browser copy</span></dt>
+<dd><p>The browser wins. The file is overwritten with the browser's version.</p></dd>
+<dt><span class="ui">Download both</span></dt>
+<dd><p>Not sure? It downloads both versions as JSON files to your Downloads folder so you can compare them. The bar stays
+until you choose one of the two options above.</p></dd>
+</dl>
+</div>
+</section>
+
+<section id="t-reconnect" data-level="2" data-pl="Po zamknięciu przeglądarki: Reconnect" data-en="After closing the browser: Reconnect">
+<div class="l-pl" lang="pl">
+<p>Przeglądarka pamięta Twój plik, ale ze względów bezpieczeństwa po każdym jej zamknięciu prosi o zgodę na zapis.
+Dlatego po ponownym otwarciu trackera zobaczysz baner:</p>
+<figure class="shot"><img data-shot="t-reconnect" alt="Baner Reconnect"><figcaption>Baner pokazuje nazwę zapamiętanego pliku. Jedno kliknięcie wystarczy.</figcaption></figure>
+<ol class="steps">
+<li>Kliknij <span class="ui">Reconnect</span>.</li>
+<li>Chrome zapyta, czy pozwolić stronie edytować plik — kliknij „Edytuj plik” / „Allow”.</li>
+<li>Zobaczysz <span class="ui">Connected — changes save automatically</span>. Gotowe — do zamknięcia przeglądarki nie zapyta ponownie.</li>
+</ol>
+<div class="callout tip">Najlepiej kliknąć <span class="ui">Reconnect</span> od razu po otwarciu. Jeśli jednak zaczniesz pracę
+wcześniej, nic nie przepadnie — po połączeniu Twoje zmiany zostaną zapisane do pliku.</div>
+<p>Jeśli odmówisz, zobaczysz <span class="ui">Without file access your changes stay in the browser only</span>. Możesz połączyć się później:
+<span class="ui">Save</span>, <kbd>Ctrl</kbd>+<kbd>S</kbd> albo baner u góry.</p>
+</div>
+<div class="l-en" lang="en">
+<p>The browser remembers your file, but for safety it asks for permission to save every time it has been closed.
+So when you open the tracker again you see a banner:</p>
+<figure class="shot"><img data-shot="t-reconnect" alt="The Reconnect banner"><figcaption>The banner shows the remembered file's name. One click is enough.</figcaption></figure>
+<ol class="steps">
+<li>Click <span class="ui">Reconnect</span>.</li>
+<li>Chrome asks whether to let the page edit the file — click “Edit file” / “Allow”.</li>
+<li>You see <span class="ui">Connected — changes save automatically</span>. Done — it will not ask again until you close the browser.</li>
+</ol>
+<div class="callout tip">It is best to click <span class="ui">Reconnect</span> straight away. If you start working first, nothing is
+lost — once connected, your changes are written to the file.</div>
+<p>If you refuse, you see <span class="ui">Without file access your changes stay in the browser only</span>. You can connect later:
+<span class="ui">Save</span>, <kbd>Ctrl</kbd>+<kbd>S</kbd> or the banner at the top.</p>
+</div>
+</section>
+
+<section id="t-rows" data-level="2" data-pl="Dodawanie i poprawianie wierszy" data-en="Adding and editing rows">
+<div class="l-pl" lang="pl">
+<h4>Nowy wiersz</h4>
+<ol class="steps">
+<li>Kliknij <span class="ui">+ Add row</span> nad tabelą. Z prawej wysunie się panel z formularzem.</li>
+<li>Wypełnij pola. Pola z gwiazdką są obowiązkowe. Niektóre są już wypełnione (np. dzisiejsza data, Twoje imię).</li>
+<li>Kliknij <span class="ui">Add row</span> na dole panelu.</li>
+</ol>
+<h4>Poprawianie w panelu</h4>
+<p><strong>Kliknij wiersz</strong> — otworzy się panel ze wszystkimi polami (także tymi, których nie ma w tabeli).
+Popraw i kliknij <span class="ui">Save changes</span>. <span class="ui">Delete row</span> usuwa wiersz (po potwierdzeniu).</p>
+<figure class="shot"><img data-shot="t-drawer" alt="Panel szczegółów wiersza"><figcaption>Panel wiersza: wszystkie pola, karteczki przypięte do wiersza i przyciski na dole.</figcaption></figure>
+<div class="callout warn"><span class="t">Zamknięcie panelu bez zapisu porzuca zmiany</span>
+✕, <kbd>Esc</kbd> albo kliknięcie obok panelu zamykają go bez pytania. Zawsze kończ przyciskiem
+<span class="ui">Save changes</span> albo <span class="ui">Add row</span>.</div>
+<h4>Szybka poprawka w komórce</h4>
+<p><strong>Kliknij dwa razy</strong> komórkę — zamieni się w pole edycji. <kbd>Enter</kbd> zapisuje, <kbd>Esc</kbd> anuluje.
+Kolumny tak/nie zmieniasz jednym kliknięciem w kratkę, a długi tekst tylko w panelu.</p>
+<figure class="shot"><img data-shot="t-cell-edit" alt="Edycja w komórce"><figcaption>Dwuklik na statusie: lista wyboru prosto w tabeli.</figcaption></figure>
+<h4>Kropkowane podkreślenie</h4>
+<p>Wartość podkreślona kropkami nie pasuje do typu kolumny (np. „32.13.2026” w kolumnie daty, tekst w kolumnie liczb).
+Tracker jej nie zmienia ani nie kasuje — najedź myszą, żeby zobaczyć wyjaśnienie, i popraw wartość.</p>
+<figure class="shot"><img data-shot="t-bad-value" alt="Wartość, która nie pasuje do kolumny"><figcaption>„32.13.2026” w kolumnie Due — do poprawienia.</figcaption></figure>
+</div>
+<div class="l-en" lang="en">
+<h4>A new row</h4>
+<ol class="steps">
+<li>Click <span class="ui">+ Add row</span> above the table. A panel with a form slides in from the right.</li>
+<li>Fill in the fields. Fields with an asterisk are required. Some are already filled in (e.g. today's date, your name).</li>
+<li>Click <span class="ui">Add row</span> at the bottom of the panel.</li>
+</ol>
+<h4>Editing in the panel</h4>
+<p><strong>Click a row</strong> — a panel opens with every field (including ones not shown in the table). Make your changes
+and click <span class="ui">Save changes</span>. <span class="ui">Delete row</span> deletes the row (after confirming).</p>
+<figure class="shot"><img data-shot="t-drawer" alt="The row details panel"><figcaption>The row panel: every field, notes pinned to the row and the buttons at the bottom.</figcaption></figure>
+<div class="callout warn"><span class="t">Closing the panel without saving discards the changes</span>
+✕, <kbd>Esc</kbd> or clicking beside the panel close it without asking. Always finish with
+<span class="ui">Save changes</span> or <span class="ui">Add row</span>.</div>
+<h4>A quick fix in a cell</h4>
+<p><strong>Double-click</strong> a cell — it turns into an input. <kbd>Enter</kbd> saves, <kbd>Esc</kbd> cancels. Yes/no
+columns change with one click on the box, and long text only in the panel.</p>
+<figure class="shot"><img data-shot="t-cell-edit" alt="Editing in a cell"><figcaption>Double-clicking a status: the pick list right in the table.</figcaption></figure>
+<h4>A dotted underline</h4>
+<p>A value with a dotted underline does not fit the column type (e.g. “32.13.2026” in a date column, text in a number
+column). The tracker neither changes nor deletes it — hover to see the explanation, then correct the value.</p>
+<figure class="shot"><img data-shot="t-bad-value" alt="A value that does not fit its column"><figcaption>“32.13.2026” in the Due column — needs fixing.</figcaption></figure>
+</div>
+</section>
+
+<section id="t-find" data-level="2" data-pl="Szukanie, szybkie filtry, sortowanie, strony" data-en="Search, quick filters, sorting, pages">
+<div class="l-pl" lang="pl">
+<figure class="shot"><img data-shot="t-toolbar" alt="Pasek nad tabelą"><figcaption>Nad tabelą: szukanie, szybkie filtry, liczba zaznaczonych, + Add row i Export.</figcaption></figure>
+<dl class="fields">
+<dt><span class="ui">Search…</span></dt>
+<dd><p>Wpisz fragment tekstu — tabela pokaże wiersze, w których ten tekst występuje w którejkolwiek widocznej kolumnie.</p></dd>
+<dt>Szybkie filtry</dt>
+<dd><p>Kliknij np. <em>Overdue</em> — zostaną tylko zaległe. Kliknij jeszcze raz, żeby wyłączyć. Działa jeden naraz.</p></dd>
+<dt>Sortowanie</dt>
+<dd><p>Kliknij nagłówek kolumny: rosnąco. Jeszcze raz: malejąco. Strzałka przy nagłówku pokazuje kierunek.</p></dd>
+<dt>Strony</dt>
+<dd><p>Pod tabelą jest licznik („42 rows · page 1 of 1”) i przyciski stron.</p></dd>
+</dl>
+<figure class="shot"><img data-shot="t-chip-active" alt="Włączony szybki filtr"><figcaption>Włączony filtr Overdue — zostały tylko zgłoszenia po terminie.</figcaption></figure>
+<p>Gdy filtry nic nie znajdą, zobaczysz <span class="ui">Nothing matches your filters</span> i przycisk
+<span class="ui">Clear filters</span>. Przy ponad 500 pasujących wierszach tabela pokazuje pierwsze 500 (baner
+<span class="ui">Showing the first 500 rows</span>) — eksport i sumy i tak obejmują wszystkie.</p>
+<div class="callout note">Szukanie, filtry, sortowanie, strona i zaznaczenie są zapominane po zamknięciu trackera.
+Po otwarciu zawsze widać pierwszą zakładkę.</div>
+</div>
+<div class="l-en" lang="en">
+<figure class="shot"><img data-shot="t-toolbar" alt="The bar above the table"><figcaption>Above the table: search, quick filters, the number selected, + Add row and Export.</figcaption></figure>
+<dl class="fields">
+<dt><span class="ui">Search…</span></dt>
+<dd><p>Type part of a text — the table shows rows where it appears in any visible column.</p></dd>
+<dt>Quick filters</dt>
+<dd><p>Click e.g. <em>Overdue</em> — only overdue rows remain. Click again to switch it off. One works at a time.</p></dd>
+<dt>Sorting</dt>
+<dd><p>Click a column header: ascending. Again: descending. The arrow next to the header shows the direction.</p></dd>
+<dt>Pages</dt>
+<dd><p>Under the table there is a counter (“42 rows · page 1 of 1”) and page buttons.</p></dd>
+</dl>
+<figure class="shot"><img data-shot="t-chip-active" alt="A quick filter switched on"><figcaption>The Overdue filter is on — only overdue requests remain.</figcaption></figure>
+<p>When the filters find nothing you see <span class="ui">Nothing matches your filters</span> and a
+<span class="ui">Clear filters</span> button. With more than 500 matching rows the table shows the first 500 (the banner
+<span class="ui">Showing the first 500 rows</span>) — exports and totals still cover all of them.</p>
+<div class="callout note">Search, filters, sorting, the page and the selection are forgotten when the tracker is closed.
+It always opens on the first tab.</div>
+</div>
+</section>
+
+<section id="t-select" data-level="2" data-pl="Zaznaczanie i prawy przycisk myszy" data-en="Selecting rows and right-clicking">
+<div class="l-pl" lang="pl">
+<p>Kratka na początku wiersza zaznacza go. Kratka w nagłówku zaznacza wszystkie wiersze <strong>na bieżącej stronie</strong>.
+Zaznaczenie przetrwa zmianę strony i filtrowania.</p>
+<p>Kliknij wiersz <strong>prawym przyciskiem myszy</strong>, żeby zobaczyć menu:</p>
+<figure class="shot"><img data-shot="t-context-menu" alt="Menu pod prawym przyciskiem"><figcaption>Dwa zaznaczone wiersze: menu działa na oba.</figcaption></figure>
+<div class="tbl"><table><thead><tr><th>Pozycja</th><th>Co robi</th></tr></thead><tbody>
+<tr><td><span class="ui">Edit row</span> / <span class="ui">Open first row</span></td><td>Otwiera panel wiersza (przy wielu — pierwszego).</td></tr>
+<tr><td><span class="ui">Duplicate</span></td><td>Tworzy kopię wiersza (lub wierszy).</td></tr>
+<tr><td><span class="ui">Add a note</span></td><td>Otwiera panel wiersza, gdzie klikasz <span class="ui">+ Pin a note</span>.</td></tr>
+<tr><td><span class="ui">Copy as text</span></td><td>Kopiuje wiersze z nagłówkiem — można je wkleić do Excela albo maila.</td></tr>
+<tr><td>Własne akcje</td><td>Np. <em>Close request</em>, <em>Due today</em>, <em>Assign to me</em> — robią swoje jednym kliknięciem.</td></tr>
+<tr><td><span class="ui">Export selected to Excel</span></td><td>Zapisuje zaznaczone wiersze do pliku Excel.</td></tr>
+<tr><td>Delete</td><td>Usuwa (po potwierdzeniu).</td></tr>
+</tbody></table></div>
+<div class="callout tip"><span class="t">Zasada wielu wierszy</span>
+Kliknięty prawym wiersz jest <strong>w zaznaczeniu</strong> → akcja dotyczy wszystkich zaznaczonych (menu pokazuje ich
+liczbę u góry). Kliknięty wiersz jest <strong>poza zaznaczeniem</strong> → akcja dotyczy tylko jego.</div>
+<p>Z klawiatury: przejdź <kbd>Tab</kbd> do kratki wiersza i naciśnij <kbd>Shift</kbd>+<kbd>F10</kbd>.</p>
+</div>
+<div class="l-en" lang="en">
+<p>The box at the start of a row selects it. The box in the header selects every row <strong>on the current page</strong>.
+The selection survives changing pages and filters.</p>
+<p><strong>Right-click</strong> a row to see the menu:</p>
+<figure class="shot"><img data-shot="t-context-menu" alt="The right-click menu"><figcaption>Two rows ticked: the menu acts on both.</figcaption></figure>
+<div class="tbl"><table><thead><tr><th>Item</th><th>What it does</th></tr></thead><tbody>
+<tr><td><span class="ui">Edit row</span> / <span class="ui">Open first row</span></td><td>Opens the row panel (the first one when several).</td></tr>
+<tr><td><span class="ui">Duplicate</span></td><td>Makes a copy of the row (or rows).</td></tr>
+<tr><td><span class="ui">Add a note</span></td><td>Opens the row panel, where you click <span class="ui">+ Pin a note</span>.</td></tr>
+<tr><td><span class="ui">Copy as text</span></td><td>Copies the rows with a header — paste them into Excel or an email.</td></tr>
+<tr><td>Your own actions</td><td>E.g. <em>Close request</em>, <em>Due today</em>, <em>Assign to me</em> — each does its job in one click.</td></tr>
+<tr><td><span class="ui">Export selected to Excel</span></td><td>Saves the ticked rows to an Excel file.</td></tr>
+<tr><td>Delete</td><td>Deletes (after confirming).</td></tr>
+</tbody></table></div>
+<div class="callout tip"><span class="t">The many-rows rule</span>
+The right-clicked row is <strong>in the selection</strong> → the action applies to every ticked row (the menu shows how many at
+the top). The row is <strong>outside the selection</strong> → it applies to that row only.</div>
+<p>From the keyboard: <kbd>Tab</kbd> to a row's box and press <kbd>Shift</kbd>+<kbd>F10</kbd>.</p>
+</div>
+</section>
+
+<section id="t-paste" data-level="2" data-pl="Wklejanie z Excela" data-en="Pasting from Excel">
+<div class="l-pl" lang="pl">
+<ol class="steps">
+<li>W Excelu zaznacz wiersze (najlepiej razem z nagłówkiem) i skopiuj: <kbd>Ctrl</kbd>+<kbd>C</kbd>.</li>
+<li>W trackerze otwórz zakładkę z tabelą, kliknij gdziekolwiek poza polem tekstowym i naciśnij <kbd>Ctrl</kbd>+<kbd>V</kbd>.</li>
+<li>Pojawi się okno <span class="ui">Import rows</span>. Sprawdź, czy każda kolumna z Excela trafia we właściwą kolumnę
+trackera. Kolumny, których nie chcesz, ustaw na <span class="ui">— skip —</span>.</li>
+<li>Kliknij <span class="ui nocheck">Import N rows</span>.</li>
+</ol>
+<figure class="shot medium"><img data-shot="t-paste-import" alt="Okno Import rows"><figcaption>Kolumny dopasowane po nazwach; przy każdej przykład wartości z Excela.</figcaption></figure>
+<ul>
+<li><strong>Z nagłówkiem</strong> kolumny są dopasowane po nazwach, w dowolnej kolejności. <strong>Bez nagłówka</strong>
+— po kolejności kolumn w tabeli; okno to napisze.</li>
+<li>Daty i liczby są czytane według formatu wybranego w kreatorze. „06.10.2026”, „1 234,56 zł”, „PRAWDA” — wszystko zadziała,
+jeśli format zgadza się z Twoim Excelem.</li>
+<li>Wartości, których nie da się odczytać, nie przepadają: trafiają do trackera tak, jak były, z kropkowanym podkreśleniem,
+a komunikat po imporcie mówi, ile ich było.</li>
+<li>Pusta tabela ma też przycisk <span class="ui">Paste from Excel</span> — otwiera pole, w które wklejasz ręcznie.</li>
+</ul>
+<div class="callout note">Import nie sprawdza pól obowiązkowych. Puste kolumny, które mają wartość domyślną (dziś, Twoje imię),
+zostaną nią wypełnione.</div>
+</div>
+<div class="l-en" lang="en">
+<ol class="steps">
+<li>In Excel, select the rows (ideally with the header) and copy: <kbd>Ctrl</kbd>+<kbd>C</kbd>.</li>
+<li>In the tracker, open a tab with a table, click anywhere outside a text field and press <kbd>Ctrl</kbd>+<kbd>V</kbd>.</li>
+<li>The <span class="ui">Import rows</span> window appears. Check that each Excel column goes into the right tracker column.
+Set columns you do not want to <span class="ui">— skip —</span>.</li>
+<li>Click <span class="ui nocheck">Import N rows</span>.</li>
+</ol>
+<figure class="shot medium"><img data-shot="t-paste-import" alt="The Import rows window"><figcaption>Columns matched by name; each shows an example value from Excel.</figcaption></figure>
+<ul>
+<li><strong>With a header</strong>, columns are matched by name in any order. <strong>Without one</strong>, by the order of the
+table's columns; the window says so.</li>
+<li>Dates and numbers are read in the format chosen in the wizard. “06/10/2026”, “£1,234.56”, “TRUE” — all work, as long as the
+format matches your Excel.</li>
+<li>Values that cannot be read are not lost: they go in as they were, with a dotted underline, and the message after the import
+says how many there were.</li>
+<li>An empty table also has a <span class="ui">Paste from Excel</span> button — it opens a box you paste into by hand.</li>
+</ul>
+<div class="callout note">The import does not check required fields. Empty columns that have a default (today, your name) are
+filled with it.</div>
+</div>
+</section>
+
+<section id="t-export" data-level="2" data-pl="Eksport do Excela i kopie zapasowe" data-en="Exporting to Excel and backups">
+<div class="l-pl" lang="pl">
+<p>Przycisk <span class="ui">Export</span> nad tabelą:</p>
+<figure class="shot"><img data-shot="t-export-menu" alt="Menu eksportu"><figcaption>Cztery zakresy eksportu do Excela i kopia JSON.</figcaption></figure>
+<div class="tbl"><table><thead><tr><th>Pozycja</th><th>Co trafia do pliku</th></tr></thead><tbody>
+<tr><td><span class="ui">Selected rows</span></td><td>Tylko zaznaczone kratkami.</td></tr>
+<tr><td><span class="ui">Current view</span></td><td>To, co widzisz: po szukaniu, filtrach i sortowaniu, wszystkie strony.</td></tr>
+<tr><td><span class="ui">Whole dataset</span></td><td>Wszystkie wiersze zbioru.</td></tr>
+<tr><td><span class="ui">Everything — one sheet per dataset</span></td><td>Cały tracker: arkusz na każdy zbiór, plus karteczki i checklisty.</td></tr>
+<tr><td><span class="ui">Data backup as JSON</span></td><td>Kopia danych do odtworzenia w trackerze (nie do Excela).</td></tr>
+</tbody></table></div>
+<p>Plik Excel ma prawdziwe typy: daty są datami, kwoty liczbami z walutą, a lista wyboru jest zapisana etykietą
+(np. „In progress”). Nagłówek jest zamrożony i ma filtr. Chrome zapyta, gdzie zapisać plik.</p>
+<h4>Menu ⋯</h4>
+<figure class="shot"><img data-shot="t-more-menu" alt="Menu więcej opcji"><figcaption>Dane, plik danych i profil.</figcaption></figure>
+<dl class="fields">
+<dt><span class="ui">Export everything to Excel</span></dt><dd><p>To samo co „Everything” w Export.</p></dd>
+<dt><span class="ui">Save a JSON backup</span></dt><dd><p>Pobiera kopię wszystkich danych do folderu Pobrane. <strong>Rób to co jakiś czas.</strong></p></dd>
+<dt><span class="ui">Load data from a JSON file…</span></dt><dd><p>Odtwarza dane z kopii. <strong>Zastępuje</strong> wszystko, co jest w trackerze — tracker zapyta o potwierdzenie.</p></dd>
+<dt><span class="ui">Save now</span></dt><dd><p>Zapis natychmiast (jak <kbd>Ctrl</kbd>+<kbd>S</kbd>).</p></dd>
+<dt><span class="ui">Link a different file…</span> / <span class="ui">Link a data file…</span></dt><dd><p>Otwiera wybór pliku danych (patrz <a href="#t-first">6.1</a>).</p></dd>
+<dt><span class="ui">Your profile…</span></dt><dd><p>Twój profil (patrz <a href="#t-alerts">6.10</a>).</p></dd>
+</dl>
+</div>
+<div class="l-en" lang="en">
+<p>The <span class="ui">Export</span> button above the table:</p>
+<figure class="shot"><img data-shot="t-export-menu" alt="The export menu"><figcaption>Four export scopes for Excel and a JSON backup.</figcaption></figure>
+<div class="tbl"><table><thead><tr><th>Item</th><th>What goes into the file</th></tr></thead><tbody>
+<tr><td><span class="ui">Selected rows</span></td><td>Only the ticked ones.</td></tr>
+<tr><td><span class="ui">Current view</span></td><td>What you see: after search, filters and sorting, every page.</td></tr>
+<tr><td><span class="ui">Whole dataset</span></td><td>Every row of the dataset.</td></tr>
+<tr><td><span class="ui">Everything — one sheet per dataset</span></td><td>The whole tracker: a sheet per dataset, plus notes and checklists.</td></tr>
+<tr><td><span class="ui">Data backup as JSON</span></td><td>A copy of the data to restore into the tracker (not for Excel).</td></tr>
+</tbody></table></div>
+<p>The Excel file keeps real types: dates are dates, amounts are numbers with the currency, and a pick list is written as
+its label (e.g. “In progress”). The header is frozen and has a filter. Chrome asks where to save the file.</p>
+<h4>The ⋯ menu</h4>
+<figure class="shot"><img data-shot="t-more-menu" alt="The more options menu"><figcaption>Data, the data file and your profile.</figcaption></figure>
+<dl class="fields">
+<dt><span class="ui">Export everything to Excel</span></dt><dd><p>The same as “Everything” under Export.</p></dd>
+<dt><span class="ui">Save a JSON backup</span></dt><dd><p>Downloads a copy of all data to your Downloads folder. <strong>Do this now and then.</strong></p></dd>
+<dt><span class="ui">Load data from a JSON file…</span></dt><dd><p>Restores data from a backup. It <strong>replaces</strong> everything in the tracker — the tracker asks you to confirm.</p></dd>
+<dt><span class="ui">Save now</span></dt><dd><p>Saves at once (like <kbd>Ctrl</kbd>+<kbd>S</kbd>).</p></dd>
+<dt><span class="ui">Link a different file…</span> / <span class="ui">Link a data file…</span></dt><dd><p>Opens the data file choice (see <a href="#t-first">6.1</a>).</p></dd>
+<dt><span class="ui">Your profile…</span></dt><dd><p>Your profile (see <a href="#t-alerts">6.10</a>).</p></dd>
+</dl>
+</div>
+</section>
+
+<section id="t-other" data-level="2" data-pl="Karteczki, checklisty, agenda" data-en="Notes, checklists, agenda">
+<div class="l-pl" lang="pl">
+<h4>Karteczki</h4>
+<ul>
+<li><span class="ui">+ Add note</span> dodaje pustą karteczkę. Kliknij ją i pisz; zapisuje się, gdy klikniesz obok.</li>
+<li>Kropki na dole zmieniają kolor, ✕ usuwa (po potwierdzeniu <span class="ui">Delete this note?</span>).</li>
+<li><strong>Karteczka przypięta do wiersza</strong>: otwórz wiersz i kliknij <span class="ui">+ Pin a note</span> w sekcji
+<span class="ui">Notes on this row</span>. Widać ją tylko w tym wierszu, nie na tablicy.</li>
+</ul>
+<h4>Checklisty</h4>
+<ul>
+<li>Wpisz pozycję w polu <span class="ui">New item, then Enter</span> i naciśnij <kbd>Enter</kbd>. Jeśli obok jest pole
+daty, możesz od razu ustawić termin.</li>
+<li>Kliknij kratkę, żeby odhaczyć. Kliknij tekst, żeby go poprawić. Kliknij termin, żeby go zmienić.</li>
+<li>✕ usuwa pozycję <strong>od razu, bez pytania</strong>.</li>
+<li>Licznik w rogu pokazuje „zrobione / wszystkie”. W codziennej rutynie odhaczenia znikają następnego dnia.</li>
+</ul>
+<h4>Agenda</h4>
+<p>Agenda sama zbiera terminy z tabeli. Kliknij pozycję, żeby otworzyć jej wiersz.</p>
+<figure class="shot"><img data-shot="t-agenda" alt="Agenda i codzienna checklista"><figcaption>Zakładka Dates: agenda terminów (zaległe na górze) i codzienna checklista.</figcaption></figure>
+</div>
+<div class="l-en" lang="en">
+<h4>Sticky notes</h4>
+<ul>
+<li><span class="ui">+ Add note</span> adds an empty note. Click it and type; it saves when you click elsewhere.</li>
+<li>The dots at the bottom change the colour, ✕ deletes it (after confirming <span class="ui">Delete this note?</span>).</li>
+<li><strong>A note pinned to a row</strong>: open the row and click <span class="ui">+ Pin a note</span> under
+<span class="ui">Notes on this row</span>. It shows only in that row, not on the board.</li>
+</ul>
+<h4>Checklists</h4>
+<ul>
+<li>Type an item in <span class="ui">New item, then Enter</span> and press <kbd>Enter</kbd>. If there is a date field beside
+it, you can set a due date straight away.</li>
+<li>Click the box to tick an item. Click the text to edit it. Click the due date to change it.</li>
+<li>✕ deletes an item <strong>straight away, without asking</strong>.</li>
+<li>The counter in the corner shows “done / total”. In a daily routine the ticks clear the next day.</li>
+</ul>
+<h4>Agenda</h4>
+<p>The agenda collects dates from the table by itself. Click an item to open its row.</p>
+<figure class="shot"><img data-shot="t-agenda" alt="The agenda and a daily checklist"><figcaption>The Dates tab: the agenda (overdue at the top) and a daily checklist.</figcaption></figure>
+</div>
+</section>
+
+<section id="t-alerts" data-level="2" data-pl="Alerty i Twój profil" data-en="Alerts and your profile">
+<div class="l-pl" lang="pl">
+<h4>Dzwonek 🔔</h4>
+<p>Czerwona liczba na dzwonku = ile alertów jest aktywnych. Kliknij dzwonek, żeby zobaczyć listę. Kliknięcie alertu
+przenosi na zakładkę, na której warto działać. Gdy wszystko jest w porządku, lista pokazuje
+<span class="ui">Nothing needs your attention</span>.</p>
+<figure class="shot"><img data-shot="t-alerts" alt="Lista alertów pod dzwonkiem"><figcaption>Dwa aktywne alerty: zaległe zgłoszenia i zgłoszenia bez opiekuna.</figcaption></figure>
+<h4>Profil</h4>
+<p>Na dole lewego paska jest Twój awatar i imię. Kliknij, żeby ustawić profil.</p>
+<figure class="shot small"><img data-shot="t-profile" alt="Okno profilu"><figcaption>Imię, zespół, kolor awatara i opcjonalne zdjęcie.</figcaption></figure>
+<dl class="fields">
+<dt><span class="ui">Your name</span></dt><dd><p>Używane przez akcję „Assign to me”, filtr „Mine” i wartość domyślną „Owner”. Wpisz tak, jak
+w kolumnie opiekuna (np. „Anna Kowalska”), żeby filtry działały.</p></dd>
+<dt><span class="ui">Team</span></dt><dd><p>Twój zespół (<em>@team</em>).</p></dd>
+<dt><span class="ui">Avatar colour</span>, <span class="ui">Upload a photo</span>, <span class="ui">Remove photo</span></dt>
+<dd><p>Wygląd awatara. Zdjęcie jest zmniejszane do małego kwadratu, żeby plik danych pozostał mały.</p></dd>
+</dl>
+<p>Kliknij <span class="ui">Save profile</span>. Profil jest zapisany na tym komputerze i w pliku danych.</p>
+<div class="callout note">Zmiana imienia nie zmienia wierszy, w których Twoje stare imię już zostało wpisane (np. przez „Assign to me”).</div>
+</div>
+<div class="l-en" lang="en">
+<h4>The bell 🔔</h4>
+<p>The red number on the bell = how many alerts are active. Click the bell to see the list. Clicking an alert takes you to
+the tab where you can act on it. When all is well, the list says <span class="ui">Nothing needs your attention</span>.</p>
+<figure class="shot"><img data-shot="t-alerts" alt="The list of alerts under the bell"><figcaption>Two active alerts: overdue requests and requests without an owner.</figcaption></figure>
+<h4>Profile</h4>
+<p>Your avatar and name are at the bottom of the left bar. Click to set up your profile.</p>
+<figure class="shot small"><img data-shot="t-profile" alt="The profile window"><figcaption>Name, team, avatar colour and an optional photo.</figcaption></figure>
+<dl class="fields">
+<dt><span class="ui">Your name</span></dt><dd><p>Used by the “Assign to me” action, the “Mine” filter and the “Owner” default. Type it exactly as it
+appears in the owner column (e.g. “Anna Kowalska”) so the filters work.</p></dd>
+<dt><span class="ui">Team</span></dt><dd><p>Your team (<em>@team</em>).</p></dd>
+<dt><span class="ui">Avatar colour</span>, <span class="ui">Upload a photo</span>, <span class="ui">Remove photo</span></dt>
+<dd><p>How your avatar looks. A photo is shrunk to a small square so the data file stays small.</p></dd>
+</dl>
+<p>Click <span class="ui">Save profile</span>. The profile is kept on this computer and in the data file.</p>
+<div class="callout note">Changing your name does not change rows where your old name was already filled in (e.g. by “Assign to me”).</div>
+</div>
+</section>

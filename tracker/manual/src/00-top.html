@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tracker builder — user guide</title>
+<style><!--M:CSS--></style>
+<script>
+/* Język ustawiany przed pierwszym malowaniem, żeby nie mignęła druga wersja. */
+(function () {
+  var lang = null;
+  try { lang = localStorage.getItem('tb-manual-lang'); } catch (e) { /* tryb prywatny */ }
+  if (lang !== 'pl' && lang !== 'en') {
+    var nav = (navigator.languages && navigator.languages[0]) || navigator.language || 'en';
+    lang = /^pl/i.test(nav) ? 'pl' : 'en';
+  }
+  document.documentElement.setAttribute('data-lang', lang);
+  document.documentElement.setAttribute('lang', lang);
+})();
+</script>
+</head>
+<body>
+<a class="skip" href="#content"><span class="l-pl" lang="pl">Przejdź do treści</span><span class="l-en" lang="en">Skip to content</span></a>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <button type="button" class="menu-btn" id="menu-btn" aria-controls="toc" aria-expanded="false">
+      <span aria-hidden="true">☰</span>
+      <span class="l-pl" lang="pl">Spis treści</span><span class="l-en" lang="en">Contents</span>
+    </button>
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">▦</span>
+      <span class="l-pl" lang="pl">Tracker builder — instrukcja obsługi</span>
+      <span class="l-en" lang="en">Tracker builder — user guide</span>
+    </div>
+    <div class="lang-switch" role="group" aria-label="Language / Język">
+      <button type="button" data-set-lang="pl" lang="pl">PL</button>
+      <button type="button" data-set-lang="en" lang="en">EN</button>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+<nav class="toc" id="toc" aria-label="Contents">
+<!--M:TOC-->
+</nav>
+<main id="content" class="content">

@@ -1,0 +1,534 @@
+<section id="wizard" data-level="1" data-pl="Kreator krok po kroku" data-en="The wizard, step by step">
+<div class="l-pl" lang="pl">
+<p>Kreator ma siedem kroków. Widzisz je w lewym pasku: <span class="ui">Start</span>,
+<span class="ui">Basics</span>, <span class="ui">Data</span>, <span class="ui">Tabs</span>,
+<span class="ui">Components</span>, <span class="ui">Alerts</span>, <span class="ui">Review &amp; export</span>.</p>
+<ul>
+<li>Po krokach chodzisz przyciskami <span class="ui">← Back</span> i <span class="ui">Next →</span> albo
+klikając nazwę kroku w lewym pasku — w dowolnej kolejności.</li>
+<li>Kreator <strong>niczego nie sprawdza po drodze</strong>. Wszystkie problemy zobaczysz razem w ostatnim
+kroku, w czerwonej ramce, z opisem co poprawić.</li>
+<li>Na dole lewego paska jest krótka podpowiedź do bieżącego kroku.</li>
+<li>Kreator <strong>nie zapisuje pracy sam</strong>. Jeśli zamkniesz kartę przed pobraniem plików, zmiany
+przepadną. Przy dłuższej pracy pobieraj co jakiś czas <span class="ui">Download structure (.tracker.json)</span>.</li>
+</ul>
+</div>
+<div class="l-en" lang="en">
+<p>The wizard has seven steps. You see them in the left bar: <span class="ui">Start</span>,
+<span class="ui">Basics</span>, <span class="ui">Data</span>, <span class="ui">Tabs</span>,
+<span class="ui">Components</span>, <span class="ui">Alerts</span>, <span class="ui">Review &amp; export</span>.</p>
+<ul>
+<li>Move between steps with <span class="ui">← Back</span> and <span class="ui">Next →</span>, or click a step
+name in the left bar — in any order.</li>
+<li>The wizard <strong>does not check anything along the way</strong>. You see every problem at once in the
+last step, in a red box that says what to fix.</li>
+<li>At the bottom of the left bar there is a short hint for the current step.</li>
+<li>The wizard <strong>does not save your work by itself</strong>. If you close the tab before downloading the
+files, the changes are lost. During longer sessions, download
+<span class="ui">Download structure (.tracker.json)</span> now and then.</li>
+</ul>
+</div>
+</section>
+
+<section id="s-start" data-level="2" data-pl="Krok Start — nowy tracker albo zmiana istniejącego" data-en="Start — a new tracker or changing one">
+<div class="l-pl" lang="pl">
+<p>Na starcie masz dwie drogi.</p>
+<h4>Droga 1: nowy tracker z szablonu</h4>
+<p>Kliknij jeden z trzech kafelków. Każdy tworzy gotową konfigurację, którą potem możesz dowolnie zmieniać.</p>
+<div class="tbl"><table>
+<thead><tr><th>Kafelek</th><th>Co dostajesz</th><th>Dla kogo</th></tr></thead>
+<tbody>
+<tr><td><span class="ui">Request log</span></td><td>Zbiór <em>Requests</em> z 7 kolumnami (zgłaszający, temat, data wpływu, termin, status, opiekun, rozwiązanie), zakładki <em>Summary</em>, <em>Log</em>, <em>Dates</em>, <em>Notes</em>, trzy akcje pod prawym przyciskiem i dwa alerty.</td><td>Zgłoszenia, sprawy, wnioski, reklamacje — wszystko, co ma status i termin.</td></tr>
+<tr><td><span class="ui">Tasks and notes</span></td><td>Zbiór <em>Tasks</em> (zadanie, termin, priorytet, opiekun, zrobione), zakładki <em>Today</em> i <em>Tasks</em>, codzienna checklista, karteczki i alert o zaległych zadaniach.</td><td>Osobista lista zadań.</td></tr>
+<tr><td><span class="ui">Blank tracker</span></td><td>Jeden zbiór z jedną kolumną i jedna tabela.</td><td>Gdy chcesz wszystko ułożyć sam.</td></tr>
+</tbody></table></div>
+<div class="callout tip">Nawet jeśli Twój tracker ma być inny, zacznij od <span class="ui">Request log</span> i zmieniaj
+— szybciej przerobić gotowy niż budować od zera.</div>
+<h4>Droga 2: zmiana trackera, który już masz</h4>
+<p>W dolnej ramce <span class="ui">Already have a tracker and want to change it</span> przeciągnij plik
+<code>Nazwa.tracker.json</code> albo kliknij ramkę i go wskaż. Kreator wczyta strukturę, styl i wszystkie
+ustawienia i przejdzie do kroku <span class="ui">Basics</span>. Dane w trackerze nie są ruszane. Pełna procedura
+zmiany jest w rozdziale <a href="#change">8</a>.</p>
+<div class="callout warn"><span class="t">Kliknięcie kafelka lub wczytanie pliku zastępuje bieżącą pracę</span>
+Bez pytania. Jeśli masz coś niezapisanego w kreatorze, najpierw pobierz <code>.tracker.json</code>.</div>
+<p>Możliwe komunikaty przy wczytywaniu: <span class="ui">That is not a tracker structure file (.tracker.json)</span>
+— wskazałeś zły plik (np. <code>.data.json</code> zamiast <code>.tracker.json</code>).</p>
+</div>
+<div class="l-en" lang="en">
+<p>At the start you have two ways in.</p>
+<h4>Way 1: a new tracker from a template</h4>
+<p>Click one of the three tiles. Each creates a complete set-up that you can change freely afterwards.</p>
+<div class="tbl"><table>
+<thead><tr><th>Tile</th><th>What you get</th><th>Who it is for</th></tr></thead>
+<tbody>
+<tr><td><span class="ui">Request log</span></td><td>A <em>Requests</em> dataset with 7 columns (requested by, subject, received, due, status, owner, resolution), the tabs <em>Summary</em>, <em>Log</em>, <em>Dates</em>, <em>Notes</em>, three right-click actions and two alerts.</td><td>Requests, cases, applications, complaints — anything with a status and a due date.</td></tr>
+<tr><td><span class="ui">Tasks and notes</span></td><td>A <em>Tasks</em> dataset (task, due, priority, owner, done), the tabs <em>Today</em> and <em>Tasks</em>, a daily checklist, sticky notes and an overdue-tasks alert.</td><td>A personal task list.</td></tr>
+<tr><td><span class="ui">Blank tracker</span></td><td>One dataset with one column and one table.</td><td>When you want to set everything up yourself.</td></tr>
+</tbody></table></div>
+<div class="callout tip">Even if your tracker will look different, start from <span class="ui">Request log</span> and change it
+— reshaping a finished one is faster than building from nothing.</div>
+<h4>Way 2: changing a tracker you already have</h4>
+<p>In the lower box, <span class="ui">Already have a tracker and want to change it</span>, drop the file
+<code>Name.tracker.json</code> or click the box and pick it. The wizard loads the structure, the style and every
+setting and moves to <span class="ui">Basics</span>. The data in the tracker is not touched. The full procedure
+is in chapter <a href="#change">8</a>.</p>
+<div class="callout warn"><span class="t">Clicking a tile or loading a file replaces your current work</span>
+Without asking. If you have unsaved work in the wizard, download the <code>.tracker.json</code> first.</div>
+<p>Possible message when loading: <span class="ui">That is not a tracker structure file (.tracker.json)</span>
+— you picked the wrong file (e.g. <code>.data.json</code> instead of <code>.tracker.json</code>).</p>
+</div>
+</section>
+
+<section id="s-basics" data-level="2" data-pl="Krok Basics — nazwa, format, styl" data-en="Basics — name, format, style">
+<div class="l-pl" lang="pl">
+<figure class="shot"><img data-shot="w-basics" alt="Krok Basics"><figcaption>Krok Basics: nazwa, format liczb i dat, waluta, personalizacja i styl.</figcaption></figure>
+<dl class="fields">
+<dt><span class="ui">Tracker name</span></dt>
+<dd><p>Nazwa trackera. Widać ją w lewym górnym rogu trackera i na karcie przeglądarki. Od niej pochodzą nazwy
+plików: <code>Nazwa.html</code>, <code>Nazwa.tracker.json</code>, <code>Nazwa.data.json</code> i plików eksportu.</p>
+<p class="eg">„Zgłoszenia działu IT”. Polskie litery są w porządku; znaki takie jak <code>/</code> czy <code>:</code> zamieniają się w nazwie pliku na <code>_</code>.</p></dd>
+<dt><span class="ui">Number and date format</span></dt>
+<dd><p>Jak tracker pokazuje daty i liczby oraz jak <strong>czyta</strong> to, co wklejasz z Excela.</p>
+<div class="tbl"><table><thead><tr><th>Opcja</th><th>Data</th><th>Liczba</th></tr></thead><tbody>
+<tr><td><span class="ui">English (UK) — 31/12/2026 · 1,234.56</span></td><td>dzień/miesiąc/rok</td><td>przecinek tysięcy, kropka dziesiętna</td></tr>
+<tr><td><span class="ui">English (US) — 12/31/2026 · 1,234.56</span></td><td>miesiąc/dzień/rok</td><td>jak wyżej</td></tr>
+<tr><td><span class="ui">Polish — 31.12.2026 · 1 234,56</span></td><td>dzień.miesiąc.rok</td><td>spacja tysięcy, przecinek dziesiętny</td></tr>
+</tbody></table></div>
+<p>Wybierz ten, którego używa Twój Excel. To ważne przy wklejaniu: <code>06/10/2026</code> to 6 października
+w formacie UK i 10 czerwca w formacie US.</p></dd>
+<dt><span class="ui">Currency</span></dt>
+<dd><p>Waluta dla kolumn liczbowych z formatem „currency”, w trackerze i w eksporcie do Excela: złoty, euro, dolar
+albo funt.</p></dd>
+<dt><span class="ui">Default team name</span></dt>
+<dd><p>Zespół wpisany na start w profilu każdej osoby (można go zmienić w trackerze). To także wartość
+<em>@team</em>.</p><p class="eg">„Obsługa klienta”.</p></dd>
+<dt><span class="ui">Let people personalise the tracker</span></dt>
+<dd><p>Włączone: każdy w trackerze ustawia swoje imię, zespół, kolor awatara i zdjęcie (rozdział <a href="#t-alerts">6.10</a>).
+Wyłączone: tracker nie ma profilu, a akcje typu „przypisz do mnie” i filtr <em>Mine</em> nie mają czyjego imienia
+użyć. Zostaw włączone, chyba że masz powód.</p></dd>
+<dt>Styl (kafelki)</dt>
+<dd><p>Pięć wyglądów: <span class="ui">Soft Corporate</span>, <span class="ui">Pastel Iridescent</span>,
+<span class="ui">Frosted Mono Glass</span>, <span class="ui">Crisp Fintech</span>, <span class="ui">Amber Dusk</span>.
+Zmienia się tylko wygląd, nie działanie. Styl jest „wypalony” w pliku — żeby go zmienić później, wczytaj
+<code>.tracker.json</code>, kliknij inny kafelek i wygeneruj tracker ponownie.</p></dd>
+<dt><span class="ui">Load web fonts when online (otherwise system fonts)</span></dt>
+<dd><p>Włączone: z internetem tracker pobiera czcionki stylu, bez internetu używa systemowych. Działa tak samo
+w obu przypadkach. Wyłącz, jeśli tracker ma nigdy nie łączyć się z internetem.</p></dd>
+</dl>
+</div>
+<div class="l-en" lang="en">
+<figure class="shot"><img data-shot="w-basics" alt="The Basics step"><figcaption>The Basics step: name, number and date format, currency, personalisation and style.</figcaption></figure>
+<dl class="fields">
+<dt><span class="ui">Tracker name</span></dt>
+<dd><p>The tracker's name. It shows in the tracker's top-left corner and on the browser tab. The file names come from
+it: <code>Name.html</code>, <code>Name.tracker.json</code>, <code>Name.data.json</code> and export files.</p>
+<p class="eg">“IT team requests”. Accented letters are fine; characters such as <code>/</code> or <code>:</code> become <code>_</code> in the file name.</p></dd>
+<dt><span class="ui">Number and date format</span></dt>
+<dd><p>How the tracker shows dates and numbers, and how it <strong>reads</strong> what you paste from Excel.</p>
+<div class="tbl"><table><thead><tr><th>Option</th><th>Date</th><th>Number</th></tr></thead><tbody>
+<tr><td><span class="ui">English (UK) — 31/12/2026 · 1,234.56</span></td><td>day/month/year</td><td>comma for thousands, dot for decimals</td></tr>
+<tr><td><span class="ui">English (US) — 12/31/2026 · 1,234.56</span></td><td>month/day/year</td><td>as above</td></tr>
+<tr><td><span class="ui">Polish — 31.12.2026 · 1 234,56</span></td><td>day.month.year</td><td>space for thousands, comma for decimals</td></tr>
+</tbody></table></div>
+<p>Pick the one your Excel uses. It matters when pasting: <code>06/10/2026</code> is 6 October in the UK format and
+10 June in the US format.</p></dd>
+<dt><span class="ui">Currency</span></dt>
+<dd><p>The currency for number columns formatted as “currency”, in the tracker and in the Excel export: złoty, euro,
+dollar or pound.</p></dd>
+<dt><span class="ui">Default team name</span></dt>
+<dd><p>The team pre-filled in everyone's profile (they can change it in the tracker). It is also the value of
+<em>@team</em>.</p><p class="eg">“Customer service”.</p></dd>
+<dt><span class="ui">Let people personalise the tracker</span></dt>
+<dd><p>On: everyone sets their own name, team, avatar colour and photo in the tracker (chapter <a href="#t-alerts">6.10</a>).
+Off: the tracker has no profile, so “assign to me” actions and the <em>Mine</em> filter have no name to use. Leave it on
+unless you have a reason.</p></dd>
+<dt>Style (tiles)</dt>
+<dd><p>Five looks: <span class="ui">Soft Corporate</span>, <span class="ui">Pastel Iridescent</span>,
+<span class="ui">Frosted Mono Glass</span>, <span class="ui">Crisp Fintech</span>, <span class="ui">Amber Dusk</span>.
+Only the look changes, not the behaviour. The style is baked into the file — to change it later, load the
+<code>.tracker.json</code>, click another tile and generate the tracker again.</p></dd>
+<dt><span class="ui">Load web fonts when online (otherwise system fonts)</span></dt>
+<dd><p>On: with an internet connection the tracker loads the style's fonts; without one it uses system fonts. It
+works the same either way. Turn it off if the tracker must never connect to the internet.</p></dd>
+</dl>
+</div>
+</section>
+
+<section id="s-data" data-level="2" data-pl="Krok Data — zbiory i kolumny" data-en="Data — datasets and columns">
+<div class="l-pl" lang="pl">
+<p>Tu decydujesz, <strong>jakie informacje</strong> zapisujesz. To najważniejszy krok — reszta (tabele, wykresy,
+filtry) korzysta z tego, co tu ustawisz.</p>
+<figure class="shot"><img data-shot="w-data" alt="Krok Data"><figcaption>Po lewej zbiory danych, po prawej kolumny wybranego zbioru.</figcaption></figure>
+<h4>Zbiory (lewa karta <span class="ui">Datasets</span>)</h4>
+<p>Większości trackerów wystarcza jeden zbiór. Drugi dodaj tylko wtedy, gdy masz zupełnie inne rzeczy do
+śledzenia (np. <em>Zgłoszenia</em> i <em>Dostawcy</em>). <span class="ui">+ New dataset</span> dodaje zbiór,
+kliknięcie zbioru wybiera go do edycji, a ✕ go usuwa — kreator powie, ile komponentów i alertów z niego korzysta.</p>
+<h4>Ustawienia zbioru</h4>
+<dl class="fields">
+<dt><span class="ui">Dataset name</span></dt>
+<dd><p>Nazwa zbioru, widoczna w kreatorze i jako nazwa arkusza w eksporcie do Excela.</p></dd>
+<dt><span class="ui">Column used as the row title</span></dt>
+<dd><p>Kolumna, która „nazywa” wiersz. Jej wartość jest nagłówkiem okna szczegółów wiersza i tytułem pozycji w agendzie.</p><p class="eg">Dla zgłoszeń: <em>Subject</em>.</p></dd>
+</dl>
+<h4>Kolumny</h4>
+<p><span class="ui">+ Add column</span> dodaje kolumnę tekstową o nazwie „New column”. Każda kolumna ma jeden wiersz ustawień:</p>
+<figure class="shot"><img data-shot="w-column-row" alt="Ustawienia jednej kolumny"><figcaption>Jedna kolumna: nazwa, typ, przyciski ↑ ↓ ✕ i opcje zależne od typu.</figcaption></figure>
+<dl class="fields">
+<dt>Nazwa</dt>
+<dd><p>Nagłówek kolumny w tabeli i nazwa pola w formularzu. <strong>Zmieniaj ją śmiało</strong> — dane zostają,
+bo tracker rozpoznaje kolumny po ukrytym identyfikatorze, nie po nazwie.</p></dd>
+<dt>Typ</dt>
+<dd>
+<div class="tbl"><table><thead><tr><th>Typ</th><th>Do czego</th><th>Przykład</th></tr></thead><tbody>
+<tr><td><span class="ui">Text</span></td><td>Krótki tekst w jednej linii.</td><td>Temat, klient, opiekun</td></tr>
+<tr><td><span class="ui">Long text</span></td><td>Dłuższy opis, wiele linii. W tabeli widać tylko początek; całość w oknie szczegółów.</td><td>Opis problemu, rozwiązanie</td></tr>
+<tr><td><span class="ui">Number</span></td><td>Liczba, którą można sumować i liczyć średnią.</td><td>Kwota, ilość, godziny</td></tr>
+<tr><td><span class="ui">Date</span></td><td>Data z kalendarza. Daje filtry „po terminie”, „w tym tygodniu” i agendę.</td><td>Data wpływu, termin</td></tr>
+<tr><td><span class="ui">Pick list</span></td><td>Wybór jednej z ustalonych opcji, z kolorami.</td><td>Status, priorytet, kategoria</td></tr>
+<tr><td><span class="ui">Yes / no</span></td><td>Pole do zaznaczenia.</td><td>Zrobione, pilne, zapłacone</td></tr>
+</tbody></table></div>
+<p>Dla kolumny <span class="ui">Number</span> pojawia się wybór formatu: <span class="ui">1,234.56</span> (dwa miejsca po
+przecinku), <span class="ui">1,235</span> (całkowite), <span class="ui">currency</span> (z walutą),
+<span class="ui">12.3%</span> (procent — wpisujesz 12,3, widać 12,3%) i <span class="ui">1.2k</span> (skrótowo: 1,2 tys.).</p>
+</dd>
+<dt><span class="ui">required</span></dt>
+<dd><p>Pole obowiązkowe: w formularzu ma gwiazdkę, a puste pokazuje <span class="ui">This field is required.</span></p></dd>
+<dt><span class="ui">defaults to today</span> (tylko daty)</dt>
+<dd><p>Nowy wiersz ma od razu dzisiejszą datę.</p><p class="eg">„Data wpływu”.</p></dd>
+<dt><span class="ui">defaults to the user’s name</span> / <span class="ui">defaults to their team</span> (tylko tekst)</dt>
+<dd><p>Nowy wiersz ma od razu imię albo zespół osoby, która go dodaje (z jej profilu). Można zaznaczyć tylko jedno.</p><p class="eg">„Opiekun”.</p></dd>
+<dt>↑ ↓ ✕</dt>
+<dd><p>Przesuwają kolumnę wyżej lub niżej (kolejność ma znaczenie dla nowych tabel i presetów) albo ją usuwają.</p></dd>
+</dl>
+<div class="callout warn"><span class="t">Zmiana nazwy ≠ usunięcie</span>
+Usunięta kolumna znika z trackera, ale jej dane zostają ukryte w pliku i wrócą, jeśli dodasz ją z powrotem.
+<strong>Nigdy nie usuwaj kolumny tylko po to, żeby zmienić jej nazwę</strong> — nowa kolumna o tej samej nazwie będzie pusta.
+Po usunięciu sprawdź filtry, szybkie filtry i alerty, które z niej korzystały.</div>
+<div class="callout warn"><span class="t">Zmiana typu kolumny</span>
+Zmiana z <span class="ui">Pick list</span> na inny typ kasuje opcje listy. Zmiana z <span class="ui">Number</span>
+kasuje format. Wartości już wpisane w trackerze zostają; jeśli nie pasują do nowego typu, tracker oznaczy je
+kropkowanym podkreśleniem.</div>
+<h4>Opcje listy wyboru</h4>
+<p>Przy kolumnie typu <span class="ui">Pick list</span> kliknij <span class="ui nocheck">Pick list options (N)</span>.</p>
+<figure class="shot medium"><img data-shot="w-options" alt="Okno opcji listy wyboru"><figcaption>Każda opcja ma wartość, etykietę i kolor. Na dole: od jakiej opcji zaczyna nowy wiersz.</figcaption></figure>
+<dl class="fields">
+<dt>value (wartość)</dt>
+<dd><p>Identyfikator zapisany w danych. Ustaw raz i <strong>nie zmieniaj</strong>, gdy w trackerze są już wiersze —
+wiersze z poprzednią wartością przestaną pasować do opcji.</p><p class="eg"><code>wip</code></p></dd>
+<dt>label (etykieta)</dt>
+<dd><p>To, co widzą ludzie i co trafia do Excela. Zmieniaj dowolnie.</p><p class="eg">„In progress”, „W toku”</p></dd>
+<dt>Kolor</dt>
+<dd><p><span class="ui">no colour</span>, <span class="ui">green</span>, <span class="ui">amber</span>,
+<span class="ui">red</span>, <span class="ui">blue</span> — kolor znacznika w tabeli i kropki w agendzie.</p></dd>
+<dt><span class="ui">New rows start as</span></dt>
+<dd><p>Opcja ustawiona w każdym nowym wierszu. <span class="ui">— empty —</span> = bez wartości.</p><p class="eg">Status nowego zgłoszenia: „New”.</p></dd>
+</dl>
+<h4>Kolumny prosto z Excela</h4>
+<p>Masz już arkusz? Kliknij <span class="ui">Paste a header from Excel</span>, w Excelu zaznacz nagłówek
+i kilka wierszy pod nim, skopiuj (<kbd>Ctrl</kbd>+<kbd>C</kbd>) i wklej w okno (<kbd>Ctrl</kbd>+<kbd>V</kbd>).
+Po <span class="ui">Create columns</span> kreator utworzy kolumnę dla każdego nagłówka i zgadnie typ z wartości pod nim.</p>
+<figure class="shot medium"><img data-shot="w-paste-header" alt="Wklejanie nagłówka z Excela"><figcaption>Nagłówek i trzy wiersze z Excela — z tego powstaną kolumny tekstowa, liczbowa, data i tak/nie.</figcaption></figure>
+<ul>
+<li>Kolumny są <strong>dopisywane</strong> do istniejących — nic nie jest zastępowane.</li>
+<li>Typy zgadywane: tak/nie (TRUE/FALSE, tak/nie, prawda/fałsz), data, liczba (także z walutą), lista wyboru
+(gdy wartości się powtarzają), długi tekst (ponad 80 znaków), w pozostałych przypadkach tekst.</li>
+<li>Wklej <strong>co najmniej 5–10 wierszy</strong>. Przy 1–2 wierszach prawie każda kolumna tekstowa zostanie
+uznana za listę wyboru. Po wklejeniu sprawdź typy i popraw je ręcznie.</li>
+<li>Tu powstają tylko kolumny. Same dane wkleisz później w trackerze (rozdział <a href="#t-paste">6.7</a>).</li>
+</ul>
+</div>
+<div class="l-en" lang="en">
+<p>This is where you decide <strong>what information</strong> you keep. It is the most important step — everything else
+(tables, charts, filters) uses what you set here.</p>
+<figure class="shot"><img data-shot="w-data" alt="The Data step"><figcaption>Datasets on the left, the columns of the selected dataset on the right.</figcaption></figure>
+<h4>Datasets (left card, <span class="ui">Datasets</span>)</h4>
+<p>One dataset is enough for most trackers. Add a second only for completely different things to track (e.g.
+<em>Requests</em> and <em>Suppliers</em>). <span class="ui">+ New dataset</span> adds one, clicking a dataset
+selects it for editing, and ✕ deletes it — the wizard tells you how many components and alerts use it.</p>
+<h4>Dataset settings</h4>
+<dl class="fields">
+<dt><span class="ui">Dataset name</span></dt>
+<dd><p>The dataset's name, shown in the wizard and as the sheet name in the Excel export.</p></dd>
+<dt><span class="ui">Column used as the row title</span></dt>
+<dd><p>The column that “names” a row. Its value is the heading of the row details panel and the title of an agenda item.</p><p class="eg">For requests: <em>Subject</em>.</p></dd>
+</dl>
+<h4>Columns</h4>
+<p><span class="ui">+ Add column</span> adds a text column called “New column”. Each column has one row of settings:</p>
+<figure class="shot"><img data-shot="w-column-row" alt="Settings of one column"><figcaption>One column: name, type, the ↑ ↓ ✕ buttons and options that depend on the type.</figcaption></figure>
+<dl class="fields">
+<dt>Name</dt>
+<dd><p>The column header in the table and the field name in the form. <strong>Rename it freely</strong> — the data stays,
+because the tracker recognises columns by a hidden id, not by their name.</p></dd>
+<dt>Type</dt>
+<dd>
+<div class="tbl"><table><thead><tr><th>Type</th><th>For</th><th>Example</th></tr></thead><tbody>
+<tr><td><span class="ui">Text</span></td><td>Short text on one line.</td><td>Subject, client, owner</td></tr>
+<tr><td><span class="ui">Long text</span></td><td>A longer description over several lines. The table shows the start; the details panel shows all of it.</td><td>Problem description, resolution</td></tr>
+<tr><td><span class="ui">Number</span></td><td>A number you can sum and average.</td><td>Amount, quantity, hours</td></tr>
+<tr><td><span class="ui">Date</span></td><td>A date from a calendar. Enables “overdue” and “this week” filters and the agenda.</td><td>Received, due</td></tr>
+<tr><td><span class="ui">Pick list</span></td><td>A choice of one of a fixed set of options, with colours.</td><td>Status, priority, category</td></tr>
+<tr><td><span class="ui">Yes / no</span></td><td>A tick box.</td><td>Done, urgent, paid</td></tr>
+</tbody></table></div>
+<p>For a <span class="ui">Number</span> column a format choice appears: <span class="ui">1,234.56</span> (two decimals),
+<span class="ui">1,235</span> (whole numbers), <span class="ui">currency</span> (with the currency),
+<span class="ui">12.3%</span> (percent — you type 12.3, it shows 12.3%) and <span class="ui">1.2k</span> (short form).</p>
+</dd>
+<dt><span class="ui">required</span></dt>
+<dd><p>A mandatory field: the form shows an asterisk, and leaving it empty shows <span class="ui">This field is required.</span></p></dd>
+<dt><span class="ui">defaults to today</span> (dates only)</dt>
+<dd><p>A new row starts with today's date.</p><p class="eg">“Received”.</p></dd>
+<dt><span class="ui">defaults to the user’s name</span> / <span class="ui">defaults to their team</span> (text only)</dt>
+<dd><p>A new row starts with the name or team of the person adding it (from their profile). Only one can be ticked.</p><p class="eg">“Owner”.</p></dd>
+<dt>↑ ↓ ✕</dt>
+<dd><p>Move the column up or down (the order matters for new tables and presets) or delete it.</p></dd>
+</dl>
+<div class="callout warn"><span class="t">Renaming ≠ deleting</span>
+A deleted column disappears from the tracker, but its data stays hidden in the file and comes back if you add the
+column back. <strong>Never delete a column just to rename it</strong> — a new column with the same name will be empty.
+After deleting, check the filters, quick filters and alerts that used it.</div>
+<div class="callout warn"><span class="t">Changing a column's type</span>
+Changing away from <span class="ui">Pick list</span> deletes the list's options. Changing away from
+<span class="ui">Number</span> deletes the format. Values already typed in the tracker stay; if they do not fit the new
+type, the tracker marks them with a dotted underline.</div>
+<h4>Pick list options</h4>
+<p>On a <span class="ui">Pick list</span> column click <span class="ui nocheck">Pick list options (N)</span>.</p>
+<figure class="shot medium"><img data-shot="w-options" alt="The pick list options window"><figcaption>Each option has a value, a label and a colour. At the bottom: which option a new row starts with.</figcaption></figure>
+<dl class="fields">
+<dt>value</dt>
+<dd><p>The identifier stored in your data. Set it once and <strong>do not change it</strong> once the tracker has rows —
+rows with the old value will no longer match the option.</p><p class="eg"><code>wip</code></p></dd>
+<dt>label</dt>
+<dd><p>What people see and what lands in Excel. Change it freely.</p><p class="eg">“In progress”</p></dd>
+<dt>Colour</dt>
+<dd><p><span class="ui">no colour</span>, <span class="ui">green</span>, <span class="ui">amber</span>,
+<span class="ui">red</span>, <span class="ui">blue</span> — the colour of the tag in the table and the dot in the agenda.</p></dd>
+<dt><span class="ui">New rows start as</span></dt>
+<dd><p>The option set in every new row. <span class="ui">— empty —</span> means no value.</p><p class="eg">A new request's status: “New”.</p></dd>
+</dl>
+<h4>Columns straight from Excel</h4>
+<p>Already have a sheet? Click <span class="ui">Paste a header from Excel</span>, select the header row and a few rows under
+it in Excel, copy (<kbd>Ctrl</kbd>+<kbd>C</kbd>) and paste into the box (<kbd>Ctrl</kbd>+<kbd>V</kbd>). After
+<span class="ui">Create columns</span> the wizard creates a column for each header and guesses its type from the values below.</p>
+<figure class="shot medium"><img data-shot="w-paste-header" alt="Pasting a header from Excel"><figcaption>A header and three rows from Excel — this becomes a text, a number, a date and a yes/no column.</figcaption></figure>
+<ul>
+<li>Columns are <strong>added</strong> to the existing ones — nothing is replaced.</li>
+<li>Guessed types: yes/no (TRUE/FALSE, yes/no), date, number (also with a currency), pick list (when values repeat),
+long text (over 80 characters), otherwise text.</li>
+<li>Paste <strong>at least 5–10 rows</strong>. With only 1–2 rows almost every text column is taken for a pick list.
+Afterwards check the types and fix them by hand.</li>
+<li>Only the columns are created here. You paste the data itself later, in the tracker (chapter <a href="#t-paste">6.7</a>).</li>
+</ul>
+</div>
+</section>
+
+<section id="s-tabs" data-level="2" data-pl="Krok Tabs — zakładki" data-en="Tabs">
+<div class="l-pl" lang="pl">
+<p>Zakładka to jedna strona trackera. Tu je dodajesz, nazywasz, ustawiasz ich kolejność i dzielisz na kolumny.</p>
+<figure class="shot"><img data-shot="w-tabs" alt="Lista zakładek"><figcaption>Każda zakładka: nazwa, ikona, liczba kolumn, proporcje i przyciski.</figcaption></figure>
+<dl class="fields">
+<dt>Nazwa i ikona</dt>
+<dd><p>Nazwa w lewym pasku trackera i jeden znak jako ikona (możesz wkleić emoji, np. 📅).</p></dd>
+<dt><span class="ui">1 column</span> / <span class="ui">2 columns</span> / <span class="ui">3 columns</span></dt>
+<dd><p>Na ile pionowych kolumn dzielisz stronę. Komponenty układasz w tych kolumnach w następnym kroku. Tabele zwykle
+lepiej wyglądają na całą szerokość.</p></dd>
+<dt><span class="ui">equal</span> / <span class="ui">wide + narrow</span> (tylko przy 2 kolumnach)</dt>
+<dd><p>Równe kolumny albo szeroka lewa i wąska prawa — np. wykres po lewej, liczniki po prawej.</p></dd>
+<dt>◳ ↑ ↓ ✕</dt>
+<dd><p>◳ przechodzi do komponentów tej zakładki. ↑ ↓ zmieniają kolejność zakładek w trackerze. ✕ usuwa zakładkę
+razem z jej komponentami (zbiory danych zostają).</p></dd>
+</dl>
+<div class="callout note">To jest podział <strong>strony</strong>. Kolumny <strong>tabeli</strong> (które pola widać w tabeli)
+ustawiasz w kroku <span class="ui">Components</span>.</div>
+<h4>Dodawanie zakładki: karta <span class="ui">Add a tab</span></h4>
+<figure class="shot"><img data-shot="w-presets" alt="Rodzaje zakładek"><figcaption>Kliknij, do czego ma służyć zakładka — przyjdzie z gotowymi komponentami.</figcaption></figure>
+<div class="tbl"><table><thead><tr><th>Rodzaj</th><th>Co dostajesz</th></tr></thead><tbody>
+<tr><td><span class="ui">Summary</span></td><td>Liczniki (wszystkie, po terminie, suma liczb), wykres w czasie, wykres kołowy wg listy wyboru albo ranking.</td></tr>
+<tr><td><span class="ui">Query</span></td><td>Tabelę z wyszukiwarką, szybkimi filtrami (<em>Open</em>, <em>Overdue</em>, <em>Due this week</em>, <em>Mine</em>) i akcjami pod prawym przyciskiem.</td></tr>
+<tr><td><span class="ui">Agenda</span></td><td>Listę terminów (zaległe i najbliższe 30 dni) oraz liczniki „najbliższe 7 dni” i „po terminie”.</td></tr>
+<tr><td><span class="ui">Notes</span></td><td>Tablicę karteczek.</td></tr>
+<tr><td><span class="ui">Checklist</span></td><td>Codzienną rutynę — odhaczenia znikają następnego dnia.</td></tr>
+<tr><td><span class="ui">To-do</span></td><td>Jednorazowe zadania z terminami i karteczki obok.</td></tr>
+<tr><td><span class="ui">Blank</span></td><td>Pustą zakładkę — komponenty dodajesz sam.</td></tr>
+</tbody></table></div>
+<p>Przy dwóch lub więcej zbiorach pojawia się wybór <span class="ui">Built on dataset</span> — na którym zbiorze ma
+stanąć zakładka.</p>
+<p><strong>Jak preset dobiera kolumny.</strong> Rozpoznaje ich rolę po typie i nazwie (po angielsku i po polsku):</p>
+<ul>
+<li><strong>termin</strong> — kolumna daty z nazwą w rodzaju <em>due, deadline, until, termin, do kiedy</em>;</li>
+<li><strong>data zdarzenia</strong> (oś wykresu) — pierwsza inna kolumna daty, np. <em>Received</em>;</li>
+<li><strong>stan „zamknięte”</strong> — opcja listy albo kolumna tak/nie z nazwą w rodzaju <em>done, closed, complete, resolved, zamknięte, zrobione, gotowe</em>;</li>
+<li><strong>opiekun</strong> — kolumna tekstowa z ustawionym <span class="ui">defaults to the user’s name</span> albo z nazwą w rodzaju <em>owner, assigned, opiekun, odpowiedzialny</em>.</li>
+</ul>
+<p>Jeśli czegoś nie rozpozna, po prostu doda mniej komponentów — nigdy nie zbuduje zepsutej zakładki. Wszystko,
+co preset utworzył, poprawisz w kolejnym kroku. <span class="ui">Agenda</span> jest wyszarzona, dopóki żaden zbiór
+nie ma kolumny daty.</p>
+</div>
+<div class="l-en" lang="en">
+<p>A tab is one page of the tracker. Here you add tabs, name them, put them in order and split them into columns.</p>
+<figure class="shot"><img data-shot="w-tabs" alt="The list of tabs"><figcaption>Each tab: name, icon, number of columns, proportions and buttons.</figcaption></figure>
+<dl class="fields">
+<dt>Name and icon</dt>
+<dd><p>The name in the tracker's left bar and one character as an icon (you can paste an emoji such as 📅).</p></dd>
+<dt><span class="ui">1 column</span> / <span class="ui">2 columns</span> / <span class="ui">3 columns</span></dt>
+<dd><p>How many vertical columns the page is split into. You place components in these columns in the next step. Tables
+usually look best at full width.</p></dd>
+<dt><span class="ui">equal</span> / <span class="ui">wide + narrow</span> (2 columns only)</dt>
+<dd><p>Equal columns, or a wide left and a narrow right one — e.g. a chart on the left and counters on the right.</p></dd>
+<dt>◳ ↑ ↓ ✕</dt>
+<dd><p>◳ jumps to this tab's components. ↑ ↓ change the order of tabs in the tracker. ✕ deletes the tab with its
+components (datasets stay).</p></dd>
+</dl>
+<div class="callout note">This splits the <strong>page</strong>. Which fields a <strong>table</strong> shows is set in the
+<span class="ui">Components</span> step.</div>
+<h4>Adding a tab: the <span class="ui">Add a tab</span> card</h4>
+<figure class="shot"><img data-shot="w-presets" alt="Kinds of tab"><figcaption>Click what the tab is for — it arrives with components already set up.</figcaption></figure>
+<div class="tbl"><table><thead><tr><th>Kind</th><th>What you get</th></tr></thead><tbody>
+<tr><td><span class="ui">Summary</span></td><td>Counters (all, overdue, sum of numbers), a chart over time, a donut by pick list or a ranking.</td></tr>
+<tr><td><span class="ui">Query</span></td><td>A table with search, quick filters (<em>Open</em>, <em>Overdue</em>, <em>Due this week</em>, <em>Mine</em>) and right-click actions.</td></tr>
+<tr><td><span class="ui">Agenda</span></td><td>A list of dates (overdue and the next 30 days) and counters for “next 7 days” and “overdue”.</td></tr>
+<tr><td><span class="ui">Notes</span></td><td>A board of sticky notes.</td></tr>
+<tr><td><span class="ui">Checklist</span></td><td>A daily routine — the ticks clear the next day.</td></tr>
+<tr><td><span class="ui">To-do</span></td><td>One-off items with due dates, with sticky notes beside them.</td></tr>
+<tr><td><span class="ui">Blank</span></td><td>An empty tab — you add the components yourself.</td></tr>
+</tbody></table></div>
+<p>With two or more datasets, a <span class="ui">Built on dataset</span> choice appears — which dataset the tab uses.</p>
+<p><strong>How a preset picks columns.</strong> It recognises their role by type and name (English and Polish):</p>
+<ul>
+<li><strong>due date</strong> — a date column named like <em>due, deadline, until, termin</em>;</li>
+<li><strong>event date</strong> (the chart's time axis) — the first other date column, e.g. <em>Received</em>;</li>
+<li><strong>“closed” state</strong> — a pick list option or a yes/no column named like <em>done, closed, complete, resolved, finished</em>;</li>
+<li><strong>owner</strong> — a text column set to <span class="ui">defaults to the user’s name</span>, or named like <em>owner, assigned, responsible</em>.</li>
+</ul>
+<p>If it does not recognise something, it simply adds fewer components — it never builds a broken tab. You can fix
+anything a preset created in the next step. <span class="ui">Agenda</span> is greyed out until some dataset has a date column.</p>
+</div>
+</section>
+
+<section id="s-components" data-level="2" data-pl="Krok Components — co jest na zakładce" data-en="Components — what goes on a tab">
+<div class="l-pl" lang="pl">
+<figure class="shot"><img data-shot="w-components" alt="Krok Components"><figcaption>U góry wybór zakładki. Po lewej jej komponenty i przyciski dodawania, po prawej ustawienia wybranego.</figcaption></figure>
+<ol class="steps">
+<li>W polu <span class="ui">Tab</span> wybierz zakładkę.</li>
+<li>Po lewej kliknij komponent, żeby zobaczyć jego ustawienia, albo dodaj nowy przyciskiem pod napisem
+<span class="ui">Add a component</span>.</li>
+<li>Po prawej ustaw pola. Zmiany zapisują się od razu — nie ma przycisku „zapisz”.</li>
+</ol>
+<p>Każdy komponent ma dwa pola położenia:</p>
+<dl class="fields">
+<dt><span class="ui">Width</span></dt>
+<dd><p><span class="ui">one column</span> albo <span class="ui">full width</span> (cała szerokość, nad kolumnami).</p></dd>
+<dt><span class="ui">Place in</span></dt>
+<dd><p>W której kolumnie zakładki ma stać (widać, gdy zakładka ma 2 lub 3 kolumny).</p></dd>
+</dl>
+<p>Strzałki ↑ ↓ przy komponencie zmieniają kolejność od góry do dołu, a ✕ usuwa go od razu, bez pytania.
+Opis każdego z 9 rodzajów komponentów i ich pól jest w rozdziale <a href="#components">5</a>.</p>
+</div>
+<div class="l-en" lang="en">
+<figure class="shot"><img data-shot="w-components" alt="The Components step"><figcaption>At the top, the tab picker. On the left its components and the add buttons, on the right the selected component's settings.</figcaption></figure>
+<ol class="steps">
+<li>In <span class="ui">Tab</span> pick the tab.</li>
+<li>On the left, click a component to see its settings, or add a new one with a button under
+<span class="ui">Add a component</span>.</li>
+<li>On the right, set the fields. Changes apply at once — there is no “save” button.</li>
+</ol>
+<p>Every component has two placement fields:</p>
+<dl class="fields">
+<dt><span class="ui">Width</span></dt>
+<dd><p><span class="ui">one column</span> or <span class="ui">full width</span> (across the whole page, above the columns).</p></dd>
+<dt><span class="ui">Place in</span></dt>
+<dd><p>Which of the tab's columns it sits in (shown when the tab has 2 or 3 columns).</p></dd>
+</dl>
+<p>The ↑ ↓ arrows next to a component change the order from top to bottom, and ✕ removes it straight away, without
+asking. Each of the 9 kinds of component and its fields is described in chapter <a href="#components">5</a>.</p>
+</div>
+</section>
+
+<section id="s-alerts" data-level="2" data-pl="Krok Alerts — ostrzeżenia pod dzwonkiem" data-en="Alerts — warnings under the bell">
+<div class="l-pl" lang="pl">
+<p>Alert liczy wiersze spełniające warunek i, gdy jest ich za dużo, pokazuje ostrzeżenie pod 🔔 w trackerze — z liczbą
+i kolorem. Przelicza się po każdej zmianie danych. Działa tylko w otwartym trackerze: nic nie jest wysyłane mailem ani
+w tle.</p>
+<figure class="shot"><img data-shot="w-alerts" alt="Krok Alerts"><figcaption>Rozwinięty alert: co liczyć, kiedy ostrzegać, co napisać i dokąd przejść po kliknięciu.</figcaption></figure>
+<p><span class="ui">+ Add alert</span> dodaje nowy. W nagłówku alertu jest jego nazwa, kolor
+(<span class="ui">green</span>, <span class="ui">amber</span>, <span class="ui">red</span>, <span class="ui">blue</span>),
+▸/▾ do rozwinięcia i ✕ do usunięcia.</p>
+<dl class="fields">
+<dt><span class="ui">Dataset to count</span></dt>
+<dd><p>W którym zbiorze liczyć wiersze.</p></dd>
+<dt><span class="ui">Count only rows where…</span></dt>
+<dd><p>Filtr — które wiersze się liczą (rozdział <a href="#c-filter">5.9</a>).</p><p class="eg">Due — date relative to today — overdue, oraz Status — is not — Closed.</p></dd>
+<dt><span class="ui">Fire when there are</span> + <span class="ui">this many rows</span></dt>
+<dd><p>Kiedy alert się włącza: <span class="ui">more than</span>, <span class="ui">at least</span>,
+<span class="ui">exactly</span>, <span class="ui">fewer than</span> i liczba.</p><p class="eg">„more than 0” = gdy jest choć jeden taki wiersz.</p></dd>
+<dt><span class="ui">Message ({{n}} inserts the number)</span></dt>
+<dd><p>Tekst pod dzwonkiem. <code>{{n}}</code> zostanie zastąpione liczbą wierszy.</p><p class="eg">„{{n}} zgłoszeń jest po terminie.”</p></dd>
+<dt><span class="ui">Jump to tab when clicked</span></dt>
+<dd><p>Na którą zakładkę przejść po kliknięciu alertu — zwykle tę z tabelą.</p></dd>
+</dl>
+</div>
+<div class="l-en" lang="en">
+<p>An alert counts rows that meet a condition and, when there are too many, shows a warning under 🔔 in the tracker —
+with a count and a colour. It recalculates after every change. It only works in the open tracker: nothing is emailed or
+run in the background.</p>
+<figure class="shot"><img data-shot="w-alerts" alt="The Alerts step"><figcaption>An expanded alert: what to count, when to warn, what to say and where to go when clicked.</figcaption></figure>
+<p><span class="ui">+ Add alert</span> adds a new one. The alert's header has its name, its colour
+(<span class="ui">green</span>, <span class="ui">amber</span>, <span class="ui">red</span>, <span class="ui">blue</span>),
+▸/▾ to expand and ✕ to delete.</p>
+<dl class="fields">
+<dt><span class="ui">Dataset to count</span></dt>
+<dd><p>Which dataset's rows to count.</p></dd>
+<dt><span class="ui">Count only rows where…</span></dt>
+<dd><p>A filter — which rows count (chapter <a href="#c-filter">5.9</a>).</p><p class="eg">Due — date relative to today — overdue, and Status — is not — Closed.</p></dd>
+<dt><span class="ui">Fire when there are</span> + <span class="ui">this many rows</span></dt>
+<dd><p>When the alert switches on: <span class="ui">more than</span>, <span class="ui">at least</span>,
+<span class="ui">exactly</span>, <span class="ui">fewer than</span> and a number.</p><p class="eg">“more than 0” = as soon as there is one such row.</p></dd>
+<dt><span class="ui">Message ({{n}} inserts the number)</span></dt>
+<dd><p>The text under the bell. <code>{{n}}</code> is replaced with the number of rows.</p><p class="eg">“{{n}} requests are past their due date.”</p></dd>
+<dt><span class="ui">Jump to tab when clicked</span></dt>
+<dd><p>Which tab to open when the alert is clicked — usually the one with the table.</p></dd>
+</dl>
+</div>
+</section>
+
+<section id="s-review" data-level="2" data-pl="Krok Review &amp; export — sprawdzenie i zapis" data-en="Review &amp; export — check and save">
+<div class="l-pl" lang="pl">
+<p>Ostatni krok pokazuje podsumowanie i problemy do poprawienia, a potem pozwala zapisać pliki.</p>
+<figure class="shot medium"><img data-shot="w-problems" alt="Lista problemów"><figcaption>Czerwona ramka wymienia każdy problem i mówi, w którym kroku go poprawić.</figcaption></figure>
+<p>Dopóki są problemy, <span class="ui">Preview</span> i <span class="ui">Download tracker (.html)</span> pokazują tylko
+<span class="ui">Fix the problems first</span>. Lista wszystkich komunikatów i ich naprawy jest w rozdziale <a href="#trouble">11</a>.</p>
+<dl class="fields">
+<dt><span class="ui">Preview</span></dt>
+<dd><p>Otwiera tracker w okienku z przykładowymi danymi (24 wymyślone wiersze). Nic nie jest zapisywane. Służy do
+obejrzenia układu przed zapisem.</p></dd>
+<dt><span class="ui">Download tracker (.html)</span> albo <span class="ui">Save tracker</span></dt>
+<dd><p>Zapisuje tracker. Chrome zapyta, gdzie zapisać plik. To samo robi przycisk w prawym górnym rogu.</p></dd>
+<dt><span class="ui">Download structure (.tracker.json)</span></dt>
+<dd><p>Zapisuje strukturę. Działa nawet wtedy, gdy są problemy — możesz zapisać niedokończoną pracę i wrócić do niej później.</p></dd>
+</dl>
+<figure class="shot"><img data-shot="w-preview" alt="Podgląd trackera"><figcaption>Podgląd z przykładowymi danymi. U góry rozmiar pliku, który zostanie zapisany.</figcaption></figure>
+<div class="callout bad"><span class="t">Zapisz OBA pliki w tym samym folderze</span>
+<code>.html</code> to tracker, <code>.tracker.json</code> to jego struktura. Bez <code>.tracker.json</code> każda późniejsza
+zmiana oznacza budowanie trackera od nowa. Przy aktualizacji istniejącego trackera <strong>nadpisz stary plik
+<code>.html</code> w tym samym miejscu, pod tą samą nazwą</strong>.</div>
+</div>
+<div class="l-en" lang="en">
+<p>The last step shows a summary and any problems to fix, then lets you save the files.</p>
+<figure class="shot medium"><img data-shot="w-problems" alt="The list of problems"><figcaption>The red box lists every problem and says which step fixes it.</figcaption></figure>
+<p>While there are problems, <span class="ui">Preview</span> and <span class="ui">Download tracker (.html)</span> only
+show <span class="ui">Fix the problems first</span>. Every message and its fix is listed in chapter <a href="#trouble">11</a>.</p>
+<dl class="fields">
+<dt><span class="ui">Preview</span></dt>
+<dd><p>Opens the tracker in a window with sample data (24 made-up rows). Nothing is saved. Use it to look at the layout
+before saving.</p></dd>
+<dt><span class="ui">Download tracker (.html)</span> or <span class="ui">Save tracker</span></dt>
+<dd><p>Saves the tracker. Chrome asks where to save the file. The button in the top-right corner does the same.</p></dd>
+<dt><span class="ui">Download structure (.tracker.json)</span></dt>
+<dd><p>Saves the structure. It works even while there are problems — you can save unfinished work and come back to it.</p></dd>
+</dl>
+<figure class="shot"><img data-shot="w-preview" alt="The tracker preview"><figcaption>The preview with sample data. At the top, the size of the file that will be saved.</figcaption></figure>
+<div class="callout bad"><span class="t">Save BOTH files in the same folder</span>
+The <code>.html</code> is the tracker, the <code>.tracker.json</code> is its structure. Without the
+<code>.tracker.json</code> every later change means building the tracker again. When you update an existing tracker,
+<strong>overwrite the old <code>.html</code> file in the same place, under the same name</strong>.</div>
+</div>
+</section>

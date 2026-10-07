@@ -1,0 +1,279 @@
+<section id="start" data-level="1" data-pl="Zacznij tutaj" data-en="Start here">
+<div class="l-pl" lang="pl">
+<p class="lead">Tracker builder to kreator, w którym bez programowania składasz własny tracker do codziennej
+pracy — rejestr zgłoszeń, listę zadań, terminy, notatki — zamiast prowadzić to w Excelu.</p>
+<p>Na końcu kreator daje Ci <strong>jeden plik HTML</strong>. Otwierasz go w przeglądarce i pracujesz:
+dodajesz wiersze, filtrujesz, patrzysz na wykresy, eksportujesz do Excela. Działa bez internetu,
+a dane zapisuje w pliku na Twoim dysku — nic nie wysyła na żaden serwer.</p>
+<p>Ta instrukcja prowadzi od zera. Jeśli robisz to pierwszy raz, przeczytaj ten rozdział i od razu
+przejdź do rozdziału 2 — w 10 minut zbudujesz działający tracker. Resztę czytaj wtedy, gdy będziesz
+czegoś potrzebować.</p>
+<div class="callout note"><span class="t">Etykiety na ekranie są po angielsku</span>
+Kreator i tracker mówią po angielsku. W tej instrukcji przyciski i pola są cytowane dokładnie tak,
+jak je zobaczysz, w ramce — na przykład <span class="ui">Next →</span>. Szukaj na ekranie dokładnie
+tego napisu.</div>
+</div>
+<div class="l-en" lang="en">
+<p class="lead">Tracker builder is a wizard where you put together your own work tracker — a request log,
+a task list, deadlines, notes — without writing any code, instead of keeping it all in Excel.</p>
+<p>At the end the wizard gives you <strong>one HTML file</strong>. You open it in your browser and work:
+add rows, filter them, look at charts, export to Excel. It works without an internet connection and
+saves your data in a file on your own disk — nothing is sent to any server.</p>
+<p>This guide starts from zero. If this is your first time, read this chapter and go straight to
+chapter 2 — in 10 minutes you will have a working tracker. Read the rest when you need it.</p>
+<div class="callout note"><span class="t">Labels are quoted exactly</span>
+Buttons and fields are quoted exactly as they appear on screen, in a box like this:
+<span class="ui">Next →</span>. Look for exactly that text.</div>
+</div>
+</section>
+
+<section id="files" data-level="2" data-pl="Cztery pliki, które musisz rozumieć" data-en="The four files you need to understand">
+<div class="l-pl" lang="pl">
+<p>Cała praca kręci się wokół czterech plików. Jeśli zrozumiesz tę jedną mapę, unikniesz 90% problemów.</p>
+<div class="files-map" role="img" aria-label="Mapa plików: kreator tworzy tracker i plik struktury; tracker zapisuje dane w osobnym pliku.">
+<svg viewBox="0 0 720 300" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="arr-pl" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--muted)"/></marker></defs>
+  <rect class="box" x="10" y="20" width="220" height="70" rx="10"/>
+  <text class="t1" x="24" y="48">tracker-wizard.html</text>
+  <text class="t2" x="24" y="70">kreator — budujesz w nim tracker</text>
+  <rect class="box key" x="430" y="20" width="280" height="70" rx="10"/>
+  <text class="t1" x="444" y="48">Nazwa.html</text>
+  <text class="t2" x="444" y="70">Twój tracker — w nim pracujesz codziennie</text>
+  <rect class="box" x="10" y="200" width="300" height="70" rx="10"/>
+  <text class="t1" x="24" y="228">Nazwa.tracker.json</text>
+  <text class="t2" x="24" y="250">struktura — potrzebna do późniejszych zmian</text>
+  <rect class="box key" x="430" y="200" width="280" height="70" rx="10"/>
+  <text class="t1" x="444" y="228">Nazwa.data.json</text>
+  <text class="t2" x="444" y="250">Twoje dane — wszystkie wiersze</text>
+  <path class="arrow" d="M230 55 H425" marker-end="url(#arr-pl)"/>
+  <text class="lbl" x="262" y="47">tworzy</text>
+  <path class="arrow" d="M120 90 V195" marker-end="url(#arr-pl)"/>
+  <text class="lbl" x="128" y="150">zapisuje też</text>
+  <path class="arrow" d="M570 90 V195" marker-start="url(#arr-pl)" marker-end="url(#arr-pl)"/>
+  <text class="lbl" x="578" y="150">czyta i zapisuje</text>
+  <path class="arrow" d="M310 235 C 360 235, 360 120, 300 100 L 236 82" marker-end="url(#arr-pl)" stroke-dasharray="4 4"/>
+  <text class="lbl" x="330" y="190">wgrywasz, żeby coś zmienić</text>
+</svg>
+</div>
+<div class="tbl"><table>
+<thead><tr><th>Plik</th><th>Co to jest</th><th>Co z nim robić</th></tr></thead>
+<tbody>
+<tr><td><code>tracker-wizard.html</code></td><td>Kreator. Ten sam dla wszystkich.</td><td>Otwierasz, gdy chcesz zbudować nowy tracker albo zmienić istniejący.</td></tr>
+<tr><td><code>Nazwa.html</code></td><td>Twój tracker. Nazwa pochodzi z pola <span class="ui">Tracker name</span>.</td><td>Otwierasz codziennie. <strong>Nie zmieniaj mu nazwy i nie przenoś go</strong> bez potrzeby.</td></tr>
+<tr><td><code>Nazwa.tracker.json</code></td><td>Struktura trackera: kolumny, zakładki, komponenty, styl. Bez danych.</td><td>Przechowuj obok trackera. Bez niego zmiana trackera oznacza budowanie od nowa.</td></tr>
+<tr><td><code>Nazwa.data.json</code></td><td>Twoje dane — wszystkie wiersze, notatki, checklisty, profil.</td><td><strong>Najcenniejszy plik.</strong> Tracker tworzy go przy pierwszym uruchomieniu. Rób kopie.</td></tr>
+</tbody></table></div>
+<div class="callout tip"><span class="t">Najprostsza zasada</span>
+Trzymaj trzy ostatnie pliki w jednym folderze, np. <code>Dokumenty\Trackery\Zgłoszenia</code>, i nie
+ruszaj ich. Kreator możesz trzymać gdziekolwiek.</div>
+</div>
+<div class="l-en" lang="en">
+<p>Everything revolves around four files. Understand this one map and you will avoid 90% of problems.</p>
+<div class="files-map" role="img" aria-label="File map: the wizard creates the tracker and a structure file; the tracker saves data in a separate file.">
+<svg viewBox="0 0 720 300" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="arr-en" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--muted)"/></marker></defs>
+  <rect class="box" x="10" y="20" width="220" height="70" rx="10"/>
+  <text class="t1" x="24" y="48">tracker-wizard.html</text>
+  <text class="t2" x="24" y="70">the wizard — you build trackers in it</text>
+  <rect class="box key" x="430" y="20" width="280" height="70" rx="10"/>
+  <text class="t1" x="444" y="48">Name.html</text>
+  <text class="t2" x="444" y="70">your tracker — you work in it every day</text>
+  <rect class="box" x="10" y="200" width="300" height="70" rx="10"/>
+  <text class="t1" x="24" y="228">Name.tracker.json</text>
+  <text class="t2" x="24" y="250">the structure — needed to change it later</text>
+  <rect class="box key" x="430" y="200" width="280" height="70" rx="10"/>
+  <text class="t1" x="444" y="228">Name.data.json</text>
+  <text class="t2" x="444" y="250">your data — every row</text>
+  <path class="arrow" d="M230 55 H425" marker-end="url(#arr-en)"/>
+  <text class="lbl" x="268" y="47">creates</text>
+  <path class="arrow" d="M120 90 V195" marker-end="url(#arr-en)"/>
+  <text class="lbl" x="128" y="150">also saves</text>
+  <path class="arrow" d="M570 90 V195" marker-start="url(#arr-en)" marker-end="url(#arr-en)"/>
+  <text class="lbl" x="578" y="150">reads and writes</text>
+  <path class="arrow" d="M310 235 C 360 235, 360 120, 300 100 L 236 82" marker-end="url(#arr-en)" stroke-dasharray="4 4"/>
+  <text class="lbl" x="330" y="190">load it back to change things</text>
+</svg>
+</div>
+<div class="tbl"><table>
+<thead><tr><th>File</th><th>What it is</th><th>What to do with it</th></tr></thead>
+<tbody>
+<tr><td><code>tracker-wizard.html</code></td><td>The wizard. The same file for everyone.</td><td>Open it when you want to build a new tracker or change an existing one.</td></tr>
+<tr><td><code>Name.html</code></td><td>Your tracker. The name comes from the <span class="ui">Tracker name</span> field.</td><td>Open it every day. <strong>Do not rename or move it</strong> unless you have to.</td></tr>
+<tr><td><code>Name.tracker.json</code></td><td>The tracker's structure: columns, tabs, components, style. No data.</td><td>Keep it next to the tracker. Without it, changing the tracker means building it again.</td></tr>
+<tr><td><code>Name.data.json</code></td><td>Your data — every row, note, checklist item and your profile.</td><td><strong>The most valuable file.</strong> The tracker creates it on first use. Back it up.</td></tr>
+</tbody></table></div>
+<div class="callout tip"><span class="t">The simplest rule</span>
+Keep the last three files together in one folder, e.g. <code>Documents\Trackers\Requests</code>, and
+leave them there. The wizard can live anywhere.</div>
+</div>
+</section>
+
+<section id="needs" data-level="2" data-pl="Czego potrzebujesz" data-en="What you need">
+<div class="l-pl" lang="pl">
+<ul>
+<li><strong>Google Chrome albo Microsoft Edge</strong> na komputerze (Windows albo Mac). W Firefoksie i Safari
+tracker się nie uruchomi — zamiast tego pokaże komunikat, że działa w Chrome i Edge. To celowe: tylko te
+przeglądarki potrafią zapisywać do pliku na dysku.</li>
+<li><strong>Plik <code>tracker-wizard.html</code>.</strong> Nic nie instalujesz.</li>
+<li>Internet nie jest potrzebny. Gdy jest, tracker pobierze ładniejsze czcionki; bez internetu użyje
+czcionek systemowych i działa tak samo.</li>
+</ul>
+<figure class="shot medium"><img data-shot="t-gate" alt="Komunikat w nieobsługiwanej przeglądarce"><figcaption>Tak wygląda tracker otwarty w nieobsługiwanej przeglądarce. Otwórz plik w Chrome albo Edge.</figcaption></figure>
+<div class="callout tip"><span class="t">Jak otworzyć plik HTML w Chrome</span>
+Kliknij plik prawym przyciskiem myszy → <em>Otwórz za pomocą</em> → <em>Google Chrome</em>
+(albo <em>Microsoft Edge</em>). Możesz też przeciągnąć plik na otwarte okno przeglądarki.</div>
+</div>
+<div class="l-en" lang="en">
+<ul>
+<li><strong>Google Chrome or Microsoft Edge</strong> on a computer (Windows or Mac). In Firefox and Safari the
+tracker will not start — it shows a message saying it runs in Chrome and Edge instead. That is on purpose:
+only these browsers can save to a file on your disk.</li>
+<li><strong>The file <code>tracker-wizard.html</code>.</strong> Nothing to install.</li>
+<li>No internet connection is needed. When there is one, the tracker loads nicer fonts; without it, it uses
+the system fonts and works the same.</li>
+</ul>
+<figure class="shot medium"><img data-shot="t-gate" alt="Message in an unsupported browser"><figcaption>This is what the tracker shows in an unsupported browser. Open the file in Chrome or Edge.</figcaption></figure>
+<div class="callout tip"><span class="t">How to open an HTML file in Chrome</span>
+Right-click the file → <em>Open with</em> → <em>Google Chrome</em> (or <em>Microsoft Edge</em>). You can
+also drag the file onto an open browser window.</div>
+</div>
+</section>
+
+<section id="quick" data-level="1" data-pl="Pierwszy tracker w 10 minut" data-en="Your first tracker in 10 minutes">
+<div class="l-pl" lang="pl">
+<p>Zbudujemy rejestr zgłoszeń z gotowego szablonu, wygenerujemy go i wpiszemy pierwszy wiersz.
+Każdy krok zrób dokładnie tak, jak jest opisany.</p>
+<ol class="steps">
+<li><strong>Otwórz kreator.</strong> Otwórz <code>tracker-wizard.html</code> w Chrome. Zobaczysz ekran
+<span class="ui">Let’s start</span> z trzema kafelkami.
+<figure class="shot"><img data-shot="w-start" alt="Ekran startowy kreatora"><figcaption>Ekran startowy. Kafelki to gotowe szablony, a pole na dole służy do wczytania istniejącego trackera.</figcaption></figure></li>
+<li><strong>Wybierz szablon.</strong> Kliknij kafelek <span class="ui">Request log</span>. Kreator sam
+przejdzie do kroku <span class="ui">Basics</span>. Szablon ma już kolumny, zakładki, wykresy i alerty —
+nie musisz niczego dodawać.</li>
+<li><strong>Nadaj nazwę.</strong> W polu <span class="ui">Tracker name</span> wpisz nazwę, np.
+<em>Zgłoszenia działu</em>. Od niej będą nazywać się pliki.</li>
+<li><strong>Wybierz format i styl.</strong> W <span class="ui">Number and date format</span> wybierz
+<span class="ui">Polish — 31.12.2026 · 1 234,56</span>, jeśli w Excelu używasz polskich liczb i dat. Niżej
+kliknij jeden z pięciu kafelków stylu — to tylko wygląd.</li>
+<li><strong>Przejdź na koniec.</strong> W lewym pasku kliknij <span class="ui">Review &amp; export</span>.
+Jeśli wszystko jest w porządku, nie zobaczysz czerwonej ramki z problemami.</li>
+<li><strong>Zapisz oba pliki.</strong> Kliknij <span class="ui">Download tracker (.html)</span>, wskaż
+folder (np. nowy folder <em>Trackery</em>) i zapisz. Potem kliknij
+<span class="ui">Download structure (.tracker.json)</span> i zapisz w <strong>tym samym folderze</strong>.
+<figure class="shot"><img data-shot="w-review" alt="Krok Review & export"><figcaption>Ostatni krok: podsumowanie i dwa przyciski pobierania.</figcaption></figure></li>
+<li><strong>Otwórz tracker.</strong> Zamknij kreator. W folderze otwórz nowy plik
+<code>Zgłoszenia działu.html</code> w Chrome. U góry zobaczysz żółty baner
+<span class="ui">Your data is not being written to a file</span> — to normalne przy pierwszym otwarciu.</li>
+<li><strong>Utwórz plik danych.</strong> Kliknij <span class="ui">Choose a data file</span>, a w okienku
+<span class="ui">Create a new data file</span>. Zapisz plik w tym samym folderze (nazwa jest
+podpowiedziana). Baner zniknie, a u góry pojawi się zielone <span class="ui nocheck">Saved</span> z godziną.</li>
+<li><strong>Dodaj pierwszy wiersz.</strong> Wejdź w zakładkę <em>Log</em>, kliknij
+<span class="ui">+ Add row</span>, wypełnij pola i kliknij <span class="ui">Add row</span>. Gotowe — wiersz
+jest w tabeli, a za chwilę także w pliku.</li>
+</ol>
+<div class="callout tip"><span class="t">Co dalej?</span>
+Następnego dnia po prostu otwórz ten sam plik <code>.html</code>. Po restarcie przeglądarki tracker
+raz poprosi o ponowne połączenie z plikiem danych — kliknij <span class="ui">Reconnect</span>
+(patrz <a href="#t-reconnect">6.3</a>).</div>
+</div>
+<div class="l-en" lang="en">
+<p>We will build a request log from a ready-made template, generate it and enter the first row.
+Do each step exactly as written.</p>
+<ol class="steps">
+<li><strong>Open the wizard.</strong> Open <code>tracker-wizard.html</code> in Chrome. You will see the
+<span class="ui">Let’s start</span> screen with three tiles.
+<figure class="shot"><img data-shot="w-start" alt="The wizard start screen"><figcaption>The start screen. The tiles are ready-made templates; the box below loads an existing tracker.</figcaption></figure></li>
+<li><strong>Pick a template.</strong> Click the <span class="ui">Request log</span> tile. The wizard moves
+to the <span class="ui">Basics</span> step on its own. The template already has columns, tabs, charts and
+alerts — you do not need to add anything.</li>
+<li><strong>Give it a name.</strong> In <span class="ui">Tracker name</span> type a name, e.g.
+<em>Team requests</em>. The files will be named after it.</li>
+<li><strong>Pick a format and a style.</strong> In <span class="ui">Number and date format</span> pick the one
+you use in Excel — <span class="ui">English (UK) — 31/12/2026 · 1,234.56</span> for day-first dates. Below,
+click one of the five style tiles — that is only the look.</li>
+<li><strong>Go to the end.</strong> In the left bar click <span class="ui">Review &amp; export</span>. If
+everything is fine there is no red box with problems.</li>
+<li><strong>Save both files.</strong> Click <span class="ui">Download tracker (.html)</span>, choose a folder
+(e.g. a new folder <em>Trackers</em>) and save. Then click
+<span class="ui">Download structure (.tracker.json)</span> and save it in <strong>the same folder</strong>.
+<figure class="shot"><img data-shot="w-review" alt="The Review & export step"><figcaption>The last step: a summary and two download buttons.</figcaption></figure></li>
+<li><strong>Open the tracker.</strong> Close the wizard. In the folder, open the new file
+<code>Team requests.html</code> in Chrome. At the top there is a yellow banner,
+<span class="ui">Your data is not being written to a file</span> — that is normal the first time.</li>
+<li><strong>Create the data file.</strong> Click <span class="ui">Choose a data file</span>, then
+<span class="ui">Create a new data file</span>. Save it in the same folder (the name is suggested). The banner
+disappears and a green <span class="ui nocheck">Saved</span> with the time shows at the top.</li>
+<li><strong>Add the first row.</strong> Open the <em>Log</em> tab, click <span class="ui">+ Add row</span>,
+fill in the fields and click <span class="ui">Add row</span>. Done — the row is in the table and, a moment
+later, in the file.</li>
+</ol>
+<div class="callout tip"><span class="t">What next?</span>
+Tomorrow, just open the same <code>.html</code> file. After a browser restart the tracker asks once to
+reconnect to the data file — click <span class="ui">Reconnect</span> (see <a href="#t-reconnect">6.3</a>).</div>
+</div>
+</section>
+
+<section id="words" data-level="1" data-pl="Słowniczek" data-en="Words you will see">
+<div class="l-pl" lang="pl">
+<p>Kilka słów wraca w kreatorze na każdym kroku. Każde wyjaśniam na przykładzie rejestru zgłoszeń.</p>
+<dl class="fields">
+<dt>Dataset (zbiór danych)</dt>
+<dd><p>Jedna tabela: kolumny i wiersze. Jak jeden arkusz w Excelu.</p><p class="eg">Zbiór <em>Requests</em> — wszystkie zgłoszenia.</p></dd>
+<dt>Column (kolumna)</dt>
+<dd><p>Jedna informacja o każdym wierszu. Ma nazwę i typ.</p><p class="eg"><em>Subject</em>, <em>Due</em>, <em>Status</em>.</p></dd>
+<dt>Row (wiersz)</dt>
+<dd><p>Jeden wpis w zbiorze — w trackerze dodajesz go przyciskiem <span class="ui">+ Add row</span>.</p><p class="eg">Jedno zgłoszenie: „Korekta faktury, termin 10.10, w toku”.</p></dd>
+<dt>Column type (typ kolumny)</dt>
+<dd><p>Mówi trackerowi, co jest w kolumnie: tekst, liczba, data, lista wyboru albo tak/nie. Od typu zależy,
+jakie pole zobaczysz przy wpisywaniu, jak działa sortowanie i co trafia do Excela.</p></dd>
+<dt>Pick list (lista wyboru)</dt>
+<dd><p>Kolumna, w której wybierasz jedną z ustalonych opcji, a nie piszesz dowolnie. Każda opcja może mieć kolor.</p><p class="eg">Status: <em>New</em> (niebieski), <em>In progress</em> (żółty), <em>Closed</em> (zielony).</p></dd>
+<dt>Tab (zakładka)</dt>
+<dd><p>Jedna strona trackera, widoczna w lewym pasku.</p><p class="eg"><em>Summary</em>, <em>Log</em>, <em>Dates</em>, <em>Notes</em>.</p></dd>
+<dt>Component (komponent)</dt>
+<dd><p>Klocek na zakładce: tabela, licznik (KPI), wykres, pasek postępu, baner, agenda, karteczki albo checklista.</p></dd>
+<dt>Filter (filtr)</dt>
+<dd><p>Warunki, które wybierają tylko część wierszy. Wszystkie warunki muszą być spełnione jednocześnie.</p><p class="eg">„Status is not Closed” i „Due — overdue” = zgłoszenia otwarte po terminie.</p></dd>
+<dt>Quick filter chip (szybki filtr)</dt>
+<dd><p>Przycisk nad tabelą, który jednym kliknięciem włącza gotowy filtr. Drugie kliknięcie go wyłącza.</p><p class="eg"><em>Open</em>, <em>Overdue</em>, <em>Mine</em>.</p></dd>
+<dt>Alert</dt>
+<dd><p>Reguła, która liczy wiersze i pokazuje ostrzeżenie pod dzwonkiem, gdy jest ich za dużo.</p><p class="eg">„Więcej niż 0 zgłoszeń po terminie”.</p></dd>
+<dt>Preset (szablon zakładki)</dt>
+<dd><p>Gotowy typ zakładki, który sam dobiera komponenty do Twoich kolumn.</p></dd>
+<dt>@user, @team, @today</dt>
+<dd><p>Specjalne wartości: „imię osoby, która używa trackera”, „jej zespół” i „dzisiejsza data”. Tracker
+podstawia je w chwili użycia, więc „Mine” u każdego pokazuje jego wiersze.</p></dd>
+</dl>
+</div>
+<div class="l-en" lang="en">
+<p>A few words come back at every step of the wizard. Each one is explained with the request log as the example.</p>
+<dl class="fields">
+<dt>Dataset</dt>
+<dd><p>One table: columns and rows. Like one sheet in Excel.</p><p class="eg">The dataset <em>Requests</em> — every request.</p></dd>
+<dt>Column</dt>
+<dd><p>One piece of information about every row. It has a name and a type.</p><p class="eg"><em>Subject</em>, <em>Due</em>, <em>Status</em>.</p></dd>
+<dt>Row</dt>
+<dd><p>One entry in a dataset — in the tracker you add one with <span class="ui">+ Add row</span>.</p><p class="eg">One request: “Invoice correction, due 10 Oct, in progress”.</p></dd>
+<dt>Column type</dt>
+<dd><p>Tells the tracker what the column holds: text, a number, a date, a pick list or yes/no. The type decides
+which input you get when typing, how sorting works and what lands in Excel.</p></dd>
+<dt>Pick list</dt>
+<dd><p>A column where you choose one of a fixed set of options instead of typing freely. Each option can have a colour.</p><p class="eg">Status: <em>New</em> (blue), <em>In progress</em> (amber), <em>Closed</em> (green).</p></dd>
+<dt>Tab</dt>
+<dd><p>One page of the tracker, listed in the left bar.</p><p class="eg"><em>Summary</em>, <em>Log</em>, <em>Dates</em>, <em>Notes</em>.</p></dd>
+<dt>Component</dt>
+<dd><p>A building block on a tab: a table, a counter (KPI), a chart, a progress bar, a banner, an agenda, sticky notes or a checklist.</p></dd>
+<dt>Filter</dt>
+<dd><p>Conditions that pick out only some rows. Every condition must be true at the same time.</p><p class="eg">“Status is not Closed” and “Due — overdue” = open requests past their due date.</p></dd>
+<dt>Quick filter chip</dt>
+<dd><p>A button above a table that switches a ready-made filter on with one click. A second click switches it off.</p><p class="eg"><em>Open</em>, <em>Overdue</em>, <em>Mine</em>.</p></dd>
+<dt>Alert</dt>
+<dd><p>A rule that counts rows and shows a warning under the bell when there are too many.</p><p class="eg">“More than 0 requests past their due date”.</p></dd>
+<dt>Preset</dt>
+<dd><p>A ready-made kind of tab that picks components to match your columns.</p></dd>
+<dt>@user, @team, @today</dt>
+<dd><p>Special values: “the name of the person using the tracker”, “their team” and “today’s date”. The tracker
+fills them in when they are used, so “Mine” shows each person their own rows.</p></dd>
+</dl>
+</div>
+</section>

@@ -14,6 +14,7 @@ they are maintenance notes, not product.
 | `<name>.html` | the finished tracker | the builder, last step |
 | `<name>.tracker.json` | the tracker's **structure**, for later edits | the builder, last step |
 | `<name>.data.json` | the user's **data** | the tracker itself, while in use |
+| `dist/tracker-manual.html` | the **user guide**, Polish and English | `build-manual.py` |
 
 Structure and data are kept apart permanently, so rebuilding a tracker never
 touches the rows people have typed.
@@ -23,7 +24,9 @@ touches the rows people have typed.
 ```bash
 python3 tracker/build-themes.py     # extracts the 5 themes from tracker/sources/
 python3 tracker/build-wizard.py     # assembles dist/tracker-wizard.html
-sh tracker/tests/run-all.sh         # build + 263 end-to-end assertions in Chromium
+python3 tracker/build-manual.py     # assembles dist/tracker-manual.html (the user guide)
+node tracker/tools/manual-shots.mjs # re-takes the guide's 42 screenshots — run after UI changes
+sh tracker/tests/run-all.sh         # build + 340 end-to-end assertions in Chromium
                                     # (part 8 opens the .xlsx export in LibreOffice Calc)
 ```
 
@@ -45,7 +48,9 @@ would look exactly like losing everything. The `.json` file does not care.
 
 What this means for the person using it:
 
-- On first run the tracker asks them to pick a data file.
+- On first run the tracker asks where the data should live: **“Open my existing
+  data file”** (reads it, never overwrites it blindly) or **“Create a new data
+  file”**. A foreign JSON is refused; a file from another tracker needs a confirm.
 - After the browser is closed and reopened it shows **“Reconnect to your data
   file”** with the remembered file name. One click per browser session — that
   cannot be avoided, because browsers require a user gesture to renew file
@@ -54,8 +59,12 @@ What this means for the person using it:
   **Ctrl+S**. Hiding the tab forces a save.
 - `beforeunload` cannot finish an async write, so an unsaved state triggers the
   browser's own warning and IndexedDB acts as the safety net.
-- If the file changed outside the tab, a conflict bar offers three ways out.
-  **Nothing is ever overwritten automatically.**
+- Edits made before clicking **Reconnect** are kept: a persistent `localDirty`
+  flag decides whether the browser copy goes to the file or the file is loaded.
+- If the file changed outside the tab *and* the browser has unsaved changes, a
+  conflict bar offers three ways out. **While it is up nothing is written to the
+  file**, and nothing is ever overwritten automatically.
+- A failed write never shows “Saved”.
 - When updating a tracker, **overwrite the old file in place, same name**.
 
 ## Personalisation
@@ -179,6 +188,27 @@ Anything that floats above content — the context menu, tooltips, the modal, th
 drawer, sticky table headers — uses `--tb-solid`, which lays the theme's
 `--surface` over an opaque `--page-bg`. Without it the glass themes show the
 table straight through the menu.
+
+## User guide
+
+`dist/tracker-manual.html` is a single offline file with a PL/EN switch,
+42 screenshots and 12 chapters. Sources are in `tracker/manual/`: one HTML file
+per chapter in `src/`, `manual.css`, and the PNGs from `tools/manual-shots.mjs`.
+Every section holds one Polish and one English block; the build adds headings,
+numbering and the table of contents.
+
+The build **fails** when the guide drifts from the product:
+
+- every label in `<span class="ui">…</span>` must appear verbatim in the wizard
+  or tracker source (810 labels today) — use `class="ui nocheck"` only for
+  labels assembled at runtime, such as “Import N rows”;
+- PL and EN blocks of a section must have the same screenshots, sub-headings,
+  tables, callouts and steps;
+- a numeric cross-reference such as `<a href="#change">8</a>` must match the
+  target section's number;
+- a referenced screenshot must exist.
+
+After changing the UI: run `tools/manual-shots.mjs`, then `build-manual.py`.
 
 ## Not built yet
 

@@ -66,9 +66,11 @@
   </div>
 </div>
 
-<!-- Assety trackera trzymane jako base64. Dzięki temu literalne "</script"
-     albo "-->" w kodzie CSS/JS nie jest w stanie zamknąć wyspy. Samo atob()
-     zepsułoby znaki spoza ASCII, więc dekodujemy przez TextDecoder. -->
+<!-- Assety trackera trzymane jako base64. Dzięki temu literalny zamykacz
+     skryptu albo komentarza w kodzie CSS/JS nie jest w stanie zamknąć wyspy.
+     Samo atob() zepsułoby znaki spoza ASCII, więc dekodujemy przez TextDecoder.
+     UWAGA: w komentarzu HTML nie wolno pisać sekwencji zamykającej komentarz —
+     kończy go w tym miejscu, a reszta tekstu staje się widoczna na stronie. -->
 <!--WZ:ASSETS-->
 
 <script><!--WZ:CHARTS--></script>

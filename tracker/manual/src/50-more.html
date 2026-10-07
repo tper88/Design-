@@ -1,0 +1,351 @@
+<section id="recipes" data-level="1" data-pl="Przepisy krok po kroku" data-en="Step-by-step recipes">
+<div class="l-pl" lang="pl">
+<p>Gotowe procedury na najczęstsze potrzeby. Rób kroki po kolei.</p>
+</div>
+<div class="l-en" lang="en">
+<p>Ready-made procedures for the most common needs. Follow the steps in order.</p>
+</div>
+</section>
+
+<section id="r-excel" data-level="2" data-pl="Tracker z mojego arkusza Excela" data-en="A tracker from my own Excel sheet">
+<div class="l-pl" lang="pl">
+<ol class="steps">
+<li>W kreatorze kliknij <span class="ui">Blank tracker</span>. W <span class="ui">Basics</span> wpisz nazwę i wybierz format, którego używa Twój Excel.</li>
+<li>W <span class="ui">Data</span> zmień <span class="ui">Dataset name</span> (np. „Zgłoszenia”) i usuń kolumnę „Name” przyciskiem ✕.</li>
+<li>Kliknij <span class="ui">Paste a header from Excel</span>, wklej nagłówek i <strong>co najmniej 10 wierszy</strong> z arkusza, kliknij <span class="ui">Create columns</span>.</li>
+<li>Sprawdź typ każdej kolumny i popraw pomyłki. Dla list wyboru otwórz opcje: nadaj kolory i ustaw <span class="ui">New rows start as</span>.</li>
+<li>Ustaw <span class="ui">Column used as the row title</span> na kolumnę, która najlepiej nazywa wiersz.</li>
+<li>W <span class="ui">Tabs</span> usuń zakładkę „Data” (✕) i dodaj <span class="ui">Query</span>, <span class="ui">Summary</span> oraz — jeśli masz terminy — <span class="ui">Agenda</span>.</li>
+<li>W <span class="ui">Components</span> przejrzyj, co dodały presety. W tabeli sprawdź <span class="ui">Columns to show</span>.</li>
+<li>W <span class="ui">Review &amp; export</span> pobierz oba pliki do jednego folderu.</li>
+<li>Otwórz tracker, <span class="ui">Choose a data file</span> → <span class="ui">Create a new data file</span>.</li>
+<li>W Excelu skopiuj <strong>wszystkie</strong> wiersze z nagłówkiem, w trackerze otwórz zakładkę z tabelą i naciśnij <kbd>Ctrl</kbd>+<kbd>V</kbd> → <span class="ui nocheck">Import N rows</span>.</li>
+</ol>
+</div>
+<div class="l-en" lang="en">
+<ol class="steps">
+<li>In the wizard click <span class="ui">Blank tracker</span>. In <span class="ui">Basics</span> type a name and pick the format your Excel uses.</li>
+<li>In <span class="ui">Data</span> change <span class="ui">Dataset name</span> (e.g. “Requests”) and delete the “Name” column with ✕.</li>
+<li>Click <span class="ui">Paste a header from Excel</span>, paste the header and <strong>at least 10 rows</strong> of your sheet, click <span class="ui">Create columns</span>.</li>
+<li>Check each column's type and fix mistakes. For pick lists, open the options: give them colours and set <span class="ui">New rows start as</span>.</li>
+<li>Set <span class="ui">Column used as the row title</span> to the column that best names a row.</li>
+<li>In <span class="ui">Tabs</span> delete the “Data” tab (✕) and add <span class="ui">Query</span>, <span class="ui">Summary</span> and — if you have due dates — <span class="ui">Agenda</span>.</li>
+<li>In <span class="ui">Components</span> look through what the presets added. In the table check <span class="ui">Columns to show</span>.</li>
+<li>In <span class="ui">Review &amp; export</span> download both files into one folder.</li>
+<li>Open the tracker, <span class="ui">Choose a data file</span> → <span class="ui">Create a new data file</span>.</li>
+<li>In Excel copy <strong>all</strong> the rows with the header, open the tab with the table and press <kbd>Ctrl</kbd>+<kbd>V</kbd> → <span class="ui nocheck">Import N rows</span>.</li>
+</ol>
+</div>
+</section>
+
+<section id="r-view" data-level="2" data-pl="Widok „Moje otwarte”" data-en="A “My open items” view">
+<div class="l-pl" lang="pl">
+<ol class="steps">
+<li>Wczytaj <code>.tracker.json</code> w kreatorze (krok <span class="ui">Start</span>).</li>
+<li>W <span class="ui">Tabs</span> kliknij <span class="ui">Blank</span> i zmień nazwę zakładki na „Moje otwarte”.</li>
+<li>W <span class="ui">Components</span> wybierz tę zakładkę i dodaj <span class="ui">Table</span>.</li>
+<li>W <span class="ui">Columns to show</span> kliknij kolumny w kolejności, w jakiej mają się pokazać.</li>
+<li>W <span class="ui">Fixed filter (this is how you make a saved view)</span> dodaj dwa warunki: <em>Owner — is — the current user</em> oraz <em>Status — is not — Closed</em>.</li>
+<li>Zapisz tracker i nadpisz stary plik (rozdział <a href="#change">8</a>).</li>
+</ol>
+</div>
+<div class="l-en" lang="en">
+<ol class="steps">
+<li>Load the <code>.tracker.json</code> in the wizard (the <span class="ui">Start</span> step).</li>
+<li>In <span class="ui">Tabs</span> click <span class="ui">Blank</span> and rename the tab to “My open”.</li>
+<li>In <span class="ui">Components</span> pick that tab and add a <span class="ui">Table</span>.</li>
+<li>In <span class="ui">Columns to show</span> click the columns in the order you want them.</li>
+<li>In <span class="ui">Fixed filter (this is how you make a saved view)</span> add two conditions: <em>Owner — is — the current user</em> and <em>Status — is not — Closed</em>.</li>
+<li>Save the tracker and overwrite the old file (chapter <a href="#change">8</a>).</li>
+</ol>
+</div>
+</section>
+
+<section id="r-kpi" data-level="2" data-pl="Licznik „po terminie” i alert" data-en="An “overdue” counter and alert">
+<div class="l-pl" lang="pl">
+<ol class="steps">
+<li>W <span class="ui">Components</span> wybierz zakładkę <em>Summary</em> i dodaj <span class="ui">KPI card</span>.</li>
+<li><span class="ui">Title</span>: „Po terminie”. <span class="ui">Calculation</span>: <span class="ui">Count rows</span>.</li>
+<li>W <span class="ui">Only count rows where…</span>: <em>Due — date relative to today — overdue</em> oraz <em>Status — is not — Closed</em>.</li>
+<li>W <span class="ui">Alerts</span> kliknij <span class="ui">+ Add alert</span>, nazwij go, ustaw ten sam filtr, <span class="ui">more than</span> 5, kolor <span class="ui">red</span>.</li>
+<li><span class="ui">Message ({{n}} inserts the number)</span>: „{{n}} spraw po terminie — zajmij się nimi.” i <span class="ui">Jump to tab when clicked</span>: zakładka z tabelą.</li>
+</ol>
+</div>
+<div class="l-en" lang="en">
+<ol class="steps">
+<li>In <span class="ui">Components</span> pick the <em>Summary</em> tab and add a <span class="ui">KPI card</span>.</li>
+<li><span class="ui">Title</span>: “Overdue”. <span class="ui">Calculation</span>: <span class="ui">Count rows</span>.</li>
+<li>In <span class="ui">Only count rows where…</span>: <em>Due — date relative to today — overdue</em> and <em>Status — is not — Closed</em>.</li>
+<li>In <span class="ui">Alerts</span> click <span class="ui">+ Add alert</span>, name it, set the same filter, <span class="ui">more than</span> 5, colour <span class="ui">red</span>.</li>
+<li><span class="ui">Message ({{n}} inserts the number)</span>: “{{n}} items are overdue — please act.” and <span class="ui">Jump to tab when clicked</span>: the tab with the table.</li>
+</ol>
+</div>
+</section>
+
+<section id="r-chart" data-level="2" data-pl="Wykres miesięczny" data-en="A monthly chart">
+<div class="l-pl" lang="pl">
+<ol class="steps">
+<li>Dodaj <span class="ui">Chart</span>, <span class="ui">Chart type</span>: <span class="ui">Bars</span>.</li>
+<li><span class="ui">Calculation</span>: <span class="ui">Count rows</span> (ile spraw) albo <span class="ui">Sum</span> z kolumną kwoty.</li>
+<li><span class="ui">Group by column</span>: data (np. <em>Received</em>), <span class="ui">Time grouping</span>: <span class="ui">by month</span>.</li>
+<li>Opcjonalnie <span class="ui">Split into series by</span>: <em>Status</em> — każdy miesiąc podzielony kolorami.</li>
+</ol>
+</div>
+<div class="l-en" lang="en">
+<ol class="steps">
+<li>Add a <span class="ui">Chart</span>, <span class="ui">Chart type</span>: <span class="ui">Bars</span>.</li>
+<li><span class="ui">Calculation</span>: <span class="ui">Count rows</span> (how many) or <span class="ui">Sum</span> with an amount column.</li>
+<li><span class="ui">Group by column</span>: a date (e.g. <em>Received</em>), <span class="ui">Time grouping</span>: <span class="ui">by month</span>.</li>
+<li>Optionally <span class="ui">Split into series by</span>: <em>Status</em> — each month split into colours.</li>
+</ol>
+</div>
+</section>
+
+<section id="change" data-level="1" data-pl="Zmiana trackera później" data-en="Changing a tracker later">
+<div class="l-pl" lang="pl">
+<p>Chcesz dodać kolumnę, zmienić wykres albo styl? <strong>Nie zaczynaj od nowa</strong> — wczytaj strukturę.</p>
+<ol class="steps">
+<li>Otwórz <code>tracker-wizard.html</code>. W ramce <span class="ui">Already have a tracker and want to change it</span>
+wczytaj <code>Nazwa.tracker.json</code>.</li>
+<li>Wprowadź zmiany w dowolnych krokach.</li>
+<li>W <span class="ui">Review &amp; export</span> kliknij <span class="ui">Download tracker (.html)</span> i zapisz plik
+<strong>w tym samym folderze, pod tą samą nazwą</strong> — zgódź się zastąpić stary plik.</li>
+<li>Tak samo zapisz <span class="ui">Download structure (.tracker.json)</span>, zastępując stary.</li>
+<li>Otwórz tracker. Dane są na miejscu, a u góry jednorazowo pojawi się informacja, co się zmieniło.</li>
+</ol>
+<figure class="shot"><img data-shot="t-structure" alt="Informacja o zmianie struktury"><figcaption>Po aktualizacji tracker mówi, ile kolumn i zakładek doszło lub ubyło. Wiersze nie są ruszane.</figcaption></figure>
+<div class="tbl"><table><thead><tr><th>Zmiana</th><th>Bezpieczna?</th></tr></thead><tbody>
+<tr><td>Nazwa kolumny, zakładki, komponentu</td><td>Tak — zawsze.</td></tr>
+<tr><td>Nowa kolumna, zakładka, komponent, alert</td><td>Tak. Nowa kolumna jest pusta w starych wierszach.</td></tr>
+<tr><td>Styl, format liczb i dat, waluta</td><td>Tak.</td></tr>
+<tr><td>Usunięcie kolumny</td><td>Dane się ukrywają, nie znikają — wrócą, jeśli dodasz kolumnę z powrotem (to musi być ta sama, nie nowa o tej samej nazwie). Sprawdź filtry, które jej używały.</td></tr>
+<tr><td>Zmiana typu kolumny</td><td>Ostrożnie: stare wartości, które nie pasują, będą podkreślone kropkami.</td></tr>
+<tr><td>Zmiana <em>value</em> opcji listy</td><td>Nie — wiersze ze starą wartością przestaną pasować. Zmieniaj <em>label</em>.</td></tr>
+</tbody></table></div>
+<div class="callout bad"><span class="t">Nie buduj ponownie z szablonu</span>
+Tracker zbudowany od nowa z kafelka to dla przeglądarki <strong>inny</strong> tracker. Przy otwieraniu Twojego pliku danych
+zobaczysz <span class="ui">This file belongs to another tracker</span>, a część wierszy może się nie pokazać. Zmiany rób
+zawsze przez wczytanie <code>.tracker.json</code>.</div>
+</div>
+<div class="l-en" lang="en">
+<p>Want to add a column, change a chart or the style? <strong>Do not start again</strong> — load the structure.</p>
+<ol class="steps">
+<li>Open <code>tracker-wizard.html</code>. In the <span class="ui">Already have a tracker and want to change it</span> box,
+load <code>Name.tracker.json</code>.</li>
+<li>Make your changes in any step.</li>
+<li>In <span class="ui">Review &amp; export</span> click <span class="ui">Download tracker (.html)</span> and save it
+<strong>in the same folder, under the same name</strong> — agree to replace the old file.</li>
+<li>Save <span class="ui">Download structure (.tracker.json)</span> the same way, replacing the old one.</li>
+<li>Open the tracker. Your data is there, and a one-time notice at the top says what changed.</li>
+</ol>
+<figure class="shot"><img data-shot="t-structure" alt="The structure change notice"><figcaption>After an update the tracker says how many columns and tabs were added or removed. Rows are not touched.</figcaption></figure>
+<div class="tbl"><table><thead><tr><th>Change</th><th>Safe?</th></tr></thead><tbody>
+<tr><td>Renaming a column, tab or component</td><td>Yes — always.</td></tr>
+<tr><td>A new column, tab, component or alert</td><td>Yes. A new column is empty in old rows.</td></tr>
+<tr><td>Style, number and date format, currency</td><td>Yes.</td></tr>
+<tr><td>Deleting a column</td><td>The data is hidden, not erased — it comes back if you add the column back (the same one, not a new one with the same name). Check filters that used it.</td></tr>
+<tr><td>Changing a column's type</td><td>Carefully: old values that do not fit get a dotted underline.</td></tr>
+<tr><td>Changing a pick list option's <em>value</em></td><td>No — rows with the old value stop matching. Change the <em>label</em> instead.</td></tr>
+</tbody></table></div>
+<div class="callout bad"><span class="t">Do not rebuild from a template</span>
+A tracker rebuilt from a tile is a <strong>different</strong> tracker to the browser. When opening your data file you will see
+<span class="ui">This file belongs to another tracker</span>, and some rows may not show. Always change a tracker by loading its
+<code>.tracker.json</code>.</div>
+</div>
+</section>
+
+<section id="share" data-level="1" data-pl="Praca z innymi osobami" data-en="Working with other people">
+<div class="l-pl" lang="pl">
+<p>Tracker to plik na dysku, a nie aplikacja w chmurze. To ważne, gdy korzysta z niego więcej osób.</p>
+<ul>
+<li><strong>Ten sam tracker, osobne dane</strong> (zalecane): wyślij kolegom plik <code>.html</code>. Każdy przy pierwszym otwarciu
+wybiera <span class="ui">Create a new data file</span> i ma swój plik danych.</li>
+<li><strong>Przekazanie danych</strong>: wyślij swój <code>.data.json</code>. Odbiorca otwiera tracker i wybiera
+<span class="ui">Open my existing data file</span>. Od tej chwili każdy pracuje na swojej kopii.</li>
+<li><strong>Wspólny plik na dysku sieciowym</strong>: działa, ale <strong>nie dla dwóch osób naraz</strong>. Tracker sprawdza zmiany
+w pliku tylko przy otwarciu i przy <span class="ui">Reconnect</span> — jeśli dwie osoby piszą jednocześnie, wygrywa ta, która
+zapisze ostatnia. Umówcie się, kto i kiedy pracuje.</li>
+<li>Każdy ma własny profil — imię i zespół ustawione na jego komputerze nie nadpisują profilu kolegi.</li>
+</ul>
+</div>
+<div class="l-en" lang="en">
+<p>The tracker is a file on a disk, not a cloud app. That matters when more than one person uses it.</p>
+<ul>
+<li><strong>Same tracker, separate data</strong> (recommended): send colleagues the <code>.html</code> file. On first opening each
+of them chooses <span class="ui">Create a new data file</span> and has their own data file.</li>
+<li><strong>Handing over data</strong>: send your <code>.data.json</code>. The recipient opens the tracker and chooses
+<span class="ui">Open my existing data file</span>. From then on each of you works on your own copy.</li>
+<li><strong>A shared file on a network drive</strong>: it works, but <strong>not for two people at once</strong>. The tracker checks
+for changes to the file only when it opens and on <span class="ui">Reconnect</span> — if two people write at the same time,
+whoever saves last wins. Agree who works when.</li>
+<li>Everyone has their own profile — the name and team set on one computer do not overwrite a colleague's.</li>
+</ul>
+</div>
+</section>
+
+<section id="keys" data-level="1" data-pl="Skróty klawiszowe" data-en="Keyboard shortcuts">
+<div class="l-pl" lang="pl">
+<div class="tbl"><table><thead><tr><th>Klawisze</th><th>Co robią</th></tr></thead><tbody>
+<tr><td><kbd>Ctrl</kbd>+<kbd>S</kbd></td><td>Zapisz teraz (bez pliku — wybór pliku).</td></tr>
+<tr><td><kbd>Ctrl</kbd>+<kbd>V</kbd> na zakładce z tabelą</td><td>Wklej wiersze z Excela.</td></tr>
+<tr><td>Dwuklik na komórce</td><td>Edycja w komórce.</td></tr>
+<tr><td><kbd>Enter</kbd> / <kbd>Esc</kbd> w komórce</td><td>Zapisz / anuluj edycję.</td></tr>
+<tr><td><kbd>Enter</kbd> w polu checklisty</td><td>Dodaj pozycję.</td></tr>
+<tr><td><kbd>Shift</kbd>+<kbd>F10</kbd> na kratce wiersza</td><td>Menu jak pod prawym przyciskiem.</td></tr>
+<tr><td><kbd>↑</kbd> <kbd>↓</kbd> w menu</td><td>Wybór pozycji; <kbd>Enter</kbd> ją uruchamia.</td></tr>
+<tr><td><kbd>←</kbd> <kbd>→</kbd> na zakładce w lewym pasku</td><td>Poprzednia / następna zakładka.</td></tr>
+<tr><td><kbd>Esc</kbd></td><td>Zamyka panel, okno albo menu.</td></tr>
+</tbody></table></div>
+</div>
+<div class="l-en" lang="en">
+<div class="tbl"><table><thead><tr><th>Keys</th><th>What they do</th></tr></thead><tbody>
+<tr><td><kbd>Ctrl</kbd>+<kbd>S</kbd></td><td>Save now (without a file — the file choice).</td></tr>
+<tr><td><kbd>Ctrl</kbd>+<kbd>V</kbd> on a tab with a table</td><td>Paste rows from Excel.</td></tr>
+<tr><td>Double-click a cell</td><td>Edit in the cell.</td></tr>
+<tr><td><kbd>Enter</kbd> / <kbd>Esc</kbd> in a cell</td><td>Save / cancel the edit.</td></tr>
+<tr><td><kbd>Enter</kbd> in a checklist field</td><td>Add the item.</td></tr>
+<tr><td><kbd>Shift</kbd>+<kbd>F10</kbd> on a row's box</td><td>The right-click menu.</td></tr>
+<tr><td><kbd>↑</kbd> <kbd>↓</kbd> in a menu</td><td>Move between items; <kbd>Enter</kbd> runs one.</td></tr>
+<tr><td><kbd>←</kbd> <kbd>→</kbd> on a tab in the left bar</td><td>Previous / next tab.</td></tr>
+<tr><td><kbd>Esc</kbd></td><td>Closes a panel, a window or a menu.</td></tr>
+</tbody></table></div>
+</div>
+</section>
+
+<section id="trouble" data-level="1" data-pl="Problemy i rozwiązania" data-en="Problems and solutions">
+<div class="l-pl" lang="pl">
+<h4>Komunikaty w trackerze</h4>
+<div class="tbl"><table><thead><tr><th>Widzisz…</th><th>Co zrobić</th></tr></thead><tbody>
+<tr><td><span class="ui">This tracker runs in Chrome and Edge</span></td><td>Otwórz plik w Chrome albo Edge. (Brave domyślnie też blokuje zapis do plików.)</td></tr>
+<tr><td><span class="ui">This tracker file is damaged</span></td><td>Plik <code>.html</code> został uszkodzony. Wczytaj <code>.tracker.json</code> w kreatorze i zapisz tracker ponownie w tym samym miejscu.</td></tr>
+<tr><td><span class="ui">Your data is not being written to a file</span></td><td><span class="ui">Choose a data file</span> — nowy plik albo istniejący (<a href="#t-first">6.1</a>).</td></tr>
+<tr><td><span class="ui">Reconnect to your data file</span></td><td><span class="ui">Reconnect</span> — raz po każdym uruchomieniu przeglądarki (<a href="#t-reconnect">6.3</a>).</td></tr>
+<tr><td><span class="ui">Saving works, but the file was not remembered</span></td><td>Dane się zapisują, ale przy następnym otwarciu trzeba będzie wybrać plik: <span class="ui">Open my existing data file</span>.</td></tr>
+<tr><td><span class="ui nocheck">Could not write the data file: …</span></td><td>Pełny dysk, plik tylko do odczytu albo otwarty w innym programie. Usuń przyczynę i kliknij <span class="ui">Save</span>.</td></tr>
+<tr><td>Czerwony pasek wyboru wersji</td><td>Zdecyduj, która wersja wygrywa (<a href="#t-saving">6.2</a>).</td></tr>
+<tr><td><span class="ui">That file is not tracker data. Pick the .data.json this tracker saved.</span></td><td>Wskazałeś zły plik — wybierz <code>Nazwa.data.json</code>.</td></tr>
+<tr><td><span class="ui">This file belongs to another tracker</span></td><td>Tracker zbudowano od nowa zamiast przez <code>.tracker.json</code>. Najlepiej odbuduj go z <code>.tracker.json</code> (<a href="#change">8</a>).</td></tr>
+<tr><td>Kropkowane podkreślenie w komórce</td><td>Wartość nie pasuje do typu kolumny — popraw ją (<a href="#t-rows">6.4</a>).</td></tr>
+</tbody></table></div>
+<h4>Problemy zgłaszane przez kreator</h4>
+<div class="tbl"><table><thead><tr><th>Komunikat</th><th>Naprawa</th></tr></thead><tbody>
+<tr><td><span class="ui">The tracker has no name (Basics step).</span></td><td><span class="ui">Basics</span> → wpisz <span class="ui">Tracker name</span>.</td></tr>
+<tr><td><span class="ui">There is no dataset (Data step).</span></td><td><span class="ui">Data</span> → <span class="ui">+ New dataset</span>.</td></tr>
+<tr><td>Dataset “…” has no columns.</td><td>Dodaj kolumny albo usuń ten zbiór.</td></tr>
+<tr><td>Column “…” is a pick list but has no options.</td><td>Otwórz opcje listy → <span class="ui">+ Add option</span>.</td></tr>
+<tr><td><span class="ui">There are no tabs (Tabs step).</span></td><td><span class="ui">Tabs</span> → dodaj zakładkę.</td></tr>
+<tr><td>Tab “…” is empty — add a component or remove the tab.</td><td>Dodaj komponent albo usuń zakładkę.</td></tr>
+<tr><td>Component “…” on “…” has no dataset.</td><td>Ustaw jego <span class="ui">Dataset</span> (zwykle po usunięciu zbioru).</td></tr>
+<tr><td>Chart “…” on “…”: …</td><td>Ustaw <span class="ui">Group by column</span>; przy linii z podziałem <span class="ui">Max series (line charts: 3 or fewer)</span> najwyżej 3.</td></tr>
+<tr><td>Agenda “…” has no source with a date column.</td><td><span class="ui">+ Add a source</span> i wybierz <span class="ui">Date column</span>.</td></tr>
+<tr><td>Table “…” shows no columns.</td><td>Zaznacz kolumny w <span class="ui">Columns to show</span>.</td></tr>
+<tr><td>Quick filter “…” in “…” has no conditions.</td><td>Dodaj warunek albo usuń szybki filtr.</td></tr>
+<tr><td>Alert “…” has no dataset. / has no message.</td><td>Uzupełnij <span class="ui">Dataset to count</span> albo treść komunikatu.</td></tr>
+<tr><td><span class="ui">Duplicate component id — remove it and add it again.</span></td><td>Usuń komponent i dodaj go od nowa.</td></tr>
+</tbody></table></div>
+<h4>Częste pytania</h4>
+<dl class="fields">
+<dt>Nowy komputer — jak przenieść tracker?</dt>
+<dd><p>Skopiuj folder z plikami <code>.html</code> i <code>.data.json</code>. Otwórz tracker, <span class="ui">Choose a data file</span> →
+<span class="ui">Open my existing data file</span> → wskaż <code>.data.json</code>.</p></dd>
+<dt>Przeniosłem albo przemianowałem plik trackera i „zniknęły dane”</dt>
+<dd><p>Nie zniknęły — są w <code>.data.json</code>. Przeglądarka zapomniała tylko, gdzie jest plik. <span class="ui">Choose a data file</span> →
+<span class="ui">Open my existing data file</span>.</p></dd>
+<dt>Coś skasowałem i chcę wrócić do wczoraj</dt>
+<dd><p>Tracker nie ma przycisku „cofnij”. Jeśli masz kopię z <span class="ui">Save a JSON backup</span>, użyj
+<span class="ui">Load data from a JSON file…</span>. Dlatego rób kopie regularnie — albo kopiuj cały folder.</p></dd>
+<dt>Zamknąłem kreator i straciłem pracę</dt>
+<dd><p>Kreator nie zapisuje sam. Następnym razem zapisuj <span class="ui">Download structure (.tracker.json)</span> co jakiś czas.</p></dd>
+<dt>Filtr „Mine” nic nie pokazuje</dt>
+<dd><p>W profilu (<a href="#t-alerts">6.10</a>) wpisz imię dokładnie tak, jak w kolumnie opiekuna.</p></dd>
+<dt>Wklejone daty mają zamieniony dzień z miesiącem</dt>
+<dd><p>Format w <span class="ui">Basics</span> nie zgadza się z Twoim Excelem. Zmień go, wygeneruj tracker ponownie
+(<a href="#change">8</a>) i wklej jeszcze raz.</p></dd>
+<dt>Kalendarz przy polu daty pokazuje inny format niż tabela</dt>
+<dd><p>Okienko kalendarza należy do przeglądarki i używa ustawień językowych komputera. Tabela i eksport i tak używają formatu
+wybranego w kreatorze.</p></dd>
+</dl>
+</div>
+<div class="l-en" lang="en">
+<h4>Messages in the tracker</h4>
+<div class="tbl"><table><thead><tr><th>You see…</th><th>What to do</th></tr></thead><tbody>
+<tr><td><span class="ui">This tracker runs in Chrome and Edge</span></td><td>Open the file in Chrome or Edge. (Brave also blocks saving to files by default.)</td></tr>
+<tr><td><span class="ui">This tracker file is damaged</span></td><td>The <code>.html</code> file is damaged. Load the <code>.tracker.json</code> in the wizard and save the tracker again in the same place.</td></tr>
+<tr><td><span class="ui">Your data is not being written to a file</span></td><td><span class="ui">Choose a data file</span> — a new file or an existing one (<a href="#t-first">6.1</a>).</td></tr>
+<tr><td><span class="ui">Reconnect to your data file</span></td><td><span class="ui">Reconnect</span> — once after each browser start (<a href="#t-reconnect">6.3</a>).</td></tr>
+<tr><td><span class="ui">Saving works, but the file was not remembered</span></td><td>Data is being saved, but next time you will have to pick the file: <span class="ui">Open my existing data file</span>.</td></tr>
+<tr><td><span class="ui nocheck">Could not write the data file: …</span></td><td>A full disk, a read-only file or a file open in another program. Fix the cause and click <span class="ui">Save</span>.</td></tr>
+<tr><td>A red which-version bar</td><td>Decide which version wins (<a href="#t-saving">6.2</a>).</td></tr>
+<tr><td><span class="ui">That file is not tracker data. Pick the .data.json this tracker saved.</span></td><td>You picked the wrong file — choose <code>Name.data.json</code>.</td></tr>
+<tr><td><span class="ui">This file belongs to another tracker</span></td><td>The tracker was rebuilt from scratch instead of from its <code>.tracker.json</code>. Best rebuild it from the <code>.tracker.json</code> (<a href="#change">8</a>).</td></tr>
+<tr><td>A dotted underline in a cell</td><td>The value does not fit the column type — correct it (<a href="#t-rows">6.4</a>).</td></tr>
+</tbody></table></div>
+<h4>Problems the wizard reports</h4>
+<div class="tbl"><table><thead><tr><th>Message</th><th>Fix</th></tr></thead><tbody>
+<tr><td><span class="ui">The tracker has no name (Basics step).</span></td><td><span class="ui">Basics</span> → type a <span class="ui">Tracker name</span>.</td></tr>
+<tr><td><span class="ui">There is no dataset (Data step).</span></td><td><span class="ui">Data</span> → <span class="ui">+ New dataset</span>.</td></tr>
+<tr><td>Dataset “…” has no columns.</td><td>Add columns or delete that dataset.</td></tr>
+<tr><td>Column “…” is a pick list but has no options.</td><td>Open the pick list options → <span class="ui">+ Add option</span>.</td></tr>
+<tr><td><span class="ui">There are no tabs (Tabs step).</span></td><td><span class="ui">Tabs</span> → add a tab.</td></tr>
+<tr><td>Tab “…” is empty — add a component or remove the tab.</td><td>Add a component or delete the tab.</td></tr>
+<tr><td>Component “…” on “…” has no dataset.</td><td>Set its <span class="ui">Dataset</span> (usually after deleting a dataset).</td></tr>
+<tr><td>Chart “…” on “…”: …</td><td>Set <span class="ui">Group by column</span>; for a split line chart keep <span class="ui">Max series (line charts: 3 or fewer)</span> at 3 or fewer.</td></tr>
+<tr><td>Agenda “…” has no source with a date column.</td><td><span class="ui">+ Add a source</span> and pick a <span class="ui">Date column</span>.</td></tr>
+<tr><td>Table “…” shows no columns.</td><td>Tick columns in <span class="ui">Columns to show</span>.</td></tr>
+<tr><td>Quick filter “…” in “…” has no conditions.</td><td>Add a condition or remove the chip.</td></tr>
+<tr><td>Alert “…” has no dataset. / has no message.</td><td>Fill in <span class="ui">Dataset to count</span> or the message.</td></tr>
+<tr><td><span class="ui">Duplicate component id — remove it and add it again.</span></td><td>Remove the component and add it again.</td></tr>
+</tbody></table></div>
+<h4>Frequent questions</h4>
+<dl class="fields">
+<dt>A new computer — how do I move the tracker?</dt>
+<dd><p>Copy the folder with the <code>.html</code> and <code>.data.json</code> files. Open the tracker, <span class="ui">Choose a data file</span> →
+<span class="ui">Open my existing data file</span> → pick the <code>.data.json</code>.</p></dd>
+<dt>I moved or renamed the tracker file and “the data is gone”</dt>
+<dd><p>It is not gone — it is in the <code>.data.json</code>. The browser only forgot where the file is. <span class="ui">Choose a data file</span> →
+<span class="ui">Open my existing data file</span>.</p></dd>
+<dt>I deleted something and want yesterday back</dt>
+<dd><p>The tracker has no undo button. If you have a copy from <span class="ui">Save a JSON backup</span>, use
+<span class="ui">Load data from a JSON file…</span>. That is why you should back up regularly — or copy the whole folder.</p></dd>
+<dt>I closed the wizard and lost my work</dt>
+<dd><p>The wizard does not save by itself. Next time save <span class="ui">Download structure (.tracker.json)</span> now and then.</p></dd>
+<dt>The “Mine” filter shows nothing</dt>
+<dd><p>In your profile (<a href="#t-alerts">6.10</a>) type your name exactly as it appears in the owner column.</p></dd>
+<dt>Pasted dates have day and month swapped</dt>
+<dd><p>The format in <span class="ui">Basics</span> does not match your Excel. Change it, generate the tracker again
+(<a href="#change">8</a>) and paste once more.</p></dd>
+<dt>The calendar on a date field shows a different format from the table</dt>
+<dd><p>The calendar pop-up belongs to the browser and follows the computer's language settings. The table and the export still use
+the format chosen in the wizard.</p></dd>
+</dl>
+</div>
+</section>
+
+<section id="limits" data-level="1" data-pl="Czego tracker nie robi" data-en="What the tracker does not do">
+<div class="l-pl" lang="pl">
+<p>Żeby nie szukać czegoś, czego nie ma:</p>
+<ul>
+<li><strong>Nie jest wspólną aplikacją w chmurze</strong> — dwie osoby nie pracują na żywo na tym samym pliku (<a href="#share">9</a>).</li>
+<li><strong>Nie ma przycisku „cofnij”</strong> — rób kopie (<span class="ui">Save a JSON backup</span>).</li>
+<li><strong>Nie powiadamia, gdy jest zamknięty</strong> — alerty widać tylko w otwartym trackerze, nic nie jest wysyłane mailem.</li>
+<li><strong>Nie liczy formuł w kolumnach</strong> — sumy i średnie dają komponenty (KPI, wykres, wiersz sum).</li>
+<li><strong>Nie łączy warunków przez „lub”</strong> — filtr to zawsze „i” (<a href="#c-filter">5.9</a>).</li>
+<li><strong>Nie ma kalendarza w widoku miesiąca</strong> — jest agenda, czyli lista terminów.</li>
+<li><strong>Nie importuje pliku .xlsx</strong> — dane przenosisz, kopiując z Excela i wklejając (<a href="#t-paste">6.7</a>).</li>
+<li><strong>Nie działa na telefonie</strong> — tylko Chrome lub Edge na komputerze.</li>
+</ul>
+</div>
+<div class="l-en" lang="en">
+<p>So you do not go looking for something that is not there:</p>
+<ul>
+<li><strong>It is not a shared cloud app</strong> — two people cannot work live on the same file (<a href="#share">9</a>).</li>
+<li><strong>It has no undo button</strong> — make backups (<span class="ui">Save a JSON backup</span>).</li>
+<li><strong>It does not notify you when closed</strong> — alerts show only in the open tracker; nothing is emailed.</li>
+<li><strong>It does not calculate formulas in columns</strong> — sums and averages come from components (KPI, chart, totals row).</li>
+<li><strong>It does not combine conditions with “or”</strong> — a filter is always “and” (<a href="#c-filter">5.9</a>).</li>
+<li><strong>It has no month-grid calendar</strong> — there is the agenda, a list of dates.</li>
+<li><strong>It does not import .xlsx files</strong> — you move data by copying from Excel and pasting (<a href="#t-paste">6.7</a>).</li>
+<li><strong>It does not work on phones</strong> — Chrome or Edge on a computer only.</li>
+</ul>
+</div>
+</section>

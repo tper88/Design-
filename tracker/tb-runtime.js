@@ -464,6 +464,15 @@
     var saveState = 'off';
     var handleRemembered = true;
     var structureNote = null;
+    /* Zmiany, których nie ma jeszcze w pliku. Licznik edycji, a nie sama flaga:
+       edycja w trakcie zapisu nie może zostać uznana za zapisaną. Flaga jest
+       trwała (kv), żeby przetrwała zamknięcie przeglądarki przed „Reconnect”. */
+    var editSeq = 0;
+    var localDirty = false;
+    /* Plik i przeglądarka mają różne dane, a user jeszcze nie wybrał wersji.
+       Dopóki to trwa, do pliku NIC nie jest zapisywane. */
+    var conflictState = null;          // { file, reason: 'newer' | 'link', count }
+    var JSON_TYPES = [{ description: 'Tracker data', accept: { 'application/json': ['.json'] } }];
 
     function idbOpen() {
       return new Promise(function (res, rej) {
@@ -556,10 +565,14 @@
       }[s] || s;
     }
 
+    /* Zwraca true tylko wtedy, gdy dane naprawdę trafiły do pliku — od tego
+       zależy toast „Saved”, więc nieudany zapis nie może udawać udanego. */
     function flushFile() {
       fileTimer = null;
-      if (!handle || mode !== 'auto') { setSaveState(handle ? 'dirty' : 'off'); return Promise.resolve(); }
+      if (!handle || mode !== 'auto') { setSaveState(handle ? 'dirty' : 'off'); return Promise.resolve(false); }
+      if (conflictState) { setSaveState('dirty'); return Promise.resolve(false); }
       setSaveState('saving');
+      var seq = editSeq;
       var obj = dataFileObject();
       return handle.createWritable().then(function (w) {
         return w.write(JSON.stringify(obj)).then(function () { return w.close(); });
@@ -567,12 +580,19 @@
         return handle.getFile();
       }).then(function (f) {
         lastFileMtime = f.lastModified;
-        return kvPut('lastFileMtime', lastFileMtime);
-      }).then(function () {
-        setSaveState('saved');
+        kvPut('lastFileMtime', lastFileMtime).catch(function () {});
+        if (editSeq === seq) {
+          localDirty = false;
+          kvPut('localDirty', false).catch(function () {});
+          setSaveState('saved');
+        } else {
+          setSaveState('dirty');      // nowsza edycja czeka już w kolejce
+        }
+        return true;
       }).catch(function (err) {
         setSaveState('dirty');
-        TBUI.toast('Could not write the data file: ' + err.message, 'danger', 6000);
+        TBUI.toast('Could not write the data file: ' + (err && err.message), 'danger', 6000);
+        return false;
       });
     }
 
@@ -588,8 +608,17 @@
       }
     }
 
+    function markDirty() {
+      editSeq++;
+      if (!localDirty) {
+        localDirty = true;
+        kvPut('localDirty', true).catch(function () {});
+      }
+    }
+
     function touch(rec) {
       rec._m = Date.now();
+      markDirty();
       pending[rec.id] = rec;
       bumpRev(rec.ds);
       aggCache = {};
@@ -609,23 +638,139 @@
 
     function saveNow() { return flushIdb().then(flushFile); }
 
-    function pickFile() {
-      return global.showSaveFilePicker({
-        suggestedName: (CFG.meta.name || 'tracker').replace(/[^\w\-. ]+/g, '_') + '.data.json',
-        types: [{ description: 'Tracker data', accept: { 'application/json': ['.json'] } }]
-      }).then(function (h) {
-        handle = h;
-        mode = 'auto';
-        // Nieudane zapamiętanie uchwytu nie może przerwać połączenia.
-        return kvPut('fileHandle', h).catch(function (err) {
-          handleRemembered = false;
-          if (global.console) console.warn('[TB] file handle not remembered:', err && err.message);
+    function hasLocalChanges() { return localDirty && Object.keys(data.index).length > 0; }
+
+    function refreshAll() {
+      TB.shell.renderNotices();
+      TB.shell.renderProfile();
+      TB.shell.renderActive(true);
+    }
+
+    /* Pusty plik → null. Uszkodzony JSON → wyjątek (łapie wołający). */
+    function parseDataFile(t) {
+      if (!t || !t.trim()) return null;
+      return JSON.parse(t);
+    }
+
+    function fileRecords(obj) { return (obj && obj.records) || []; }
+
+    /* Dane z pliku zastępują to, co trzyma przeglądarka (pamięć i cache). */
+    function adopt(obj, f) {
+      var recs = fileRecords(obj);
+      ingest(recs);
+      adoptProfile(obj);
+      Promise.resolve(safe(function () {
+        var s = tx('records', 'readwrite');
+        s.clear();
+        recs.forEach(function (r) { s.put(r); });
+      })).catch(function () {});
+      lastFileMtime = f.lastModified;
+      kvPut('lastFileMtime', lastFileMtime).catch(function () {});
+      localDirty = false;
+      kvPut('localDirty', false).catch(function () {});
+      setSaveState(mode === 'auto' ? 'saved' : 'off');
+    }
+
+    function showConflict(f, reason, count) {
+      conflictState = { file: f, reason: reason, count: count || 0 };
+      setSaveState('dirty');
+      TB.shell.renderNotices();
+    }
+
+    function remember(h) {
+      handle = h;
+      handleRemembered = true;
+      // Nieudane zapamiętanie uchwytu nie może przerwać połączenia.
+      return kvPut('fileHandle', h).catch(function (err) {
+        handleRemembered = false;
+        if (global.console) console.warn('[TB] file handle not remembered:', err && err.message);
+      });
+    }
+
+    function dataFileName() {
+      return (CFG.meta.name || 'tracker').replace(/[^\p{L}\p{N}_\-. ]+/gu, '_') + '.data.json';
+    }
+
+    /* Nowy plik: okno ZAPISU, a do pliku trafia to, co jest w przeglądarce.
+       Jeśli user wskaże istniejący plik, Chrome sam zapyta, czy go zastąpić. */
+    function linkNew() {
+      return global.showSaveFilePicker({ suggestedName: dataFileName(), types: JSON_TYPES })
+        .then(function (h) {
+          conflictState = null;
+          mode = 'auto';
+          return remember(h);
+        }).then(function () {
+          markDirty();
+          return saveNow();
+        }).then(function (ok) {
+          refreshAll();
+          if (ok) TBUI.toast('Data file created — changes save automatically', 'success');
+          return ok;
+        }).catch(function (err) {
+          if (err && err.name === 'AbortError') return false;
+          TBUI.toast('Could not create the data file: ' + (err && err.message), 'danger', 6000);
+          return false;
         });
-      }).then(function () {
-        return saveNow();
-      }).then(function () {
-        TB.shell.renderNotices();
-        TBUI.toast('Linked to the data file', 'success');
+    }
+
+    /* Istniejący plik: okno OTWIERANIA. Plik jest najpierw czytany — nigdy
+       nadpisywany w ciemno. requestPermission idzie zaraz po wyborze pliku,
+       póki kliknięcie jeszcze liczy się jako gest użytkownika. */
+    function linkExisting() {
+      if (!global.showOpenFilePicker) return linkNew();
+      var picked = null, perm = 'prompt';
+      return global.showOpenFilePicker({ types: JSON_TYPES, multiple: false }).then(function (list) {
+        picked = list[0];
+        return picked.requestPermission({ mode: 'readwrite' }).catch(function () { return 'prompt'; });
+      }).then(function (p) {
+        perm = p;
+        return picked.getFile();
+      }).then(function (f) {
+        return f.text().then(function (txt) {
+          var obj = parseDataFile(txt);
+          if (obj && obj.$kind && obj.$kind !== 'tracker.data') throw new Error('not-data');
+          if (obj && !Array.isArray(obj.records)) throw new Error('not-data');
+          var foreign = obj && obj.trackerId && obj.trackerId !== CFG.meta.trackerId;
+          var go = foreign
+            ? TBUI.confirm({
+              title: 'This file belongs to another tracker',
+              text: 'It was saved by a tracker with a different structure, so some of its rows may not show up here. Use it anyway?',
+              confirmLabel: 'Use this file'
+            })
+            : Promise.resolve(true);
+          return go.then(function (yes) {
+            if (!yes) return false;
+            return remember(picked).then(function () {
+              conflictState = null;
+              mode = perm === 'granted' ? 'auto' : 'prompt';
+              var recs = fileRecords(obj);
+              if (recs.length && hasLocalChanges()) {
+                showConflict(f, 'link', recs.length);
+                return true;
+              }
+              if (recs.length) {
+                adopt(obj, f);
+                refreshAll();
+                TBUI.toast('Opened ' + picked.name + ' — ' + recs.length +
+                  (recs.length === 1 ? ' record loaded' : ' records loaded'), 'success');
+                return true;
+              }
+              // pusty plik: dostaje to, co już jest w przeglądarce
+              markDirty();
+              return saveNow().then(function (ok) {
+                refreshAll();
+                if (ok) TBUI.toast('Linked to ' + picked.name, 'success');
+                return ok;
+              });
+            });
+          });
+        });
+      }).catch(function (err) {
+        if (err && err.name === 'AbortError') return false;
+        TBUI.toast(err && (err.message === 'not-data' || err.name === 'SyntaxError')
+          ? 'That file is not tracker data. Pick the .data.json this tracker saved.'
+          : 'Could not open that file: ' + (err && err.message), 'danger', 6000);
+        return false;
       });
     }
 
@@ -650,56 +795,60 @@
       if (obj && obj.profile && !profile.hasLocal()) profile.set(obj.profile, true);
     }
 
+    /* Po odzyskaniu dostępu do pliku (start albo „Reconnect”):
+       - plik nowszy i w przeglądarce są niezapisane zmiany → pasek konfliktu,
+       - plik pusty albo w przeglądarce są zmiany, których plik nie zna → zapis do pliku,
+       - inaczej → wczytanie pliku.
+       Wcześniej plik zawsze wygrywał, więc edycje sprzed „Reconnect” znikały. */
     function afterConnect() {
       return handle.getFile().then(function (f) {
-        if (f.lastModified > lastFileMtime + 2000 && Object.keys(data.index).length) {
-          TB.shell.conflict(f);
-          return;
-        }
-        return f.text().then(function (t) {
-          if (t && t.trim()) {
-            var obj = JSON.parse(t);
-            if (obj && obj.records) {
-              ingest(obj.records);
-              adoptProfile(obj);
-              safe(function () {
-                var s = tx('records', 'readwrite');
-                obj.records.forEach(function (r) { s.put(r); });
-              });
-            }
+        var newer = f.lastModified > lastFileMtime + 2000;
+        return f.text().then(function (txt) {
+          var obj;
+          try { obj = parseDataFile(txt); } catch (e) {
+            mode = 'denied';
+            TBUI.toast('The data file could not be read, so nothing was loaded or overwritten. ' +
+              'Pick it again or restore a JSON backup.', 'danger', 8000);
+            TB.shell.renderNotices();
+            return;
           }
-          lastFileMtime = f.lastModified;
-          setSaveState('saved');
-          TB.shell.renderNotices();
-          TB.shell.renderProfile();
-          TB.shell.renderActive(true);
+          var recs = fileRecords(obj);
+          if (newer && recs.length && hasLocalChanges()) { showConflict(f, 'newer', recs.length); return; }
+          if (!recs.length || (!newer && hasLocalChanges())) {
+            return saveNow().then(refreshAll);
+          }
+          adopt(obj, f);
+          refreshAll();
         });
       });
     }
 
     function loadFileNow() {
       return handle.getFile().then(function (f) {
-        return f.text().then(function (t) {
-          var obj = t && t.trim() ? JSON.parse(t) : { records: [] };
-          ingest(obj.records || []);
-          adoptProfile(obj);
-          safe(function () {
-            var s = tx('records', 'readwrite');
-            s.clear();
-            (obj.records || []).forEach(function (r) { s.put(r); });
-          });
-          lastFileMtime = f.lastModified;
-          setSaveState('saved');
-          TB.shell.renderNotices();
-          TB.shell.renderActive(true);
+        return f.text().then(function (txt) {
+          conflictState = null;
+          adopt(parseDataFile(txt) || { records: [] }, f);
+          refreshAll();
+          return true;
         });
       });
     }
 
+    /* „Keep browser copy”. Gdy plik był podpięty bez prawa zapisu, prośba o nie
+       musi być pierwszą instrukcją tego kliknięcia. */
     function keepLocal() {
-      return saveNow().then(function () {
-        TB.shell.renderNotices();
-        TB.shell.renderActive(true);
+      var ask = mode === 'auto' || !handle
+        ? Promise.resolve('granted')
+        : handle.requestPermission({ mode: 'readwrite' });
+      return ask.then(function (p) {
+        if (p !== 'granted') return false;
+        mode = 'auto';
+        conflictState = null;
+        markDirty();
+        return saveNow().then(function (ok) {
+          refreshAll();
+          return ok;
+        });
       });
     }
 
@@ -754,12 +903,14 @@
         return Promise.all([
           reqP(tx('records', 'readonly').getAll()),
           kvGet('fileHandle'), kvGet('lastFileMtime'),
-          kvGet('profile'), kvGet('configRev'), kvGet('configJson')
+          kvGet('profile'), kvGet('configRev'), kvGet('configJson'),
+          kvGet('localDirty')
         ]);
       }).then(function (res) {
         ingest(res[0]);
         handle = res[1] || null;
         lastFileMtime = res[2] || 0;
+        localDirty = !!res[6];
         if (res[3]) profile.set(res[3], true);
         noteStructureChange(res[4], res[5]);
         if (!handle) { mode = 'none'; setSaveState('off'); return; }
@@ -773,11 +924,14 @@
 
     return {
       init: init, putRecord: putRecord, softDelete: softDelete, touch: touch,
-      saveNow: saveNow, pickFile: pickFile, reconnect: reconnect,
+      saveNow: saveNow, linkNew: linkNew, linkExisting: linkExisting, reconnect: reconnect,
       loadFileNow: loadFileNow, keepLocal: keepLocal,
+      conflict: function () { return conflictState; },
+      localDirty: function () { return localDirty; },
       dataFileObject: dataFileObject, ingest: ingest,
       replaceAll: function (records) {
         ingest(records);
+        markDirty();
         safe(function () {
           var s = tx('records', 'readwrite');
           s.clear();
@@ -1336,19 +1490,34 @@
     inp.className = 'tb-input tb-input-sm';
     inp.placeholder = 'New item, then Enter';
     inp.setAttribute('aria-label', 'New checklist item');
-    inp.addEventListener('keydown', function (e) {
-      if (e.key !== 'Enter' || !inp.value.trim()) return;
+    /* Termin pozycji: pole daty przy dodawaniu, gdy w kreatorze włączono
+       „Show item due dates”. Wcześniej nie dało się go ustawić wcale. */
+    var dueIn = null;
+    if (opts.showDue !== false) {
+      dueIn = doc.createElement('input');
+      dueIn.type = 'date';
+      dueIn.className = 'tb-input tb-input-sm tb-check-add-date';
+      dueIn.setAttribute('aria-label', 'Due date (optional)');
+      dueIn.title = 'Due date (optional)';
+    }
+    function addItem() {
+      if (!inp.value.trim()) return;
       store.putRecord({
         id: newId('r_'), ds: dsId,
         data: {
-          text: inp.value.trim(), done: false, order: Date.now(), group: '', due: null,
+          text: inp.value.trim(), done: false, order: Date.now(), group: '',
+          due: dueIn && dueIn.value ? dueIn.value : null,
           resetDaily: !!opts.resetDaily
         },
         _c: Date.now(), _m: Date.now(), _d: 0
       });
       inp.value = '';
-    });
+      if (dueIn) dueIn.value = '';
+    }
+    inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') addItem(); });
+    if (dueIn) dueIn.addEventListener('keydown', function (e) { if (e.key === 'Enter') addItem(); });
     addWrap.appendChild(inp);
+    if (dueIn) addWrap.appendChild(dueIn);
 
     var doneN = recs.filter(function (r) { return r.data.done; }).length;
     var counter = div('tb-count');
@@ -1392,12 +1561,7 @@
     });
     it.appendChild(txt);
 
-    if (opts.showDue !== false && rec.data.due) {
-      var due = doc.createElement('span');
-      due.className = 'tb-check-due';
-      due.textContent = fmt.date(rec.data.due);
-      it.appendChild(due);
-    }
+    if (opts.showDue !== false) it.appendChild(dueControl(rec));
     var del = doc.createElement('button');
     del.type = 'button';
     del.className = 'tb-modal-close';
@@ -1407,6 +1571,45 @@
     del.addEventListener('click', function () { store.softDelete(rec); });
     it.appendChild(del);
     return it;
+  }
+
+  /* Termin pozycji checklisty: data jako przycisk („📅” gdy brak), klik zamienia
+     go na pole daty. Pusta data usuwa termin. */
+  function dueControl(rec) {
+    var b = doc.createElement('button');
+    b.type = 'button';
+    b.className = 'tb-check-due';
+    b.textContent = rec.data.due ? fmt.date(rec.data.due) : '📅';
+    b.title = rec.data.due ? 'Change the due date' : 'Set a due date';
+    b.setAttribute('aria-label', b.title);
+    b.addEventListener('click', function () {
+      var d = doc.createElement('input');
+      d.type = 'date';
+      d.className = 'tb-input tb-input-sm tb-check-add-date';
+      d.value = rec.data.due ? String(rec.data.due).slice(0, 10) : '';
+      d.setAttribute('aria-label', 'Due date');
+      var done = false;
+      function finish(save) {
+        if (done) return;
+        done = true;
+        if (save && (d.value || null) !== (rec.data.due || null)) {
+          rec.data.due = d.value || null;
+          store.touch(rec);          // przerysuje checklistę
+        } else if (d.isConnected) {
+          d.replaceWith(dueControl(rec));
+        }
+      }
+      d.addEventListener('change', function () { finish(true); });
+      d.addEventListener('blur', function () { finish(true); });
+      d.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') finish(false);
+        if (e.key === 'Enter') finish(true);
+      });
+      b.replaceWith(d);
+      d.focus();
+      if (d.showPicker) { try { d.showPicker(); } catch (e) { /* bez gestu — zostaje pole */ } }
+    });
+    return b;
   }
 
   /* ---- table ---- */
@@ -1462,7 +1665,11 @@
       .map(function (id) { return column(cmp.dataset, id); })
       .filter(Boolean);
 
-    var base = filtered(cmp.dataset, opts.filter);
+    /* viewAll: wiersze widoku (zbiór + stały filtr). base: do tego aktywny chip.
+       Pusty viewAll to „No rows yet”; pusty wynik przy niepustym viewAll to
+       „Nothing matches your filters” — chip też jest filtrem do wyczyszczenia. */
+    var viewAll = filtered(cmp.dataset, opts.filter);
+    var base = viewAll;
     if (state.quick >= 0 && opts.quickFilters && opts.quickFilters[state.quick]) {
       var ctx = ctxNow();
       base = base.filter(function (r) {
@@ -1476,9 +1683,6 @@
       });
     });
 
-    var capped = false;
-    if (rows.length > 500) { rows = rows.slice(0, 500); capped = true; }
-
     if (state.sort) {
       var sc = column(cmp.dataset, state.sort);
       var dir = state.dir === 'desc' ? -1 : 1;
@@ -1486,6 +1690,13 @@
         return cmpVal(a.data[state.sort], b.data[state.sort], sc) * dir;
       });
     }
+
+    /* Limit 500 dotyczy tylko ekranu i jest nakładany PO sortowaniu — inaczej
+       sortowanie porządkowałoby przypadkowe 500 wierszy. Sumy i eksport
+       „Current view” liczą się z pełnego wyniku (matched). */
+    var matched = rows;
+    var capped = false;
+    if (rows.length > 500) { rows = rows.slice(0, 500); capped = true; }
 
     var pageSize = opts.pageSize || 50;
     var pages = Math.max(1, Math.ceil(rows.length / pageSize));
@@ -1607,7 +1818,7 @@
         var op = opts.totals[c.id];
         if (op) {
           td.className = 'is-num';
-          var vals = rows.map(function (r) { return coerce(r.data[c.id], c); })
+          var vals = matched.map(function (r) { return coerce(r.data[c.id], c); })
             .filter(function (v) { return typeof v === 'number'; });
           td.textContent = fmt.number(reduceOp(op, vals), c.format, c.decimals);
         } else if (ci === 0) {
@@ -1622,7 +1833,7 @@
     tw.appendChild(table);
     wrap.appendChild(tw);
 
-    if (!base.length) {
+    if (!viewAll.length) {
       wrap.appendChild(emptyBox('No rows yet',
         'Add the first row, or paste straight from Excel with Ctrl+V.',
         [btn('+ Add row', 'btn-primary', function () {
@@ -1631,7 +1842,7 @@
         btn('Paste from Excel', 'btn-secondary', function () {
           io.pasteDialog(cmp.dataset, io.visibleCols(cmp));
         })]));
-    } else if (!rows.length) {
+    } else if (!matched.length) {
       wrap.appendChild(emptyBox('Nothing matches your filters',
         'Change the search term or clear the filter.',
         [btn('Clear filters', 'btn-secondary', function () {
@@ -1643,8 +1854,8 @@
     /* --- pagination --- */
     var pager = div('tb-pager');
     var info = doc.createElement('span');
-    info.textContent = rows.length + ' ' + plural(rows.length, 'row', 'rows') +
-      (rows.length !== base.length ? ' of ' + base.length : '') +
+    info.textContent = matched.length + ' ' + plural(matched.length, 'row', 'rows') +
+      (matched.length !== viewAll.length ? ' of ' + viewAll.length : '') +
       ' · page ' + state.page + ' of ' + pages;
     pager.appendChild(info);
     if (pages > 1) {
@@ -1675,7 +1886,7 @@
     }
 
     host.appendChild(card(cmp.title, cmp.subtitle, wrap));
-    lastView[cmp.id] = { rows: rows, cols: cols, pageRows: pageRows };
+    lastView[cmp.id] = { rows: matched, cols: cols, pageRows: pageRows };
     menu.register(cmp);
   };
 
@@ -1740,7 +1951,12 @@
 
       if (opts.editable !== false && opts.inlineEdit !== false &&
           c.type !== 'bool' && c.type !== 'longtext') {
-        td.addEventListener('dblclick', function () { editCell(td, rec, c); });
+        td.setAttribute('data-tb-editable', '');
+        td.title = 'Double-click to edit';
+        td.addEventListener('dblclick', function () {
+          clearTimeout(tr._tbOpen);
+          editCell(td, rec, c);
+        });
       }
       tr.appendChild(td);
     });
@@ -1749,6 +1965,14 @@
       tr.classList.add('tb-row-click');
       tr.addEventListener('click', function (e) {
         if (e.target.closest('input,button,select,.tb-tag')) return;
+        /* Na edytowalnej komórce czekamy chwilę: jeśli to początek dwukliku,
+           panel się nie otworzy, a komórka przejdzie w edycję. Bez tego tło
+           panelu przechwytywało drugie kliknięcie i edycja była nieosiągalna. */
+        clearTimeout(tr._tbOpen);
+        if (e.target.closest('[data-tb-editable]')) {
+          tr._tbOpen = setTimeout(function () { crud.detail(rec, cmp); }, 250);
+          return;
+        }
         crud.detail(rec, cmp);
       });
     }
@@ -1914,6 +2138,7 @@
 
     var notesWrap = div('tb-stack');
     notesWrap.style.gap = '8px';
+    if (cmp && cmp.opts && cmp.opts.rowNotes === false) notesWrap.hidden = true;
     var pinHead = div('tb-check-group');
     pinHead.textContent = 'Notes on this row';
     notesWrap.appendChild(pinHead);
@@ -2041,7 +2266,8 @@
           TBUI.toast('Deleted ' + n + ' ' + plural(n, 'row', 'rows'), 'success');
           sel.clear(cmp.id);
         } else {
-          TBUI.toast('Updated ' + n + ' ' + plural(n, 'row', 'rows'), 'success');
+          TBUI.toast((act.kind === 'duplicate' ? 'Duplicated ' : 'Updated ') + n + ' ' +
+            plural(n, 'row', 'rows'), 'success');
         }
       }
       if (act.confirm || act.kind === 'delete') {
@@ -2078,7 +2304,7 @@
           onClick: function () { applyAction({ kind: 'duplicate', label: 'Duplicate' }, recs, cmp); }
         });
       }
-      if (builtins.indexOf('addNote') >= 0) {
+      if (builtins.indexOf('addNote') >= 0 && (cmp.opts || {}).rowNotes !== false) {
         items.push({
           label: 'Add a note', icon: '🗒',
           onClick: function () { crud.detail(recs[0], cmp); }
@@ -2086,7 +2312,7 @@
       }
       if (builtins.indexOf('copyRow') >= 0) {
         items.push({
-          label: 'Copy as text', icon: '⎘', kbd: 'Ctrl+C',
+          label: 'Copy as text', icon: '⎘',
           onClick: function () { io.copyRows(recs, cmp); }
         });
       }
@@ -2400,7 +2626,8 @@
         actions: [
           { label: 'Cancel', variant: 'ghost' },
           {
-            label: 'Import ' + bodyRows.length + ' rows', variant: 'primary', close: false,
+            label: 'Import ' + bodyRows.length + ' ' + plural(bodyRows.length, 'row', 'rows'),
+            variant: 'primary', close: false,
             onClick: function () {
               var map = selects.map(function (s) { return s.value; });
               if (!map.some(Boolean)) {
@@ -2420,7 +2647,7 @@
                 store.putRecord(rec);
                 added++;
               });
-              TBUI.toast('Imported ' + added + ' rows' +
+              TBUI.toast('Imported ' + added + ' ' + plural(added, 'row', 'rows') +
                 (warn ? ', ' + warn + ' values did not match their column type' : ''),
                 warn ? 'warning' : 'success', 5000);
               TBUI.modal.close(wrap.closest('dialog'));
@@ -2758,14 +2985,7 @@
       box.appendChild(save);
       store.setSaveState(store.state());
 
-      var saveBtn = btn('Save', 'btn-primary', function () {
-        if (store.mode() !== 'auto') {
-          if (!store.handle()) { store.pickFile().catch(noop); return; }
-          store.reconnect().then(function (ok) { if (ok) store.saveNow(); });
-          return;
-        }
-        store.saveNow().then(function () { TBUI.toast('Saved', 'success'); });
-      });
+      var saveBtn = btn('Save', 'btn-primary', saveCommand);
       saveBtn.title = 'Save now (Ctrl+S)';
       box.appendChild(saveBtn);
 
@@ -2783,19 +3003,10 @@
           { head: 'Data file' }
         ];
         if (store.mode() === 'auto') {
-          items.push({
-            label: 'Save now', icon: '💾', kbd: 'Ctrl+S',
-            onClick: function () { store.saveNow(); }
-          });
-          items.push({
-            label: 'Link a different file…', icon: '📄',
-            onClick: function () { store.pickFile().catch(noop); }
-          });
+          items.push({ label: 'Save now', icon: '💾', kbd: 'Ctrl+S', onClick: saveCommand });
+          items.push({ label: 'Link a different file…', icon: '📄', onClick: chooseFile });
         } else {
-          items.push({
-            label: 'Link a data file…', icon: '🔗',
-            onClick: function () { store.pickFile().catch(noop); }
-          });
+          items.push({ label: 'Link a data file…', icon: '🔗', onClick: chooseFile });
         }
         if (CFG.meta.personalization !== false) {
           items.push({ sep: true });
@@ -2805,6 +3016,51 @@
       });
       more.setAttribute('aria-label', 'More options');
       box.appendChild(more);
+    }
+
+    /* Jedno zachowanie dla przycisku Save, Ctrl+S i „Save now”. Toast „Saved”
+       tylko wtedy, gdy zapis naprawdę się udał. */
+    function saveCommand() {
+      if (store.mode() !== 'auto') {
+        if (!store.handle()) { chooseFile(); return; }
+        store.reconnect().then(function (ok) { if (ok) return store.saveNow(); }).catch(noop);
+        return;
+      }
+      store.saveNow().then(function (ok) { if (ok) TBUI.toast('Saved', 'success'); });
+    }
+
+    /* Wybór pliku danych: dwie drogi, bo „otwórz istniejący” i „utwórz nowy”
+       to różne operacje. Wcześniej był jeden przycisk z oknem ZAPISU, który
+       nadpisywał wskazany plik — na nowym komputerze kasował dane. Okna plików
+       są wołane wprost w kliknięciu, żeby przeglądarka uznała je za gest. */
+    function chooseFile() {
+      var wrap = div('tb-stack');
+      function option(icon, title, text, run) {
+        var b = doc.createElement('button');
+        b.type = 'button';
+        b.className = 'tb-choice';
+        b.innerHTML = '<i>' + icon + '</i><span><b>' + fmt.esc(title) + '</b><small>' +
+          fmt.esc(text) + '</small></span>';
+        b.addEventListener('click', function () {
+          run();
+          TBUI.modal.close(wrap.closest('dialog'));
+        });
+        return b;
+      }
+      wrap.appendChild(option('📂', 'Open my existing data file',
+        'You saved data with this tracker before — on another computer, before clearing the ' +
+        'browser, or in another folder. Its rows are loaded; nothing is overwritten.',
+        function () { store.linkExisting(); }));
+      wrap.appendChild(option('＋', 'Create a new data file',
+        'First time with this tracker. Pick a folder and a name; everything you have typed so ' +
+        'far goes into the new file.',
+        function () { store.linkNew(); }));
+      TBUI.modal.show({
+        title: 'Where should your data live?',
+        sub: 'The tracker keeps your rows in a .data.json file on your disk',
+        body: wrap,
+        actions: [{ label: 'Cancel', variant: 'ghost' }]
+      });
     }
 
     function pickJson() {
@@ -2877,6 +3133,8 @@
         box.appendChild(p);
         return;
       }
+      var cf = store.conflict();
+      if (cf) conflictBanner(box, cf);
       var sn = store.structureNote();
       if (sn) {
         var sb = div('tb-banner tb-banner-accent');
@@ -2932,33 +3190,47 @@
           'tracker writes them to disk — and once you do, keep tracker.html where it is and ' +
           'under the same name.</div></div>';
         var act2 = div('tb-banner-actions');
-        act2.appendChild(btn('Choose a data file', 'btn-primary', function () {
-          store.pickFile().catch(noop);
-        }));
+        act2.appendChild(btn('Choose a data file', 'btn-primary', chooseFile));
         c.appendChild(act2);
         box.appendChild(c);
       }
     }
 
-    function conflict(file) {
-      var box = doc.getElementById('tb-notices');
+    /* Pasek konfliktu jest rysowany ze stanu magazynu przy każdym renderNotices,
+       więc nie znika, gdy coś innego odświeży powiadomienia. Dopóki wisi,
+       magazyn nic nie zapisuje do pliku. */
+    function conflictBanner(box, info) {
+      var file = info.file;
       var b = div('tb-banner tb-banner-danger');
+      var title, text;
+      if (info.reason === 'link') {
+        title = 'This file already holds data';
+        text = fmt.esc(file.name) + ' has ' + info.count + (info.count === 1 ? ' record' : ' records') +
+          ', and this browser has changes that are not in it. Pick which version to keep — ' +
+          'nothing is overwritten until you choose.';
+      } else {
+        title = 'The data file is newer than the browser copy';
+        text = 'It changed outside this tab on ' +
+          fmt.esc(fmt.date(new Date(file.lastModified).toISOString().slice(0, 10))) +
+          ', and this browser has changes that are not in it. Pick which version to keep — ' +
+          'nothing is overwritten until you choose.';
+      }
       b.innerHTML = '<i>⚠</i><div class="tb-banner-body">' +
-        '<div class="tb-banner-title">The data file is newer than the browser copy</div>' +
-        '<div class="tb-banner-text">It changed outside this tab on ' +
-        fmt.date(new Date(file.lastModified).toISOString().slice(0, 10)) +
-        '. Pick which version wins — nothing is overwritten on its own.</div></div>';
+        '<div class="tb-banner-title">' + title + '</div>' +
+        '<div class="tb-banner-text">' + text + '</div></div>';
       var act = div('tb-banner-actions');
       act.appendChild(btn('Load from file', 'btn-primary', function () {
         store.loadFileNow().then(function () { TBUI.toast('Loaded from file', 'success'); });
       }));
       act.appendChild(btn('Keep browser copy', 'btn-secondary', function () {
-        store.keepLocal().then(function () { TBUI.toast('File overwritten with the browser copy', 'success'); });
+        store.keepLocal().then(function (ok) {
+          if (ok) TBUI.toast('File overwritten with the browser copy', 'success');
+        });
       }));
       act.appendChild(btn('Download both', 'btn-ghost', function () {
         io.exportJson();
-        file.text().then(function (t) {
-          var url = URL.createObjectURL(new Blob([t], { type: 'application/json' }));
+        file.text().then(function (txt) {
+          var url = URL.createObjectURL(new Blob([txt], { type: 'application/json' }));
           var a = doc.createElement('a');
           a.href = url;
           a.download = 'from-file-' + fmt.todayISO() + '.json';
@@ -2968,7 +3240,6 @@
       }));
       b.appendChild(act);
       box.appendChild(b);
-      store.setSaveState('dirty');
     }
 
     /* ---- renderowanie ---- */
@@ -3062,13 +3333,7 @@
       doc.addEventListener('keydown', function (e) {
         if (!(e.ctrlKey || e.metaKey) || e.key.toLowerCase() !== 's') return;
         e.preventDefault();
-        if (store.mode() === 'auto') {
-          store.saveNow().then(function () { TBUI.toast('Saved', 'success'); });
-        } else if (store.handle()) {
-          store.reconnect().then(function (ok) { if (ok) store.saveNow(); });
-        } else {
-          store.pickFile().catch(noop);
-        }
+        saveCommand();
       });
 
       /* Ctrl+V na zakładce z tabelą: wklejka z Excela idzie prosto do
@@ -3119,7 +3384,7 @@
     return {
       init: init, invalidate: invalidate, renderActive: renderActive,
       renderNotices: renderNotices, renderProfile: renderProfile,
-      conflict: conflict, refreshAlerts: refreshAlerts,
+      refreshAlerts: refreshAlerts,
       activeTab: function () { return activeTab; }
     };
   })();
@@ -3128,10 +3393,11 @@
 
   /* ====================================================================== boot */
 
-  function gate(message) {
+  function gate(message, heading) {
     var g = doc.createElement('div');
     g.className = 'tb-gate';
-    g.innerHTML = '<h1>This tracker runs in Chrome and Edge</h1><p>' + fmt.esc(message) + '</p>';
+    g.innerHTML = '<h1>' + fmt.esc(heading || 'This tracker runs in Chrome and Edge') + '</h1><p>' +
+      fmt.esc(message) + '</p>';
     doc.body.appendChild(g);
   }
 
@@ -3139,7 +3405,8 @@
     try {
       CFG = parseConfig();
     } catch (e) {
-      gate(e.message);
+      gate(e.message + ' Generate the tracker again in the wizard from its .tracker.json.',
+        'This tracker file is damaged');
       return;
     }
     TBCharts.config.locale = CFG.meta.locale || 'en-GB';
