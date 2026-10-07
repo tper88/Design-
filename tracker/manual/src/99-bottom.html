@@ -1,0 +1,83 @@
+<footer class="foot">
+  <div class="l-pl" lang="pl">
+    Instrukcja opisuje kreator i tracker z tej samej wersji. Etykiety przycisków są cytowane
+    dosłownie po angielsku, tak jak widać je na ekranie.
+  </div>
+  <div class="l-en" lang="en">
+    This guide describes the wizard and the tracker from the same version. Button labels are
+    quoted exactly as they appear on screen.
+  </div>
+</footer>
+</main>
+</div>
+
+<script type="application/json" id="shots"><!--M:SHOTS--></script>
+<script>
+(function () {
+  var doc = document;
+  var root = doc.documentElement;
+
+  /* zrzuty: każdy obraz jest w pliku raz, obie wersje językowe go współdzielą */
+  var shots = {};
+  try { shots = JSON.parse(doc.getElementById('shots').textContent); } catch (e) { shots = {}; }
+  Array.prototype.forEach.call(doc.querySelectorAll('img[data-shot]'), function (img) {
+    var s = shots[img.getAttribute('data-shot')];
+    if (!s) return;
+    img.src = s.src;
+    img.width = s.w;
+    img.height = s.h;
+  });
+
+  /* przełącznik języka */
+  function setLang(l) {
+    root.setAttribute('data-lang', l);
+    root.setAttribute('lang', l);
+    try { localStorage.setItem('tb-manual-lang', l); } catch (e) { /* bez pamięci — trudno */ }
+    Array.prototype.forEach.call(doc.querySelectorAll('[data-set-lang]'), function (b) {
+      b.setAttribute('aria-pressed', b.getAttribute('data-set-lang') === l ? 'true' : 'false');
+    });
+    doc.title = l === 'pl' ? 'Tracker builder — instrukcja obsługi' : 'Tracker builder — user guide';
+  }
+  Array.prototype.forEach.call(doc.querySelectorAll('[data-set-lang]'), function (b) {
+    b.addEventListener('click', function () { setLang(b.getAttribute('data-set-lang')); });
+  });
+  setLang(root.getAttribute('data-lang') === 'pl' ? 'pl' : 'en');
+
+  /* spis treści na telefonie */
+  var btn = doc.getElementById('menu-btn');
+  var toc = doc.getElementById('toc');
+  btn.addEventListener('click', function () {
+    var open = !root.classList.contains('toc-open');
+    root.classList.toggle('toc-open', open);
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  toc.addEventListener('click', function (e) {
+    if (e.target.closest('a')) {
+      root.classList.remove('toc-open');
+      btn.setAttribute('aria-expanded', 'false');
+    }
+  });
+
+  /* podświetlenie bieżącego rozdziału w spisie */
+  var links = {};
+  Array.prototype.forEach.call(toc.querySelectorAll('a[href^="#"]'), function (a) {
+    links[a.getAttribute('href').slice(1)] = a;
+  });
+  if ('IntersectionObserver' in window) {
+    var current = null;
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        var a = links[en.target.id];
+        if (!a || a === current) return;
+        if (current) current.removeAttribute('aria-current');
+        a.setAttribute('aria-current', 'true');
+        current = a;
+      });
+    }, { rootMargin: '-70px 0px -70% 0px' });
+    Array.prototype.forEach.call(doc.querySelectorAll('section[id]'), function (s) { io.observe(s); });
+  }
+})();
+</script>
+</body>
+</html>

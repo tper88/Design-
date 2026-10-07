@@ -1,0 +1,453 @@
+<section id="components" data-level="1" data-pl="Komponenty — klocki na zakładkach" data-en="Components — the building blocks">
+<div class="l-pl" lang="pl">
+<p>Jest 9 rodzajów komponentów. Pięć z nich <strong>liczy z danych</strong> (licznik, statystyka, wykres, tabela,
+pasek postępu) — dlatego mają pole <span class="ui">Dataset</span>. Pozostałe cztery (baner, agenda, karteczki,
+checklista) działają inaczej, opisane niżej.</p>
+<p>Kilka pól powtarza się w wielu komponentach:</p>
+<dl class="fields">
+<dt><span class="ui">Title</span></dt>
+<dd><p>Nagłówek komponentu w trackerze.</p></dd>
+<dt><span class="ui">Calculation</span></dt>
+<dd><p>Co policzyć: <span class="ui">Count rows</span> (ile wierszy), <span class="ui">Sum</span> (suma),
+<span class="ui">Average</span> (średnia), <span class="ui">Minimum</span>, <span class="ui">Maximum</span>,
+<span class="ui">Distinct values</span> (ile różnych wartości).</p></dd>
+<dt><span class="ui">Column</span></dt>
+<dd><p>Z której kolumny liczyć (pojawia się dla wszystkiego oprócz <span class="ui">Count rows</span>). Sumę i średnią
+licz z kolumny liczbowej.</p></dd>
+<dt><span class="ui">Number format</span></dt>
+<dd><p>Jak pokazać wynik — te same formaty co przy kolumnie liczbowej.</p></dd>
+<dt><span class="ui">Only count rows where…</span></dt>
+<dd><p>Filtr — liczą się tylko wiersze spełniające warunki (rozdział <a href="#c-filter">5.9</a>). Pusty = wszystkie wiersze.</p></dd>
+</dl>
+</div>
+<div class="l-en" lang="en">
+<p>There are 9 kinds of component. Five of them <strong>calculate from data</strong> (KPI card, stat, chart, table,
+progress bar) — that is why they have a <span class="ui">Dataset</span> field. The other four (banner, agenda, sticky
+notes, checklist) work differently, as described below.</p>
+<p>A few fields repeat across many components:</p>
+<dl class="fields">
+<dt><span class="ui">Title</span></dt>
+<dd><p>The component's heading in the tracker.</p></dd>
+<dt><span class="ui">Calculation</span></dt>
+<dd><p>What to calculate: <span class="ui">Count rows</span>, <span class="ui">Sum</span>,
+<span class="ui">Average</span>, <span class="ui">Minimum</span>, <span class="ui">Maximum</span>,
+<span class="ui">Distinct values</span> (how many different values).</p></dd>
+<dt><span class="ui">Column</span></dt>
+<dd><p>Which column to calculate from (shown for everything except <span class="ui">Count rows</span>). Sum and average
+need a number column.</p></dd>
+<dt><span class="ui">Number format</span></dt>
+<dd><p>How to show the result — the same formats as a number column.</p></dd>
+<dt><span class="ui">Only count rows where…</span></dt>
+<dd><p>A filter — only rows that meet the conditions count (chapter <a href="#c-filter">5.9</a>). Empty = every row.</p></dd>
+</dl>
+</div>
+</section>
+
+<section id="c-kpi" data-level="2" data-pl="KPI card i Stat — jedna liczba" data-en="KPI card and Stat — one number">
+<div class="l-pl" lang="pl">
+<p><strong>Użyj, gdy</strong> chcesz widzieć jedną ważną liczbę: ile zgłoszeń jest otwartych, ile po terminie, ile
+wynosi suma kwot. <span class="ui">KPI card</span> i <span class="ui">Stat</span> mają te same pola.</p>
+<figure class="shot"><img data-shot="t-summary" alt="Zakładka Summary w trackerze"><figcaption>Zakładka Summary: baner, dwa liczniki (KPI) i dwa wykresy.</figcaption></figure>
+<dl class="fields">
+<dt><span class="ui">Caption under the value</span></dt>
+<dd><p>Mały opis pod liczbą.</p><p class="eg">„otwarte i po terminie”</p></dd>
+<dt><span class="ui">Sparkline over a date column</span></dt>
+<dd><p>Mała linia trendu pod liczbą, liczona miesięcznie po wybranej dacie. <span class="ui">— none —</span> wyłącza.</p></dd>
+</dl>
+<div class="callout tip"><span class="t">Przykład: „Ile po terminie”</span>
+<span class="ui">Calculation</span> = <span class="ui">Count rows</span>, a w filtrze dwa warunki:
+<em>Due — date relative to today — overdue</em> oraz <em>Status — is not — Closed</em>.</div>
+</div>
+<div class="l-en" lang="en">
+<p><strong>Use it when</strong> you want to see one important number: how many requests are open, how many are overdue,
+what the amounts add up to. <span class="ui">KPI card</span> and <span class="ui">Stat</span> have the same fields.</p>
+<figure class="shot"><img data-shot="t-summary" alt="The Summary tab in the tracker"><figcaption>The Summary tab: a banner, two counters (KPI cards) and two charts.</figcaption></figure>
+<dl class="fields">
+<dt><span class="ui">Caption under the value</span></dt>
+<dd><p>A small description under the number.</p><p class="eg">“open and overdue”</p></dd>
+<dt><span class="ui">Sparkline over a date column</span></dt>
+<dd><p>A small trend line under the number, counted per month by the chosen date. <span class="ui">— none —</span> turns it off.</p></dd>
+</dl>
+<div class="callout tip"><span class="t">Example: “How many overdue”</span>
+<span class="ui">Calculation</span> = <span class="ui">Count rows</span>, and two conditions in the filter:
+<em>Due — date relative to today — overdue</em> and <em>Status — is not — Closed</em>.</div>
+</div>
+</section>
+
+<section id="c-chart" data-level="2" data-pl="Chart — wykres" data-en="Chart">
+<div class="l-pl" lang="pl">
+<p><strong>Użyj, gdy</strong> chcesz zobaczyć, jak coś się rozkłada albo zmienia w czasie.</p>
+<figure class="shot medium"><img data-shot="w-chart" alt="Ustawienia wykresu"><figcaption>Wykres „Requests over time”: słupki, liczba wierszy pogrupowana po miesiącu wpływu.</figcaption></figure>
+<dl class="fields">
+<dt><span class="ui">Chart type</span></dt>
+<dd><p><span class="ui">Bars</span> (słupki — porównanie grup), <span class="ui">Line</span> (linia — zmiana w czasie),
+<span class="ui">Donut (share)</span> (koło — udział w całości, najwyżej 6 kawałków, reszta jako „Other”),
+<span class="ui">Ranking</span> (poziome słupki od największego).</p></dd>
+<dt><span class="ui">Group by column</span></dt>
+<dd><p><strong>Najważniejsze pole wykresu.</strong> Po czym dzielić wiersze na słupki lub kawałki.</p><p class="eg">Status → osobny słupek dla New, In progress, Closed.</p></dd>
+<dt><span class="ui">Time grouping</span></dt>
+<dd><p>Gdy grupujesz po dacie: <span class="ui">by day</span>, <span class="ui">by month</span>, <span class="ui">by year</span>.
+Bez tego każda data byłaby osobnym słupkiem.</p></dd>
+<dt><span class="ui">Split into series by</span></dt>
+<dd><p>Opcjonalnie: dzieli każdy słupek lub linię na kolorowe serie według drugiej kolumny.</p><p class="eg">Grupowanie po miesiącu, podział po statusie.</p></dd>
+<dt><span class="ui">Max series (line charts: 3 or fewer)</span></dt>
+<dd><p>Ile serii pokazać przy podziale. Wykres liniowy z więcej niż 3 liniami jest nieczytelny, dlatego kreator pozwala
+na najwyżej 3.</p></dd>
+<dt><span class="ui">Max groups (0 = no limit)</span></dt>
+<dd><p>Ile grup pokazać — przydatne w rankingu („top 10”).</p></dd>
+</dl>
+<div class="callout warn">Słupki, linia i koło <strong>muszą mieć</strong> ustawione <span class="ui">Group by column</span> —
+inaczej kreator zgłosi problem i nie zapisze trackera.</div>
+</div>
+<div class="l-en" lang="en">
+<p><strong>Use it when</strong> you want to see how something is spread or how it changes over time.</p>
+<figure class="shot medium"><img data-shot="w-chart" alt="Chart settings"><figcaption>The “Requests over time” chart: bars, the number of rows grouped by the month received.</figcaption></figure>
+<dl class="fields">
+<dt><span class="ui">Chart type</span></dt>
+<dd><p><span class="ui">Bars</span> (comparing groups), <span class="ui">Line</span> (change over time),
+<span class="ui">Donut (share)</span> (share of the whole, at most 6 slices, the rest as “Other”),
+<span class="ui">Ranking</span> (horizontal bars, largest first).</p></dd>
+<dt><span class="ui">Group by column</span></dt>
+<dd><p><strong>The most important chart field.</strong> What splits the rows into bars or slices.</p><p class="eg">Status → one bar each for New, In progress, Closed.</p></dd>
+<dt><span class="ui">Time grouping</span></dt>
+<dd><p>When grouping by a date: <span class="ui">by day</span>, <span class="ui">by month</span>, <span class="ui">by year</span>.
+Without it every date would be a separate bar.</p></dd>
+<dt><span class="ui">Split into series by</span></dt>
+<dd><p>Optional: splits each bar or line into coloured series by a second column.</p><p class="eg">Grouped by month, split by status.</p></dd>
+<dt><span class="ui">Max series (line charts: 3 or fewer)</span></dt>
+<dd><p>How many series to show when splitting. A line chart with more than 3 lines is unreadable, so the wizard allows
+at most 3.</p></dd>
+<dt><span class="ui">Max groups (0 = no limit)</span></dt>
+<dd><p>How many groups to show — useful for a ranking (“top 10”).</p></dd>
+</dl>
+<div class="callout warn">Bars, line and donut <strong>must have</strong> a <span class="ui">Group by column</span> — otherwise
+the wizard reports a problem and will not save the tracker.</div>
+</div>
+</section>
+
+<section id="c-table" data-level="2" data-pl="Table — tabela do pracy na danych" data-en="Table — where you work with rows">
+<div class="l-pl" lang="pl">
+<p><strong>Użyj, gdy</strong> chcesz przeglądać, dodawać i poprawiać wiersze. To serce większości trackerów.</p>
+<figure class="shot medium"><img data-shot="w-table-settings" alt="Ustawienia tabeli"><figcaption>Ustawienia tabeli „Requests” z szablonu.</figcaption></figure>
+<dl class="fields">
+<dt><span class="ui">Rows per page</span></dt>
+<dd><p>Ile wierszy na jednej stronie tabeli (domyślnie 50).</p></dd>
+<dt><span class="ui">Allow editing</span></dt>
+<dd><p>Czy można zmieniać wartości w komórkach i w oknie szczegółów.</p></dd>
+<dt><span class="ui">Row checkboxes</span></dt>
+<dd><p>Pola do zaznaczania wierszy — potrzebne do akcji na wielu wierszach i eksportu zaznaczonych.</p></dd>
+<dt><span class="ui">Search box</span></dt>
+<dd><p>Pole wyszukiwania nad tabelą.</p></dd>
+<dt><span class="ui">Notes on rows</span></dt>
+<dd><p>Czy do wierszy można przypinać karteczki. Wymaga komponentu <span class="ui">Sticky notes</span> gdzieś w trackerze.</p></dd>
+<dt><span class="ui">Columns to show</span></dt>
+<dd><p>Kliknij nazwy kolumn, które mają być widoczne. <strong>Kolejność klikania = kolejność kolumn</strong> w tabeli
+i w eksporcie. <span class="ui">Select all</span> zaznacza wszystkie.</p></dd>
+<dt><span class="ui">Quick filter chips above the table</span></dt>
+<dd><p>Przyciski-filtry nad tabelą. Każdy ma etykietę i warunki. <span class="ui">+ Add a chip</span> dodaje nowy.</p></dd>
+<dt><span class="ui">Fixed filter (this is how you make a saved view)</span></dt>
+<dd><p>Filtr na stałe. Tabela pokazuje wtedy <strong>tylko</strong> pasujące wiersze — to „zapisany widok”.</p><p class="eg">Druga zakładka „Moje otwarte” z tabelą o stałym filtrze <em>Owner — is — the current user</em> i <em>Status — is not — Closed</em>.</p></dd>
+<dt><span class="ui">Right-click menu</span></dt>
+<dd><p>Co pojawi się po kliknięciu wiersza prawym przyciskiem (rozdział <a href="#c-menu">5.10</a>).</p></dd>
+</dl>
+<figure class="shot medium"><img data-shot="w-chips" alt="Szybkie filtry"><figcaption>Trzy szybkie filtry z szablonu: Open, Overdue, Mine.</figcaption></figure>
+<div class="callout note">Zmiana zbioru w polu <span class="ui">Dataset</span> czyści listę kolumn i szybkie filtry, bo
+wskazywałyby kolumny innego zbioru.</div>
+</div>
+<div class="l-en" lang="en">
+<p><strong>Use it when</strong> you want to look through, add and correct rows. It is the heart of most trackers.</p>
+<figure class="shot medium"><img data-shot="w-table-settings" alt="Table settings"><figcaption>Settings of the template's “Requests” table.</figcaption></figure>
+<dl class="fields">
+<dt><span class="ui">Rows per page</span></dt>
+<dd><p>How many rows on one page of the table (50 by default).</p></dd>
+<dt><span class="ui">Allow editing</span></dt>
+<dd><p>Whether values can be changed in cells and in the details panel.</p></dd>
+<dt><span class="ui">Row checkboxes</span></dt>
+<dd><p>Tick boxes for selecting rows — needed for actions on many rows and for exporting selected rows.</p></dd>
+<dt><span class="ui">Search box</span></dt>
+<dd><p>A search field above the table.</p></dd>
+<dt><span class="ui">Notes on rows</span></dt>
+<dd><p>Whether sticky notes can be pinned to rows. Needs a <span class="ui">Sticky notes</span> component somewhere in the tracker.</p></dd>
+<dt><span class="ui">Columns to show</span></dt>
+<dd><p>Click the names of the columns to show. <strong>The order you click = the order of columns</strong> in the table and the
+export. <span class="ui">Select all</span> ticks every column.</p></dd>
+<dt><span class="ui">Quick filter chips above the table</span></dt>
+<dd><p>Filter buttons above the table. Each has a label and conditions. <span class="ui">+ Add a chip</span> adds one.</p></dd>
+<dt><span class="ui">Fixed filter (this is how you make a saved view)</span></dt>
+<dd><p>A permanent filter. The table then shows <strong>only</strong> the matching rows — a “saved view”.</p><p class="eg">A second tab “My open” with a table whose fixed filter is <em>Owner — is — the current user</em> and <em>Status — is not — Closed</em>.</p></dd>
+<dt><span class="ui">Right-click menu</span></dt>
+<dd><p>What appears when a row is right-clicked (chapter <a href="#c-menu">5.10</a>).</p></dd>
+</dl>
+<figure class="shot medium"><img data-shot="w-chips" alt="Quick filter chips"><figcaption>The template's three quick filters: Open, Overdue, Mine.</figcaption></figure>
+<div class="callout note">Changing the <span class="ui">Dataset</span> clears the column list and the quick filters, because they
+would point at another dataset's columns.</div>
+</div>
+</section>
+
+<section id="c-progress" data-level="2" data-pl="Progress bar — postęp do celu" data-en="Progress bar — progress towards a target">
+<div class="l-pl" lang="pl">
+<p><strong>Użyj, gdy</strong> masz cel liczbowy, np. „zamknąć 50 zgłoszeń w miesiącu”. Pasek pokazuje
+<em>wynik / cel</em> i zmienia kolor po osiągnięciu celu.</p>
+<dl class="fields">
+<dt><span class="ui">Description</span></dt>
+<dd><p>Opis nad paskiem.</p></dd>
+<dt><span class="ui">Target</span></dt>
+<dd><p>Liczba, która oznacza 100%. Bez celu pasek stoi na zerze.</p><p class="eg">Count rows, filtr Status — is — Closed, Target 50.</p></dd>
+</dl>
+</div>
+<div class="l-en" lang="en">
+<p><strong>Use it when</strong> you have a numeric target, e.g. “close 50 requests a month”. The bar shows
+<em>result / target</em> and changes colour when the target is reached.</p>
+<dl class="fields">
+<dt><span class="ui">Description</span></dt>
+<dd><p>The text above the bar.</p></dd>
+<dt><span class="ui">Target</span></dt>
+<dd><p>The number that means 100%. Without a target the bar stays at zero.</p><p class="eg">Count rows, filter Status — is — Closed, Target 50.</p></dd>
+</dl>
+</div>
+</section>
+
+<section id="c-banner" data-level="2" data-pl="Insight banner — komunikat z liczbą" data-en="Insight banner — a message with a number">
+<div class="l-pl" lang="pl">
+<p><strong>Użyj, gdy</strong> chcesz u góry zakładki zdanie z policzoną liczbą, np. „12 zgłoszeń czeka na odpowiedź”.</p>
+<dl class="fields">
+<dt><span class="ui">Heading</span></dt>
+<dd><p>Pogrubiony tytuł banera.</p></dd>
+<dt><span class="ui">Body ({{v}} inserts the calculated number)</span></dt>
+<dd><p>Treść. <code>{{v}}</code> zostanie zastąpione policzoną liczbą.</p><p class="eg">„{{v}} still waiting for an answer.”</p></dd>
+<dt><span class="ui">Tone</span></dt>
+<dd><p>Kolor: <span class="ui">neutral</span>, <span class="ui">accent</span>, <span class="ui">green</span>, <span class="ui">amber</span>, <span class="ui">red</span>.</p></dd>
+<dt><span class="ui">Icon (one character)</span></dt>
+<dd><p>Jeden znak lub emoji z lewej.</p></dd>
+<dt><span class="ui">Dataset for {{v}}</span></dt>
+<dd><p>Z którego zbioru liczyć <code>{{v}}</code> (razem z polami <span class="ui">Calculation</span> i filtrem).</p></dd>
+</dl>
+</div>
+<div class="l-en" lang="en">
+<p><strong>Use it when</strong> you want a sentence with a calculated number at the top of a tab, e.g. “12 requests are waiting for an answer”.</p>
+<dl class="fields">
+<dt><span class="ui">Heading</span></dt>
+<dd><p>The banner's bold title.</p></dd>
+<dt><span class="ui">Body ({{v}} inserts the calculated number)</span></dt>
+<dd><p>The text. <code>{{v}}</code> is replaced with the calculated number.</p><p class="eg">“{{v}} still waiting for an answer.”</p></dd>
+<dt><span class="ui">Tone</span></dt>
+<dd><p>The colour: <span class="ui">neutral</span>, <span class="ui">accent</span>, <span class="ui">green</span>, <span class="ui">amber</span>, <span class="ui">red</span>.</p></dd>
+<dt><span class="ui">Icon (one character)</span></dt>
+<dd><p>One character or emoji on the left.</p></dd>
+<dt><span class="ui">Dataset for {{v}}</span></dt>
+<dd><p>Which dataset <code>{{v}}</code> is calculated from (together with <span class="ui">Calculation</span> and the filter).</p></dd>
+</dl>
+</div>
+</section>
+
+<section id="c-agenda" data-level="2" data-pl="Agenda — lista terminów" data-en="Agenda — a list of dates">
+<div class="l-pl" lang="pl">
+<p><strong>Użyj, gdy</strong> chcesz widzieć, co i kiedy trzeba zrobić. Agenda zbiera daty z jednego lub kilku zbiorów
+i grupuje je po dniach: <em>Today</em>, <em>Tomorrow</em>, kolejne dni; zaległe są oznaczone jako <em>overdue</em>.
+Kliknięcie pozycji otwiera szczegóły tego wiersza.</p>
+<figure class="shot medium"><img data-shot="w-agenda" alt="Ustawienia agendy"><figcaption>Agenda „What is due”: terminy ze zbioru Requests, kolor kropki według statusu.</figcaption></figure>
+<dl class="fields">
+<dt><span class="ui">Range</span></dt>
+<dd><p><span class="ui">next 30 days</span> albo <span class="ui">everything</span>.</p></dd>
+<dt><span class="ui">Include overdue</span></dt>
+<dd><p>Czy pokazywać daty, które już minęły.</p></dd>
+<dt><span class="ui">Where the dates come from</span></dt>
+<dd><p>Źródła dat — każde to zbiór i kolumny. <span class="ui">+ Add a source</span> dodaje kolejne.</p>
+<ul>
+<li><span class="ui">Date column</span> — która data (zwykle termin);</li>
+<li><span class="ui">Title column</span> — co napisać przy dacie;</li>
+<li><span class="ui">Secondary text</span> — szary dopisek, np. opiekun;</li>
+<li><span class="ui">Column that colours the dot</span> — lista wyboru, której kolor ma kropka.</li>
+</ul></dd>
+</dl>
+</div>
+<div class="l-en" lang="en">
+<p><strong>Use it when</strong> you want to see what needs doing and when. The agenda collects dates from one or more
+datasets and groups them by day: <em>Today</em>, <em>Tomorrow</em>, the following days; past ones are marked
+<em>overdue</em>. Clicking an item opens that row's details.</p>
+<figure class="shot medium"><img data-shot="w-agenda" alt="Agenda settings"><figcaption>The “What is due” agenda: due dates from Requests, dot colour by status.</figcaption></figure>
+<dl class="fields">
+<dt><span class="ui">Range</span></dt>
+<dd><p><span class="ui">next 30 days</span> or <span class="ui">everything</span>.</p></dd>
+<dt><span class="ui">Include overdue</span></dt>
+<dd><p>Whether to show dates that have already passed.</p></dd>
+<dt><span class="ui">Where the dates come from</span></dt>
+<dd><p>Date sources — each is a dataset and its columns. <span class="ui">+ Add a source</span> adds another.</p>
+<ul>
+<li><span class="ui">Date column</span> — which date (usually the due date);</li>
+<li><span class="ui">Title column</span> — what to show next to the date;</li>
+<li><span class="ui">Secondary text</span> — a grey note, e.g. the owner;</li>
+<li><span class="ui">Column that colours the dot</span> — a pick list whose colour the dot takes.</li>
+</ul></dd>
+</dl>
+</div>
+</section>
+
+<section id="c-notes" data-level="2" data-pl="Sticky notes — karteczki" data-en="Sticky notes">
+<div class="l-pl" lang="pl">
+<p><strong>Użyj, gdy</strong> chcesz zapisywać luźne myśli, które nie pasują do tabeli. Ma tylko
+<span class="ui">Title</span> i <span class="ui">Caption</span>. Ten komponent jest też potrzebny, żeby przypinać
+karteczki do wierszy tabeli.</p>
+<figure class="shot"><img data-shot="t-notes" alt="Tablica karteczek"><figcaption>Tablica karteczek w trackerze.</figcaption></figure>
+</div>
+<div class="l-en" lang="en">
+<p><strong>Use it when</strong> you want to jot down loose thoughts that do not fit in a table. It has only
+<span class="ui">Title</span> and <span class="ui">Caption</span>. This component is also needed to pin notes to table rows.</p>
+<figure class="shot"><img data-shot="t-notes" alt="A board of sticky notes"><figcaption>A board of sticky notes in the tracker.</figcaption></figure>
+</div>
+</section>
+
+<section id="c-checklist" data-level="2" data-pl="Checklist — lista do odhaczania" data-en="Checklist">
+<div class="l-pl" lang="pl">
+<p><strong>Użyj, gdy</strong> masz listę rzeczy do odhaczenia — codzienną rutynę albo jednorazowe zadania z terminami.</p>
+<dl class="fields">
+<dt><span class="ui">Clear the ticks every day</span></dt>
+<dd><p>Włączone: odhaczenia znikają następnego dnia (rutyna: „sprawdź skrzynkę”, „wyślij raport”).
+Wyłączone: pozycja zostaje odhaczona na stałe.</p></dd>
+<dt><span class="ui">Show item due dates</span></dt>
+<dd><p>Włączone: przy dodawaniu pozycji jest pole daty, a termin widać przy pozycji (na czerwono, gdy minął).</p></dd>
+</dl>
+<figure class="shot"><img data-shot="t-todo" alt="Lista To-do z terminami"><figcaption>Zakładka To-do: checklista z terminami (zaległy na czerwono) i karteczka obok.</figcaption></figure>
+</div>
+<div class="l-en" lang="en">
+<p><strong>Use it when</strong> you have things to tick off — a daily routine or one-off tasks with due dates.</p>
+<dl class="fields">
+<dt><span class="ui">Clear the ticks every day</span></dt>
+<dd><p>On: ticks clear the next day (a routine: “check the inbox”, “send the report”). Off: an item stays ticked.</p></dd>
+<dt><span class="ui">Show item due dates</span></dt>
+<dd><p>On: adding an item offers a date field, and the due date shows next to the item (in red when it has passed).</p></dd>
+</dl>
+<figure class="shot"><img data-shot="t-todo" alt="A to-do list with due dates"><figcaption>The To-do tab: a checklist with due dates (overdue in red) and a note beside it.</figcaption></figure>
+</div>
+</section>
+
+<section id="c-filter" data-level="2" data-pl="Filtry — jak wybrać tylko niektóre wiersze" data-en="Filters — picking only some rows">
+<div class="l-pl" lang="pl">
+<p>Ten sam edytor filtra jest w licznikach, wykresach, banerach, tabelach (stały filtr i szybkie filtry) i alertach.</p>
+<figure class="shot"><img data-shot="w-filter" alt="Edytor filtra"><figcaption>Dwa warunki: termin minął i status nie jest „Closed”.</figcaption></figure>
+<p>Każdy warunek to trzy pola czytane jak zdanie: <strong>kolumna — warunek — wartość</strong>.
+<span class="ui">+ Add condition</span> dodaje warunek, ✕ go usuwa. <strong>Wszystkie warunki muszą być spełnione
+jednocześnie</strong> (to „i”, nie „lub”). Brak warunków = wszystkie wiersze.</p>
+<div class="tbl"><table><thead><tr><th>Warunek</th><th>Znaczenie</th></tr></thead><tbody>
+<tr><td><span class="ui">is</span> / <span class="ui">is not</span></td><td>równa się / nie równa się</td></tr>
+<tr><td><span class="ui">contains</span></td><td>zawiera tekst (np. „faktur” znajdzie „Korekta faktury”)</td></tr>
+<tr><td><span class="ui">greater than</span>, <span class="ui">less than</span>, <span class="ui">at least</span>, <span class="ui">at most</span></td><td>większe, mniejsze, co najmniej, co najwyżej — dla liczb i dat</td></tr>
+<tr><td><span class="ui">is empty</span> / <span class="ui">is not empty</span></td><td>pole puste / wypełnione (bez wartości)</td></tr>
+<tr><td><span class="ui">date relative to today</span></td><td>data względem dzisiaj: <span class="ui">today</span>, <span class="ui">tomorrow</span>, <span class="ui">overdue</span> (minęła), <span class="ui">within 7 days</span>, <span class="ui">within 30 days</span>, <span class="ui">this month</span>, <span class="ui">last month</span></td></tr>
+</tbody></table></div>
+<p>Pole wartości dopasowuje się do kolumny: dla listy wyboru pokazuje jej opcje, dla tak/nie — <span class="ui">yes</span>
+i <span class="ui">no</span>, a dla tekstu daje wybór <span class="ui">a value I type</span>, <span class="ui">the current user</span>
+albo <span class="ui">their team</span>.</p>
+<h4>Gotowe przepisy na filtry</h4>
+<div class="tbl"><table><thead><tr><th>Chcę widzieć…</th><th>Warunki</th></tr></thead><tbody>
+<tr><td>otwarte</td><td>Status — is not — Closed</td></tr>
+<tr><td>po terminie</td><td>Due — date relative to today — overdue <em>oraz</em> Status — is not — Closed</td></tr>
+<tr><td>moje</td><td>Owner — is — the current user</td></tr>
+<tr><td>bez opiekuna</td><td>Owner — is empty</td></tr>
+<tr><td>z tego miesiąca</td><td>Received — date relative to today — this month</td></tr>
+<tr><td>duże kwoty</td><td>Amount — at least — 10000</td></tr>
+</tbody></table></div>
+<div class="callout note">Nie da się zrobić „lub” w jednym filtrze (np. „New lub In progress”). Zamiast tego użyj
+przeciwieństwa: „Status — is not — Closed”.</div>
+</div>
+<div class="l-en" lang="en">
+<p>The same filter editor appears in counters, charts, banners, tables (fixed filter and quick filters) and alerts.</p>
+<figure class="shot"><img data-shot="w-filter" alt="The filter editor"><figcaption>Two conditions: the due date has passed and the status is not “Closed”.</figcaption></figure>
+<p>Each condition is three fields read like a sentence: <strong>column — condition — value</strong>.
+<span class="ui">+ Add condition</span> adds one, ✕ removes it. <strong>Every condition must be true at the same
+time</strong> (“and”, not “or”). No conditions = every row.</p>
+<div class="tbl"><table><thead><tr><th>Condition</th><th>Meaning</th></tr></thead><tbody>
+<tr><td><span class="ui">is</span> / <span class="ui">is not</span></td><td>equal / not equal</td></tr>
+<tr><td><span class="ui">contains</span></td><td>contains the text (e.g. “invoice” finds “Invoice correction”)</td></tr>
+<tr><td><span class="ui">greater than</span>, <span class="ui">less than</span>, <span class="ui">at least</span>, <span class="ui">at most</span></td><td>for numbers and dates</td></tr>
+<tr><td><span class="ui">is empty</span> / <span class="ui">is not empty</span></td><td>the field is empty / filled in (no value needed)</td></tr>
+<tr><td><span class="ui">date relative to today</span></td><td><span class="ui">today</span>, <span class="ui">tomorrow</span>, <span class="ui">overdue</span> (has passed), <span class="ui">within 7 days</span>, <span class="ui">within 30 days</span>, <span class="ui">this month</span>, <span class="ui">last month</span></td></tr>
+</tbody></table></div>
+<p>The value field adapts to the column: for a pick list it shows its options, for yes/no — <span class="ui">yes</span> and
+<span class="ui">no</span>, and for text it offers <span class="ui">a value I type</span>, <span class="ui">the current user</span>
+or <span class="ui">their team</span>.</p>
+<h4>Ready-made filter recipes</h4>
+<div class="tbl"><table><thead><tr><th>I want to see…</th><th>Conditions</th></tr></thead><tbody>
+<tr><td>open ones</td><td>Status — is not — Closed</td></tr>
+<tr><td>overdue ones</td><td>Due — date relative to today — overdue <em>and</em> Status — is not — Closed</td></tr>
+<tr><td>mine</td><td>Owner — is — the current user</td></tr>
+<tr><td>without an owner</td><td>Owner — is empty</td></tr>
+<tr><td>this month's</td><td>Received — date relative to today — this month</td></tr>
+<tr><td>large amounts</td><td>Amount — at least — 10000</td></tr>
+</tbody></table></div>
+<div class="callout note">One filter cannot do “or” (e.g. “New or In progress”). Use the opposite instead:
+“Status — is not — Closed”.</div>
+</div>
+</section>
+
+<section id="c-menu" data-level="2" data-pl="Menu pod prawym przyciskiem" data-en="The right-click menu">
+<div class="l-pl" lang="pl">
+<p>W ustawieniach tabeli, w polu <span class="ui">Right-click menu</span>, decydujesz, co zobaczy ktoś, kto kliknie
+wiersz prawym przyciskiem myszy.</p>
+<figure class="shot medium"><img data-shot="w-ctxmenu" alt="Edytor menu pod prawym przyciskiem"><figcaption>Standardowe pozycje (włączane kliknięciem) i trzy własne akcje z szablonu.</figcaption></figure>
+<h4><span class="ui">Standard items</span></h4>
+<p>Kliknij, żeby włączyć lub wyłączyć: <span class="ui">Edit row</span>, <span class="ui">Duplicate</span>,
+<span class="ui">Add a note</span>, <span class="ui">Copy as text</span>, <span class="ui">Export selected</span>,
+<span class="ui">Delete row</span>.</p>
+<h4><span class="ui">Your own actions</span></h4>
+<p>Akcja to gotowa czynność wykonywana jednym kliknięciem — bez otwierania wiersza.
+<span class="ui">+ Add your own action</span> dodaje nową. Pola:</p>
+<dl class="fields">
+<dt>Etykieta</dt>
+<dd><p>Tekst w menu.</p><p class="eg">„Zamknij zgłoszenie”</p></dd>
+<dt>Co robi</dt>
+<dd><ul>
+<li><span class="ui">Set a field to a value</span> — wpisuje wartość w kolumnę (np. Status = Closed, Due = dzisiejsza data,
+Owner = bieżący użytkownik);</li>
+<li><span class="ui">Clear a field</span> — czyści kolumnę;</li>
+<li><span class="ui">Duplicate the row</span> — kopiuje wiersz;</li>
+<li><span class="ui">Delete the row</span> — usuwa (zawsze pyta o potwierdzenie);</li>
+<li><span class="ui">Move to another dataset</span> — przenosi wiersz do innego zbioru (np. do archiwum).</li>
+</ul></dd>
+<dt>Pole i wartość</dt>
+<dd><p>Którą kolumnę ustawić i na co. Dla dat jest <span class="ui">today’s date</span>, dla tekstu
+<span class="ui">the current user</span> i <span class="ui">their team</span>, w każdym przypadku można też wpisać
+własną wartość (<span class="ui">a value I type</span>).</p></dd>
+<dt><span class="ui">Ask before running</span></dt>
+<dd><p>Przed wykonaniem pokaże pytanie z przyciskiem <span class="ui">Apply</span>. Włącz dla akcji, których łatwo
+użyć przez pomyłkę.</p></dd>
+</dl>
+<div class="callout tip"><span class="t">Działa na wielu wierszach naraz</span>
+Jeśli zaznaczysz kilka wierszy i klikniesz prawym przyciskiem jeden z nich, akcja zadziała na wszystkich
+zaznaczonych. Kliknięcie wiersza spoza zaznaczenia działa tylko na ten jeden wiersz.</div>
+</div>
+<div class="l-en" lang="en">
+<p>In a table's settings, in <span class="ui">Right-click menu</span>, you decide what someone sees when they right-click a row.</p>
+<figure class="shot medium"><img data-shot="w-ctxmenu" alt="The right-click menu editor"><figcaption>The standard items (click to switch on or off) and the template's three own actions.</figcaption></figure>
+<h4><span class="ui">Standard items</span></h4>
+<p>Click to switch on or off: <span class="ui">Edit row</span>, <span class="ui">Duplicate</span>,
+<span class="ui">Add a note</span>, <span class="ui">Copy as text</span>, <span class="ui">Export selected</span>,
+<span class="ui">Delete row</span>.</p>
+<h4><span class="ui">Your own actions</span></h4>
+<p>An action is a ready-made step done in one click — without opening the row.
+<span class="ui">+ Add your own action</span> adds one. Fields:</p>
+<dl class="fields">
+<dt>Label</dt>
+<dd><p>The text in the menu.</p><p class="eg">“Close request”</p></dd>
+<dt>What it does</dt>
+<dd><ul>
+<li><span class="ui">Set a field to a value</span> — writes a value into a column (e.g. Status = Closed, Due = today's date,
+Owner = current user);</li>
+<li><span class="ui">Clear a field</span> — empties a column;</li>
+<li><span class="ui">Duplicate the row</span> — copies the row;</li>
+<li><span class="ui">Delete the row</span> — deletes it (always asks first);</li>
+<li><span class="ui">Move to another dataset</span> — moves the row to another dataset (e.g. an archive).</li>
+</ul></dd>
+<dt>Field and value</dt>
+<dd><p>Which column to set and to what. Dates offer <span class="ui">today’s date</span>, text offers
+<span class="ui">the current user</span> and <span class="ui">their team</span>, and you can always type your own value
+(<span class="ui">a value I type</span>).</p></dd>
+<dt><span class="ui">Ask before running</span></dt>
+<dd><p>Shows a question with an <span class="ui">Apply</span> button before running. Turn it on for actions that are easy to
+click by mistake.</p></dd>
+</dl>
+<div class="callout tip"><span class="t">Works on many rows at once</span>
+If you tick several rows and right-click one of them, the action runs on all the ticked rows. Right-clicking a row
+outside the selection runs it on that one row only.</div>
+</div>
+</section>

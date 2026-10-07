@@ -1,6 +1,6 @@
 # Handoff — Tracker builder
 
-Written 2026-10-06. Read this plus `README-tracker.md` and you have the whole
+Written 2026-10-06, updated 2026-10-07. Read this plus `README-tracker.md` and you have the whole
 picture; nothing important lives only in the chat history.
 
 ## What this is
@@ -19,29 +19,36 @@ Tomasz's five styleguide HTMLs are the visual foundation. They sit untouched in
 **Done and verified.** Branch `tracker-wizard`, pushed, with a pull request into
 the repo's default branch `claude/new-session-86m809` (there is no `main`).
 
-Build + 8 test parts: **263 assertions, zero console errors**, Chromium
+Build + 10 test parts: **340 assertions, zero console errors**, Chromium
 (+ LibreOffice Calc for part 8).
 
 ```
-43 + 30 + 25 + 24 + 29 + 46 + 36 + 30 = 263
+43 + 32 + 25 + 24 + 29 + 46 + 36 + 30 + 52 + 23 = 340
 ```
 
 | | |
 |---|---|
-| emitted tracker | **164.5–165.8 KB** (one theme, no data) |
-| `dist/tracker-wizard.html` | ~405 KB |
+| emitted tracker | **~176 KB** (one theme, no data) |
+| `dist/tracker-wizard.html` | ~448 KB |
+| `dist/tracker-manual.html` | ~1.6 MB (42 WebP screenshots, PL + EN) |
 | themes | 5, 7.6–9.0 KB each |
 
 The size is worth stating plainly because the original plan promised 100–130 KB.
-The runtime came out ~35 KB bigger than estimated. Nothing is broken by it; the
-plan's number was simply wrong.
+The runtime came out bigger than estimated. Nothing is broken by it; the plan's
+number was simply wrong.
+
+**2026-10-07:** while writing the user guide, an inventory of the UI found real
+bugs, including two that could lose data. All are fixed and covered by part 9 —
+see commit `1fd3d52` and the invariants 11–13 below.
 
 ## Build and test
 
 ```bash
 python3 tracker/build-themes.py     # sources/*.html  -> themes/*.css + themes.json
 python3 tracker/build-wizard.py     # everything      -> dist/tracker-wizard.html
-sh tracker/tests/run-all.sh         # build + all 263 assertions (Chromium; part 8 also LibreOffice)
+python3 tracker/build-manual.py     # manual/         -> dist/tracker-manual.html
+node tracker/tools/manual-shots.mjs # re-take the guide's screenshots after UI changes
+sh tracker/tests/run-all.sh         # build + all 340 assertions (Chromium; part 8 also LibreOffice)
 node tracker/tests/e2e5.mjs         # one part on its own
 ```
 
@@ -68,7 +75,10 @@ it by hand is pointless — the next build overwrites it. Sources live in
 | `tb-runtime.js` | 112 KB | the tracker engine — **the big one** |
 | `tracker-shell.html` | 1.5 KB | output template, 10 `<!--TB:*-->` markers |
 | `wizard-src.html` + `wizard.css` + `wizard.js` | 3.3 + 3.9 + 85 KB | the builder itself |
-| `tests/e2e*.mjs` + `run-all.sh` | — | 8 parts, 39 phases |
+| `build-manual.py` | 9 KB | assembles the user guide; **fails** on a label missing from the product, PL/EN mismatch, a wrong chapter number |
+| `manual/src/*.html` + `manual.css` + `img/` | — | the guide: one file per chapter, its style, 42 source PNGs |
+| `tools/manual-shots.mjs` | — | Playwright script that re-takes all 42 screenshots from the current build |
+| `tests/e2e*.mjs` + `run-all.sh` | — | 10 parts, 50 phases |
 | `sources/` | — | Tomasz's 6 uploaded files, md5-verified. **Read-only.** |
 
 `design-system/` is **not** touched. `savance.css` and `savance-charts.js` were
@@ -88,6 +98,10 @@ e2e6.mjs  25 preset tiles · 26 each preset fits the columns · 27 quick filter 
 e2e7.mjs  30 real Ctrl+V, Excel clipboard, en-GB · 31 paste without header · 32 where Ctrl+V is left alone
           33 en-US dates · 34 pl-PL numbers, PRAWDA/FAŁSZ, bad values · 35 wizard type guessing
 e2e8.mjs  36 export with hard values · 37 LibreOffice opens it · 38 cell types after Calc · 39 PDF render
+e2e9.mjs  40 wizard values, fonts, file names, line chart · 41 open existing data file never overwrites
+          42 conflict on link + Reconnect keeps edits · 43 failed write · 44 table: sort before cap,
+          empty states, cell edit, notes off · 45 checklist due dates · 46 damaged config
+e2e10.mjs 50 guide language switch · 51 contents, anchors, images · 52 widths 1280/900/390 · 53 print
 ```
 
 ## Invariants — break these and things fail quietly
@@ -100,7 +114,7 @@ e2e8.mjs  36 export with hard values · 37 LibreOffice opens it · 38 cell types
    tracker non-destructive: a deleted column **hides** its data as an orphan and
    the data comes back if a column with that id is re-added.
 3. **`JSON.stringify` does not escape `<`.** The config island escapes it to
-   `<` or a tab named `</script>` closes the island and injects script.
+   `\u003c` or a tab named `</script>` closes the island and injects script.
    Test phase 2 guards this.
 4. **`String.replace` substitutes `$&` in the *replacement*.** Every asset
    injection uses the **function form** — `.replace(marker, () => value)`. The
@@ -122,6 +136,20 @@ e2e8.mjs  36 export with hard values · 37 LibreOffice opens it · 38 cell types
     escapes such as `\u2028`, `\u00a0`, `\ufeff` inside source text into the raw
     characters. It broke regex literals twice, hit `tb-parse.js` a third time and
     even this file once. Write such code through a Python patch, or scan afterwards.
+11. **Linking a data file has two paths and they must stay different.**
+    “Open my existing data file” uses the OPEN picker and reads the file first —
+    an existing file is never written before it has been read. “Create a new data
+    file” uses the SAVE picker. The single save-picker button this replaced wiped
+    an existing `.data.json` on a new computer.
+12. **The file and the browser are reconciled, never blindly replaced.** A
+    persistent `localDirty` flag (in `kv`) says the browser holds edits the file
+    lacks. Reconnect: file newer + local edits → conflict bar; local edits only →
+    write them; otherwise load the file. While the conflict bar is up
+    (`conflictState`), `flushFile` writes nothing. `saveNow()` resolves `true` only
+    when the write really happened — callers show “Saved” on `true` only.
+13. **An HTML comment must not contain the comment-closing sequence.** It ends
+    the comment early and the rest becomes visible page text — the wizard shipped
+    like that until 2026-10-07. `build-wizard.py` and `build-manual.py` now fail on it.
 
 ## Decisions already settled — do not reopen
 
@@ -156,6 +184,11 @@ only the product UI is English. Tomasz confirmed this.
 - Month-grid calendar, calculated columns, OR filters, drag and drop, undo/redo
   and `.xlsx` import are out of scope for this version.
 
+**Needs Tomasz's check in real Chrome (new on 2026-10-07):** the “Open my existing
+data file” path. Chrome may refuse the write permission requested right after the
+file picker; the tracker then falls back to the Reconnect banner (one extra
+click). It never loses data either way, but the extra click is unverified.
+
 **Checked by Tomasz in real Chrome on 2026-10-06 — reported working.**
 Before that, in this environment:
 1. **Paste from Excel** was tested with the real browser clipboard and a real
@@ -165,6 +198,14 @@ Before that, in this environment:
    (part 8) — an independent OOXML implementation.
 3. **File System Access across a browser restart** cannot be tested headless at
    all; it rests on Tomasz's check.
+
+## User guide
+
+`dist/tracker-manual.html` — PL/EN, 12 chapters, 45 sections, 42 screenshots.
+See the README section “User guide” for how it is built and what the build checks.
+After any UI change: `node tracker/tools/manual-shots.mjs` then
+`python3 tracker/build-manual.py`. If a label changes, the guide build fails and
+points at the section that still quotes the old one.
 
 ## Screenshots
 

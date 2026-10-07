@@ -127,6 +127,12 @@ def main():
         problems.append("nie wszystkie markery WZ: zostały podmienione")
     if '@import url("http' in markup:
         problems.append("został @import z sieci w CSS strony")
+    # Komentarz HTML zawierający w środku sekwencję zamykającą kończy się za
+    # wcześnie, a reszta jego tekstu ląduje na stronie jako widoczny tekst.
+    # Tak było przez pierwsze wersje kreatora — stąd ta asercja.
+    no_comments = re.sub(r"<!--.*?-->", "", markup, flags=re.S)
+    if "-->" in no_comments:
+        problems.append("komentarz HTML zamknięty za wcześnie — jego tekst jest widoczny na stronie")
     # szkielet trackera MUSI zachować swoje markery — podmienia je emitter w JS
     shell_markers = re.findall(r"<!--TB:[A-Z]+-->", assets["shell"])
     if len(shell_markers) < 10:
